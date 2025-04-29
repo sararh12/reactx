@@ -1,0 +1,161 @@
+
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Search, User, Menu, X, ShoppingCart, Bell } from 'lucide-react';
+import Logo from './Logo';
+import { Button } from '@/components/ui/button';
+import { 
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+import { Badge } from '@/components/ui/badge';
+
+const Navbar: React.FC = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  // Mock notification and cart counts - in a real app, these would come from a state manager or API
+  const notificationCount = 3;
+  const cartCount = 2;
+
+  const menuItems = [
+    { to: "/courses", label: "دوره ها" },
+    { to: "/dashboard", label: "صفحه داشبورد" },
+    { to: "/blog", label: "اخبار و مقالات" },
+    { to: "/instructors", label: "اساتید" },
+    { to: "/contact", label: "تماس با ما" },
+  ];
+
+  return (
+    <header className="bg-white shadow-sm py-4 px-6 md:px-12 rtl">
+      <div className="container mx-auto flex flex-wrap items-center justify-between">
+        <div className="flex items-center">
+          <Logo />
+        </div>
+
+        <nav className="hidden md:flex space-x-8 space-x-reverse">
+          {menuItems.map((item) => (
+            <Link
+              key={item.to}
+              to={item.to}
+              className="text-gray-700 hover:text-luko-teal px-3 py-2"
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="hidden md:flex items-center space-x-4 space-x-reverse">
+          <Link to="/search">
+            <Button variant="ghost" size="icon" aria-label="Search">
+              <Search className="h-5 w-5" />
+            </Button>
+          </Link>
+
+          <Link to="/notifications">
+            <Button variant="ghost" size="icon" aria-label="Notifications" className="relative">
+              <Bell className="h-5 w-5" />
+              {notificationCount > 0 && (
+                <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center bg-red-500">
+                  {notificationCount}
+                </Badge>
+              )}
+            </Button>
+          </Link>
+
+          <Link to="/cart">
+            <Button variant="ghost" size="icon" aria-label="Shopping Cart" className="relative">
+              <ShoppingCart className="h-5 w-5" />
+              {cartCount > 0 && (
+                <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center bg-orange-500">
+                  {cartCount}
+                </Badge>
+              )}
+            </Button>
+          </Link>
+
+          <Link to="/auth/login">
+            <Button className="bg-luko-teal hover:bg-luko-teal/90 text-white">
+              <User className="h-4 w-4 mr-2 ml-2" />
+              حساب کاربری
+            </Button>
+          </Link>
+        </div>
+
+        {/* Mobile Menu */}
+        <div className="md:hidden">
+          <Drawer direction="right">
+            <DrawerTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <Menu className="h-6 w-6" />
+              </Button>
+            </DrawerTrigger>
+            <DrawerContent className="h-full p-6 rtl">
+              <div className="flex flex-col space-y-6">
+                <div className="flex justify-between items-center mb-6">
+                  <Logo />
+                  <DrawerClose asChild>
+                    <Button variant="ghost" size="icon">
+                      <X className="h-6 w-6" />
+                    </Button>
+                  </DrawerClose>
+                </div>
+                
+                <nav className="flex flex-col space-y-4">
+                  {menuItems.map((item) => (
+                    <Link
+                      key={item.to}
+                      to={item.to}
+                      className="text-gray-700 hover:text-luko-teal px-3 py-2 text-lg font-medium"
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                </nav>
+
+                <div className="flex flex-col space-y-4 pt-6">
+                  <Link to="/search" className="w-full">
+                    <Button variant="outline" className="w-full justify-start">
+                      <Search className="h-5 w-5 ml-2" />
+                      جستجو
+                    </Button>
+                  </Link>
+                  
+                  <Link to="/notifications" className="w-full">
+                    <Button variant="outline" className="w-full justify-start">
+                      <Bell className="h-5 w-5 ml-2" />
+                      اعلان‌ها
+                      {notificationCount > 0 && (
+                        <Badge className="mr-2 bg-red-500">{notificationCount}</Badge>
+                      )}
+                    </Button>
+                  </Link>
+                  
+                  <Link to="/cart" className="w-full">
+                    <Button variant="outline" className="w-full justify-start">
+                      <ShoppingCart className="h-5 w-5 ml-2" />
+                      سبد خرید
+                      {cartCount > 0 && (
+                        <Badge className="mr-2 bg-orange-500">{cartCount}</Badge>
+                      )}
+                    </Button>
+                  </Link>
+                  
+                  <Link to="/auth/login" className="w-full">
+                    <Button className="w-full bg-luko-teal hover:bg-luko-teal/90 text-white justify-start">
+                      <User className="h-4 w-4 ml-2" />
+                      حساب کاربری
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </DrawerContent>
+          </Drawer>
+        </div>
+      </div>
+    </header>
+  );
+};
+
+export default Navbar;

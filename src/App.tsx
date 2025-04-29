@@ -1,0 +1,55 @@
+
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Index from "./pages/Index";
+import CoursesPage from "./pages/CoursesPage";
+import CourseDetail from "./pages/CourseDetail";
+import BlogPage from "./pages/BlogPage";
+import ArticleDetail from "./pages/ArticleDetail";
+import Dashboard from "./pages/Dashboard";
+import UserProfile from "./pages/UserProfile";
+import Login from "./pages/auth/Login";
+import Register from "./pages/auth/Register";
+import NotFound from "./pages/NotFound";
+import DashboardCourses from "./pages/dashboard/DashboardCourses";
+import DashboardReserved from "./pages/dashboard/DashboardReserved";
+import DashboardComments from "./pages/dashboard/DashboardComments";
+import DashboardSecurity from "./pages/dashboard/DashboardSecurity";
+import DashboardFavorites from "./pages/dashboard/DashboardFavorites";
+import CartPage from "./pages/CartPage";
+
+const queryClient = new QueryClient();
+
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/courses" element={<CoursesPage />} />
+          <Route path="/courses/:id" element={<CourseDetail />} />
+          <Route path="/blog" element={<BlogPage />} />
+          <Route path="/blog/:id" element={<ArticleDetail />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard/courses" element={<DashboardCourses />} />
+          <Route path="/dashboard/reserved" element={<DashboardReserved />} />
+          <Route path="/dashboard/comments" element={<DashboardComments />} />
+          <Route path="/dashboard/security" element={<DashboardSecurity />} />
+          <Route path="/dashboard/favorites" element={<DashboardFavorites />} />
+          <Route path="/profile" element={<UserProfile />} />
+          <Route path="/auth/login" element={<Login />} />
+          <Route path="/auth/register" element={<Register />} />
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
+    </TooltipProvider>
+  </QueryClientProvider>
+);
+
+export default App;
