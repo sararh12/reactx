@@ -90,7 +90,7 @@ const CourseDetail: React.FC = () => {
               
               <div className="md:w-1/2 bg-gradient-to-r from-blue-900 to-black p-8 flex items-center justify-center">
                 <img 
-                  src="/lovable-uploads/2c8fe63d-e1f6-484c-a699-cca9d722c335.png" 
+                  src="/lovable-uploads/pic.png" 
                   alt="React JS" 
                   className="max-w-full h-auto"
                 />

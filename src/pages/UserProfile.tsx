@@ -20,7 +20,7 @@ const UserProfile: React.FC = () => {
   const [user, setUser] = useState({
     name: 'فلان فلانی',
     fullName: 'فلان فلانی زاده فلان آبادی',
-    avatar: 'lovable-uploads/dab28740-378c-4bde-a459-8122ce2f6957.png',
+    avatar: 'lovable-uploads/ostad.png',
     email: 'folani99@gmail.com',
     phone: '09123456789',
     birthDate: '1380/05/11',

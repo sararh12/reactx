@@ -52,18 +52,18 @@ const ArticleDetail: React.FC = () => {
       
       <p>ری‌اکت یک ابزار قدرتمند برای توسعه وب‌اپلیکیشن‌هاست. مزایای آن از جمله کامپوننت‌محور بودن، استفاده از Virtual DOM، و انعطاف‌پذیری، آن را به یک انتخاب عالی برای پروژه‌های مختلف تبدیل می‌کند. اگر می‌خواهید یک وب‌اپلیکیشن مدرن و کارآمد بسازید، ری‌اکت می‌تواند گزینه مناسبی باشد.</p>
     `,
-    image: '/lovable-uploads/2c8fe63d-e1f6-484c-a699-cca9d722c335.png',
+    image: '/lovable-uploads/new.png',
     tags: ['ری اکت', 'جاوااسکریپت', 'فرانت اند'],
     relatedCourses: [
-      { id: '1', title: 'دوره جامع React.js', image: '/lovable-uploads/04f05962-568c-44ad-a091-a60a681fa24c.png' },
-      { id: '2', title: 'آموزش پیشرفته React.js', image: '/lovable-uploads/04f05962-568c-44ad-a091-a60a681fa24c.png' },
-      { id: '3', title: 'React Native برای همه', image: '/lovable-uploads/04f05962-568c-44ad-a091-a60a681fa24c.png' },
-      { id: '4', title: 'جاوااسکریپت پیشرفته', image: '/lovable-uploads/04f05962-568c-44ad-a091-a60a681fa24c.png' },
+      { id: '1', title: 'دوره جامع React.js', image: '/lovable-uploads/news.png' },
+      { id: '2', title: 'آموزش پیشرفته React.js', image: '/lovable-uploads/news.png' },
+      { id: '3', title: 'React Native برای همه', image: '/lovable-uploads/news.png' },
+      { id: '4', title: 'جاوااسکریپت پیشرفته', image: '/lovable-uploads/news.png' },
     ],
     relatedArticles: [
-      { id: '101', title: 'آموزش کامل و جامع Redux', date: '۱۴۰۲/۰۲/۱۰', image: '/lovable-uploads/ad3a9984-7970-4325-a9f0-a4a2a8f9033a.png' },
-      { id: '102', title: 'معرفی هوک‌های جدید React', date: '۱۴۰۲/۰۲/۰۵', image: '/lovable-uploads/ad3a9984-7970-4325-a9f0-a4a2a8f9033a.png' },
-      { id: '103', title: 'مقایسه React و Vue', date: '۱۴۰۲/۰۲/۰۱', image: '/lovable-uploads/ad3a9984-7970-4325-a9f0-a4a2a8f9033a.png' },
+      { id: '101', title: 'آموزش کامل و جامع Redux', date: '۱۴۰۲/۰۲/۱۰', image: '/lovable-uploads/pic.png' },
+      { id: '102', title: 'معرفی هوک‌های جدید React', date: '۱۴۰۲/۰۲/۰۵', image: '/lovable-uploads/pic.png' },
+      { id: '103', title: 'مقایسه React و Vue', date: '۱۴۰۲/۰۲/۰۱', image: '/lovable-uploads/pic.png' },
     ],
     comments: [
       { id: '1', author: 'محمد حسینی', date: '۱۴۰۲/۰۲/۱۶', content: 'مقاله بسیار مفیدی بود. ممنون از اشتراک گذاری این اطلاعات ارزشمند.', avatar: '/lovable-uploads/dab28740-378c-4bde-a459-8122ce2f6957.png', likes: 12 },

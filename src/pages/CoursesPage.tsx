@@ -267,7 +267,7 @@ const CoursesPage: React.FC = () => {
       <Navbar />
       
       <main className="flex-grow">
-        <section className="bg-gradient-mint py-12 rtl">
+        <section className=" py-12 rtl">
           <div className="container mx-auto px-6">
             <div className="flex flex-col md:flex-row items-center justify-between">
               <div className="mb-6 md:mb-0">
@@ -277,7 +277,7 @@ const CoursesPage: React.FC = () => {
               
               <div className="w-full md:w-auto">
                 <div className="relative">
-                  <Search className="absolute top-3 right-3 h-5 w-5 text-gray-400" />
+                  <Search className="absolute top-3 right-3 h-5 w-5 text-gray-400 direction-reverse" />
                   <input
                     type="text"
                     placeholder="جستجو در دوره ها..."
@@ -290,7 +290,7 @@ const CoursesPage: React.FC = () => {
             </div>
             
             <img 
-              src="/lovable-uploads/09551ee3-5b67-4fb2-85c1-8b2384a15c4d.png" 
+              src="/lovable-uploads/course.png" 
               alt="Course hero"
               className="mt-8 rounded-lg w-64 mx-auto"
             />

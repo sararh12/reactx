@@ -8,7 +8,7 @@ const Dashboard: React.FC = () => {
   const user = {
     name: 'فلان فلانی',
     fullName: 'فلان فلانی زاده فلان آبادی',
-    avatar: 'public/lovable-uploads/dab28740-378c-4bde-a459-8122ce2f6957.png',
+    avatar: 'public/lovable-uploads/ostad.png',
     progress: 60,
     enrolledCourses: 14,
     purchasedCourses: 2,

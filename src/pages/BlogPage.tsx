@@ -12,7 +12,7 @@ const BlogPage: React.FC = () => {
       id: '1',
       title: 'آنگولار بهتر است یا ری اکت؟',
       excerpt: 'مقایسه دو فریمورک محبوب فرانت اند و بررسی نقاط قوت و ضعف آنها برای پروژه های مختلف...',
-      image: '/lovable-uploads/ad3a9984-7970-4325-a9f0-a4a2a8f9033a.png',
+      image: '/lovable-uploads/news.png',
       date: '۱۴۰۲/۰۲/۱۵',
       author: 'علی محمدی',
       views: 125
@@ -21,7 +21,7 @@ const BlogPage: React.FC = () => {
       id: '2',
       title: 'آنگولار بهتر است یا ری اکت؟',
       excerpt: 'مقایسه دو فریمورک محبوب فرانت اند و بررسی نقاط قوت و ضعف آنها برای پروژه های مختلف...',
-      image: '/lovable-uploads/ad3a9984-7970-4325-a9f0-a4a2a8f9033a.png',
+      image: '/lovable-uploads/news.png',
       date: '۱۴۰۲/۰۲/۱۰',
       author: 'محمد حسینی',
       views: 98
@@ -30,7 +30,7 @@ const BlogPage: React.FC = () => {
       id: '3',
       title: 'آنگولار بهتر است یا ری اکت؟',
       excerpt: 'مقایسه دو فریمورک محبوب فرانت اند و بررسی نقاط قوت و ضعف آنها برای پروژه های مختلف...',
-      image: '/lovable-uploads/ad3a9984-7970-4325-a9f0-a4a2a8f9033a.png',
+      image: '/lovable-uploads/news.png',
       date: '۱۴۰۲/۰۲/۰۸',
       author: 'سارا کریمی',
       views: 210
@@ -39,7 +39,7 @@ const BlogPage: React.FC = () => {
       id: '4',
       title: 'آنگولار بهتر است یا ری اکت؟',
       excerpt: 'مقایسه دو فریمورک محبوب فرانت اند و بررسی نقاط قوت و ضعف آنها برای پروژه های مختلف...',
-      image: '/lovable-uploads/ad3a9984-7970-4325-a9f0-a4a2a8f9033a.png',
+      image: '/lovable-uploads/news.png',
       date: '۱۴۰۲/۰۲/۰۵',
       author: 'رضا احمدی',
       views: 156
@@ -48,7 +48,7 @@ const BlogPage: React.FC = () => {
       id: '5',
       title: 'آنگولار بهتر است یا ری اکت؟',
       excerpt: 'مقایسه دو فریمورک محبوب فرانت اند و بررسی نقاط قوت و ضعف آنها برای پروژه های مختلف...',
-      image: '/lovable-uploads/ad3a9984-7970-4325-a9f0-a4a2a8f9033a.png',
+      image: '/lovable-uploads/news.png',
       date: '۱۴۰۲/۰۲/۰۱',
       author: 'مریم رضایی',
       views: 189
@@ -57,7 +57,7 @@ const BlogPage: React.FC = () => {
       id: '6',
       title: 'آنگولار بهتر است یا ری اکت؟',
       excerpt: 'مقایسه دو فریمورک محبوب فرانت اند و بررسی نقاط قوت و ضعف آنها برای پروژه های مختلف...',
-      image: '/lovable-uploads/ad3a9984-7970-4325-a9f0-a4a2a8f9033a.png',
+      image: '/lovable-uploads/news.png',
       date: '۱۴۰۲/۰۱/۲۸',
       author: 'امیر حسینی',
       views: 145
@@ -66,7 +66,7 @@ const BlogPage: React.FC = () => {
       id: '7',
       title: 'آنگولار بهتر است یا ری اکت؟',
       excerpt: 'مقایسه دو فریمورک محبوب فرانت اند و بررسی نقاط قوت و ضعف آنها برای پروژه های مختلف...',
-      image: '/lovable-uploads/ad3a9984-7970-4325-a9f0-a4a2a8f9033a.png',
+      image: '/lovable-uploads/news.png',
       date: '۱۴۰۲/۰۱/۲۵',
       author: 'نیما کریمی',
       views: 178
@@ -75,7 +75,7 @@ const BlogPage: React.FC = () => {
       id: '8',
       title: 'آنگولار بهتر است یا ری اکت؟',
       excerpt: 'مقایسه دو فریمورک محبوب فرانت اند و بررسی نقاط قوت و ضعف آنها برای پروژه های مختلف...',
-      image: '/lovable-uploads/ad3a9984-7970-4325-a9f0-a4a2a8f9033a.png',
+      image: '/lovable-uploads/news.png',
       date: '۱۴۰۲/۰۱/۲۰',
       author: 'زهرا محمدی',
       views: 132
@@ -84,7 +84,7 @@ const BlogPage: React.FC = () => {
       id: '9',
       title: 'آنگولار بهتر است یا ری اکت؟',
       excerpt: 'مقایسه دو فریمورک محبوب فرانت اند و بررسی نقاط قوت و ضعف آنها برای پروژه های مختلف...',
-      image: '/lovable-uploads/ad3a9984-7970-4325-a9f0-a4a2a8f9033a.png',
+      image: '/lovable-uploads/news.png',
       date: '۱۴۰۲/۰۱/۱۵',
       author: 'علی رضایی',
       views: 205

@@ -16,21 +16,21 @@ const BlogSection: React.FC = () => {
       id: '1',
       title: 'چگونه در کمتر از ۶ ماه برنامه نویس وب شویم',
       excerpt: 'در این مقاله به روش‌های یادگیری سریع و اصولی برنامه‌نویسی وب می‌پردازیم...',
-      image: '/lovable-uploads/82dd1df8-b7a7-496e-9840-a14f27e64ff2.png',
+      image: '/lovable-uploads/news.png',
       date: '۱۴۰۲/۰۱/۱۲'
     },
     {
       id: '2',
       title: 'بهترین زبان‌های برنامه‌نویسی برای شروع',
       excerpt: 'مقایسه زبان‌های برنامه‌نویسی مختلف برای افراد مبتدی و توصیه‌های کاربردی...',
-      image: '/lovable-uploads/377853b9-dd72-4149-81cf-c45224f7c8aa.png',
+      image: '/lovable-uploads/news.png',
       date: '۱۴۰۲/۰۱/۰۸'
     },
     {
       id: '3',
       title: 'آینده هوش مصنوعی در دنیای برنامه‌نویسی',
       excerpt: 'بررسی تاثیر هوش مصنوعی بر حرفه برنامه‌نویسی و مهارت‌های مورد نیاز آینده...',
-      image: '/lovable-uploads/ea12bd82-7267-4a00-879f-d94b901d6405.png', 
+      image: '/lovable-uploads/news.png', 
       date: '۱۴۰۲/۰۱/۰۵'
     }
   ];
