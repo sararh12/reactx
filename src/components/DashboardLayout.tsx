@@ -88,8 +88,6 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, activeTab }
           </div>
         </main>
         
-        {/* Add Footer here */}
-        <Footer />
       </div>
     </div>
   );

@@ -63,11 +63,11 @@ const Dashboard: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 flex rtl">
+    <div className="min-h-screen bg-gray-50 flex direction-reverse">
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
-        <header className="bg-white p-4 shadow-sm flex justify-between items-center">
+        <header className="bg-white p-4 shadow-sm flex justify-between items-center rtl">
           <div className="flex items-center">
             <Link to="/" className="block">
               <Logo />
@@ -102,16 +102,16 @@ const Dashboard: React.FC = () => {
         </header>
         
         {/* Main Dashboard */}
-        <main className="flex-1 p-6">
+        <main className="flex-1 p-6 " >
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Main Column */}
-            <div className="lg:col-span-2 space-y-6">
+            <div className="lg:col-span-2 space-y-6 rtl">
               {/* User Stats */}
               <div className="bg-white rounded-lg shadow-sm p-6">
                 <div className="relative">
                   <div className="flex justify-between items-center mb-6">
-                    <div className="w-20 h-20 text-center">
-                      <div className="relative">
+                    <div className="w-20 h-20 text-center mb-14">
+                      <div className="relative ">
                         <svg viewBox="0 0 36 36" className="w-full h-full">
                           <path
                             d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
@@ -128,13 +128,13 @@ const Dashboard: React.FC = () => {
                             strokeDasharray={`${user.progress}, 100`}
                           />
                         </svg>
-                        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-lg font-bold text-orange-500">
+                        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-lg font-bold text-orange-500 ">
                           {user.progress}%
                         </div>
                       </div>
-                      <div className="text-xs text-gray-600 mt-2">
-                        برای شرکت در دوره ها باید<br />
-                        حداقل ۸۰٪ پروفایل خود را<br />
+                      <div className="text-xs text-gray-600  ">
+                        برای شرکت در دوره ها باید
+                        حداقل ۸۰٪ پروفایل خود را
                         تکمیل کنید
                       </div>
                     </div>
@@ -273,7 +273,7 @@ const Dashboard: React.FC = () => {
             </div>
             
             {/* Sidebar */}
-            <div className="bg-luko-teal text-white rounded-lg shadow-sm overflow-hidden">
+            <div className="bg-luko-teal text-white rounded-lg shadow-sm overflow-hidden rtl ">
               {/* User Profile */}
               <div className="p-6 flex flex-col items-center">
                 <img 
@@ -292,7 +292,7 @@ const Dashboard: React.FC = () => {
               </div>
               
               {/* Navigation */}
-              <nav className="p-6 space-y-2 border-t border-luko-teal/20">
+              <nav className="p-6 space-y-2 border-t border-luko-teal/20 " >
                 <Link to="/profile" className="flex items-center py-3 px-4 hover:bg-luko-teal/20 rounded-md">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />

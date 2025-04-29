@@ -56,7 +56,7 @@ const CategorySection: React.FC = () => {
   ];
 
   return (
-    <section className="py-16 rtl">
+    <section className="py-16 bg-gradient-mint rtl">
       <div className="container mx-auto px-6">
         <h2 className="text-2xl md:text-3xl font-bold text-center mb-12 relative inline-block">
           <span className="relative z-10">محبوب ترین دسته بندی ها</span>

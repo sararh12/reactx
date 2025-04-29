@@ -10,12 +10,12 @@ interface HeroSectionProps {
 
 const HeroSection: React.FC<HeroSectionProps> = ({ title, subtitle, imageUrl }) => {
   return (
-    <section className="bg-gradient-mint py-12 md:py-20 rtl">
+    <section className=" py-12 md:py-20 rtl">
       <div className="container mx-auto px-6">
         <div className="flex flex-col md:flex-row items-center">
           <div className="md:w-1/2 mb-10 md:mb-0">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 gradient-text">{title}</h1>
-            <p className="text-lg mb-8 text-gray-700">{subtitle}</p>
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 mb-8">{title}</h1>
+            <p className="text-lg mb-8 text-gray-700 max-w-96">{subtitle}</p>
             
             <div className="relative max-w-md">
               <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -66,12 +66,12 @@ const HeroSection: React.FC<HeroSectionProps> = ({ title, subtitle, imageUrl }) 
                 <br />
                 تخفیف
               </div>
-              <div className="absolute -z-10 top-6 right-6 w-full h-full rounded-lg bg-luko-teal opacity-20"></div>
+              {/* <div className="absolute -z-10 top-6 right-6 w-full h-full rounded-lg bg-luko-teal opacity-20"></div> */}
               
               {/* Floating elements */}
-              <div className="absolute -top-10 -left-10 w-16 h-16 bg-luko-yellow rounded-full opacity-60"></div>
+              {/* <div className="absolute -top-10 -left-10 w-16 h-16 bg-luko-yellow rounded-full opacity-60"></div>
               <div className="absolute bottom-20 -left-8 w-12 h-12 bg-luko-teal rounded-full opacity-60"></div>
-              <div className="absolute -bottom-6 right-20 w-10 h-10 bg-luko-orange rounded-full opacity-60"></div>
+              <div className="absolute -bottom-6 right-20 w-10 h-10 bg-luko-orange rounded-full opacity-60"></div> */}
               
               {/* Curved line */}
               <svg className="absolute top-0 left-0 w-full h-full -z-20" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
