@@ -21,7 +21,7 @@ const Index = () => {
     const fetchBlogs = fetch("https://classapi.sepehracademy.ir/api/News")
       .then(res => res.json())
       .then(data => {
-        const fiveBlogData = data.slice(0, 5);
+        const fiveBlogData = data.news.slice(0, 5);
         setBlogData(fiveBlogData);
       });
 
