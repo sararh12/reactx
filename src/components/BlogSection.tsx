@@ -1,39 +1,26 @@
 
+import BlogPage from '@/pages/BlogPage';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-interface BlogPost {
-  id: string;
-  title: string;
-  excerpt: string;
-  image: string;
-  date: string;
-}
+// interface BlogPost {
+//   id: string;
+//   title: string;
+//   excerpt: string;
+//   image: string;
+//   date: string;
+// }
 
-const BlogSection: React.FC = () => {
-  const blogPosts: BlogPost[] = [
-    {
-      id: '1',
-      title: 'چگونه در کمتر از ۶ ماه برنامه نویس وب شویم',
-      excerpt: 'در این مقاله به روش‌های یادگیری سریع و اصولی برنامه‌نویسی وب می‌پردازیم...',
-      image: '/lovable-uploads/news.png',
-      date: '۱۴۰۲/۰۱/۱۲'
-    },
-    {
-      id: '2',
-      title: 'بهترین زبان‌های برنامه‌نویسی برای شروع',
-      excerpt: 'مقایسه زبان‌های برنامه‌نویسی مختلف برای افراد مبتدی و توصیه‌های کاربردی...',
-      image: '/lovable-uploads/news.png',
-      date: '۱۴۰۲/۰۱/۰۸'
-    },
-    {
-      id: '3',
-      title: 'آینده هوش مصنوعی در دنیای برنامه‌نویسی',
-      excerpt: 'بررسی تاثیر هوش مصنوعی بر حرفه برنامه‌نویسی و مهارت‌های مورد نیاز آینده...',
-      image: '/lovable-uploads/news.png', 
-      date: '۱۴۰۲/۰۱/۰۵'
-    }
-  ];
+const BlogSection: React.FC<{blogData:any}>=({blogData})=> {
+  
+  if(blogData===null){
+    return<div>Loading...</div>
+  }
+
+  const blog=blogData.map((blog:any)=>{
+    
+  })
+
 
   return (
     <section className="py-16 rtl">
@@ -42,7 +29,7 @@ const BlogSection: React.FC = () => {
         <div className="w-24 h-1 bg-luko-teal mx-auto mb-12"></div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {blogPosts.map((post) => (
+          {/* {blogPosts.map((post) => (
             <div key={post.id} className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300">
               <Link to={`/blog/${post.id}`}>
                 <img 
@@ -65,7 +52,7 @@ const BlogSection: React.FC = () => {
                 </Link>
               </div>
             </div>
-          ))}
+          ))} */}
         </div>
         
         <div className="text-center mt-12">

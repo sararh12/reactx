@@ -3,60 +3,41 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import CourseCard from './CourseCard';
 
-interface Course {
-  id: string;
-  title: string;
-  instructor: string;
-  rating: number;
-  students: number;
-  price: number;
-  discountPrice?: number;
-  image: string;
-}
+// interface Course {
+//   id: string;
+//   title: string;
+//   instructor: string;
+//   rating: number;
+//   students: number;
+//   price: number;
+//   discountPrice?: number;
+//   image: string;
 
-const CourseSection: React.FC = () => {
-  const courses: Course[] = [
-    {
-      id: '1',
-      title: 'دوره پیشرفته جاوااسکریپت',
-      instructor: 'علی محمدی',
-      rating: 4.8,
-      students: 1250,
-      price: 1950000,
-      discountPrice: 1450000,
-      image: '/course1.jpg'
-    },
-    {
-      id: '2',
-      title: 'دوره پیشرفته پایتون',
-      instructor: 'محمد حسینی',
-      rating: 4.7,
-      students: 980,
-      price: 1850000,
-      discountPrice: 1450000,
-      image: '/course2.jpg'
-    },
-    {
-      id: '3',
-      title: 'دوره پیشرفته ریکت',
-      instructor: 'سارا کریمی',
-      rating: 4.9,
-      students: 1540,
-      price: 2100000,
-      discountPrice: 1650000,
-      image: '/course3.jpg'
-    },
-    {
-      id: '4',
-      title: 'دوره پیشرفته فلاتر',
-      instructor: 'امیر رضایی',
-      rating: 4.6,
-      students: 870,
-      price: 1950000,
-      discountPrice: 1450000,
-      image: '/course4.jpg'
-    }
-  ];
+
+// }
+
+const CourseSection: React.FC<{fetchedData:any}> = ({fetchedData})=> {
+
+  if(fetchedData===null){
+    return<div>Loading...</div>
+  }
+
+  const courses = fetchedData.map((courses:any)=>{
+    return <CourseCard
+      key={courses.courseId}
+      id={courses.courseId}
+      title={courses.classRoomName}
+      instructor={courses.teacherName}
+      rating={courses.rating}
+      students={courses.students}
+      price={courses.cost}
+      discountPrice={courses.discountPrice}
+      image={courses.image}
+
+
+    />
+  })
+   
 
   return (
     <section className="py-16 rtl">
@@ -65,19 +46,7 @@ const CourseSection: React.FC = () => {
         <div className="w-24 h-1 bg-luko-teal mx-auto mb-12"></div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {courses.map((course) => (
-            <CourseCard
-              key={course.id}
-              id={course.id}
-              title={course.title}
-              instructor={course.instructor}
-              rating={course.rating}
-              students={course.students}
-              price={course.price}
-              discountPrice={course.discountPrice}
-              image={course.image}
-            />
-          ))}
+            {courses}
         </div>
         
         <div className="text-center mt-12">
