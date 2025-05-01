@@ -1,29 +1,33 @@
 
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link,useNavigate } from 'react-router-dom';
 import Logo from '@/components/Logo';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 
 const Login = () => {
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [phoneOrGmail, setPhoneOrGmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
   
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
 
     try {
-      const response = await fetch('https://classapi.sepehracademy.ir/Login', {
+      const response = await fetch('https://classapi.sepehracademy.ir/Sign/Login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          phoneNumber,
+          phoneOrGmail,
           password,
+          rememberMe,
         }),
       });
   
@@ -41,13 +45,15 @@ const Login = () => {
       });
   
     
-      window.location.href = '/dashboard';
+      navigate('/dashboard');
     } catch (error: any) {
       toast({
         title: 'خطا در ورود',
         description: error.message || 'مشکلی پیش آمده',
         variant: 'destructive',
       });
+    }finally {
+      setIsLoading(false);
     }
   };
 
@@ -85,15 +91,15 @@ const Login = () => {
             <form onSubmit={handleLogin}>
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="phoneOrGmail" className="block text-sm font-medium text-gray-700 mb-1">
                     شماره تلفن یا ایمیل
                   </label>
                   <Input
-                    id="phoneNumber"
-                    type="tel" 
-                    placeholder="شماره موبایل"
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    id="phoneOrGmail"
+                    type="text" 
+                    placeholder="شماره موبایل یا ایمیل "
+                    value={phoneOrGmail}
+                    onChange={(e) => setPhoneOrGmail(e.target.value)}
                     required
                     className="w-full"
                   />
@@ -123,6 +129,8 @@ const Login = () => {
                   <input
                     id="remember-me"
                     type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
                     className="h-4 w-4 text-luko-teal focus:ring-luko-teal border-gray-300 rounded"
                   />
                   <label htmlFor="remember-me" className="mr-2 block text-sm text-gray-700">
@@ -130,8 +138,10 @@ const Login = () => {
                   </label>
                 </div>
                 
-                <Button type="submit" className="w-full bg-luko-teal hover:bg-luko-teal/90">
-                  ورود به حساب کاربری
+                <Button type="submit"
+                disabled={isLoading}
+                 className="w-full bg-luko-teal hover:bg-luko-teal/90">
+                  {isLoading ? 'در حال ورود...' : 'ورود به حساب کاربری'}
                 </Button>
                 
                 <div className="text-center mt-4">
