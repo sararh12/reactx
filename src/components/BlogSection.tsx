@@ -33,7 +33,7 @@ const BlogSection: React.FC<{blogData:BlogPost[] | null }>=({blogData})=> {
         <div className='text-sm text-gray-500 mb-2'>
           {new Date(post.insertDate).toLocaleDateString('fa-IR')}
         </div>
-      <Link to={`/blog${post.id}`} className='block'>
+      <Link to={`/blog/${post.id}`} className='block'>
         <h3 className='text-xl font-bold mb-3 hover:text-luko-teal transition-colors duration-300'>{post.title}</h3>
       </Link>
       <p className='text-gray-600 mb-4 flex-grow'>{post.miniDescribe}</p>
@@ -59,30 +59,7 @@ const BlogSection: React.FC<{blogData:BlogPost[] | null }>=({blogData})=> {
         <div className="w-24 h-1 bg-luko-teal mx-auto mb-12"></div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {/* {blogPosts.map((post) => (
-            <div key={post.id} className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300">
-              <Link to={`/blog/${post.id}`}>
-                <img 
-                  src={post.image} 
-                  alt={post.title} 
-                  className="w-full h-48 object-cover"
-                />
-              </Link>
-              <div className="p-6">
-                <div className="text-sm text-gray-500 mb-2">{post.date}</div>
-                <Link to={`/blog/${post.id}`}>
-                  <h3 className="text-xl font-bold mb-3 hover:text-luko-teal transition-colors duration-300">{post.title}</h3>
-                </Link>
-                <p className="text-gray-600 mb-4">{post.excerpt}</p>
-                <Link to={`/blog/${post.id}`} className="text-luko-teal hover:underline font-medium inline-flex items-center">
-                  مطالعه بیشتر
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                </Link>
-              </div>
-            </div>
-          ))} */}
+        {blogElements}
         </div>
         
         <div className="text-center mt-12">

@@ -7,20 +7,61 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 
 const Login = () => {
-  const [email, setEmail] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
   const { toast } = useToast();
   
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+
+
+    try {
+      const response = await fetch('https://classapi.sepehracademy.ir/Login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          phoneNumber,
+          password,
+        }),
+      });
+  
+      const text = await response.text();
+      const data = text ? JSON.parse(text) : {};
+  
+      if (!response.ok) {
+        throw new Error(data.message || 'Login failed');
+      }
+  
+      localStorage.setItem('token', data.token); 
+      toast({
+        title: 'ورود موفقیت‌آمیز',
+        description: 'در حال انتقال به داشبورد...',
+      });
+  
     
-    // This would normally connect to an authentication service
-    toast({
-      title: "ورود موفقیت آمیز",
-      description: "خوش آمدید! در حال انتقال به داشبورد...",
-      duration: 3000,
-    });
+      window.location.href = '/dashboard';
+    } catch (error: any) {
+      toast({
+        title: 'خطا در ورود',
+        description: error.message || 'مشکلی پیش آمده',
+        variant: 'destructive',
+      });
+    }
   };
+
+
+    
+
+    // toast({
+    //   title: "ورود موفقیت آمیز",
+    //   description: "خوش آمدید! در حال انتقال به داشبورد...",
+    //   duration: 3000,
+    // });
+
+
+  
   
   return (
     <div className="min-h-screen flex flex-col bg-gradient-form py-12">
@@ -44,15 +85,15 @@ const Login = () => {
             <form onSubmit={handleLogin}>
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                    ایمیل
+                  <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700 mb-1">
+                    شماره تلفن یا ایمیل
                   </label>
                   <Input
-                    id="email"
-                    type="email" 
-                    placeholder="ایمیل"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    id="phoneNumber"
+                    type="tel" 
+                    placeholder="شماره موبایل"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
                     required
                     className="w-full"
                   />
@@ -128,6 +169,6 @@ const Login = () => {
       </div>
     </div>
   );
-};
+  };
 
 export default Login;
