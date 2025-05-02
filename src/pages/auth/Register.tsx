@@ -188,7 +188,7 @@ const Register = () => {
                       <div className="w-full max-w-xs">
                         <Input
                           type="text"
-                          placeholder="_ _ _ _ _ _"
+                          placeholder="_ _ _ _ _ "
                           className="text-center text-xl"
                           value={verifyCode}
                           onChange={(e) => setVerifyCode(e.target.value)}
@@ -196,7 +196,7 @@ const Register = () => {
                           dir="ltr"
                         />
                         <div className="flex justify-between mt-2">
-                          <div className="text-xs text-gray-500">۱ از ۶</div>
+                          <div className="text-xs text-gray-500">1 از 5</div>
                         </div>
                       </div>
                     </div>
@@ -241,7 +241,7 @@ const Register = () => {
                       />
                     </div>
                     <div>
-                    <div className="flex items-center justify-between mb-1">
+                    <div className="flex flex-col items-center justify-between mb-1">
                       <label htmlFor='password' className="block text-sm font-medium text-gray-700">
                         رمز عبور
                       </label>
@@ -256,7 +256,7 @@ const Register = () => {
                       />
 
                     </div>
-                    <div className="flex items-center justify-between mb-1">
+                    <div className="flex flex-col items-center justify-between mb-1">
                       <label htmlFor='password' className="block text-sm font-medium text-gray-700" >
                         تکرار رمز عبور
                       </label>

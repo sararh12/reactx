@@ -1,95 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Search } from 'lucide-react';
+import axios from 'axios';
 
-const BlogPage: React.FC = () => {
+const BlogPage: React.FC =  () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [articles, setArticles] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+
+  useEffect(() => {
+    const fetchArticles = async () => {
+      try {
+        const response = await axios.get(`https://classapi.sepehracademy.ir/api/News`);
+        console.log(response.data);
+        setArticles(response.data.news);  
+      
+      } catch (err) {
+        setError('خطا در بارگیری اخبار');
+      } finally {
+        setLoading(false);
+      }
+    };
   
-  const articles = [
-    {
-      id: '1',
-      title: 'آنگولار بهتر است یا ری اکت؟',
-      excerpt: 'مقایسه دو فریمورک محبوب فرانت اند و بررسی نقاط قوت و ضعف آنها برای پروژه های مختلف...',
-      image: '/lovable-uploads/news.png',
-      date: '۱۴۰۲/۰۲/۱۵',
-      author: 'علی محمدی',
-      views: 125
-    },
-    {
-      id: '2',
-      title: 'آنگولار بهتر است یا ری اکت؟',
-      excerpt: 'مقایسه دو فریمورک محبوب فرانت اند و بررسی نقاط قوت و ضعف آنها برای پروژه های مختلف...',
-      image: '/lovable-uploads/news.png',
-      date: '۱۴۰۲/۰۲/۱۰',
-      author: 'محمد حسینی',
-      views: 98
-    },
-    {
-      id: '3',
-      title: 'آنگولار بهتر است یا ری اکت؟',
-      excerpt: 'مقایسه دو فریمورک محبوب فرانت اند و بررسی نقاط قوت و ضعف آنها برای پروژه های مختلف...',
-      image: '/lovable-uploads/news.png',
-      date: '۱۴۰۲/۰۲/۰۸',
-      author: 'سارا کریمی',
-      views: 210
-    },
-    {
-      id: '4',
-      title: 'آنگولار بهتر است یا ری اکت؟',
-      excerpt: 'مقایسه دو فریمورک محبوب فرانت اند و بررسی نقاط قوت و ضعف آنها برای پروژه های مختلف...',
-      image: '/lovable-uploads/news.png',
-      date: '۱۴۰۲/۰۲/۰۵',
-      author: 'رضا احمدی',
-      views: 156
-    },
-    {
-      id: '5',
-      title: 'آنگولار بهتر است یا ری اکت؟',
-      excerpt: 'مقایسه دو فریمورک محبوب فرانت اند و بررسی نقاط قوت و ضعف آنها برای پروژه های مختلف...',
-      image: '/lovable-uploads/news.png',
-      date: '۱۴۰۲/۰۲/۰۱',
-      author: 'مریم رضایی',
-      views: 189
-    },
-    {
-      id: '6',
-      title: 'آنگولار بهتر است یا ری اکت؟',
-      excerpt: 'مقایسه دو فریمورک محبوب فرانت اند و بررسی نقاط قوت و ضعف آنها برای پروژه های مختلف...',
-      image: '/lovable-uploads/news.png',
-      date: '۱۴۰۲/۰۱/۲۸',
-      author: 'امیر حسینی',
-      views: 145
-    },
-    {
-      id: '7',
-      title: 'آنگولار بهتر است یا ری اکت؟',
-      excerpt: 'مقایسه دو فریمورک محبوب فرانت اند و بررسی نقاط قوت و ضعف آنها برای پروژه های مختلف...',
-      image: '/lovable-uploads/news.png',
-      date: '۱۴۰۲/۰۱/۲۵',
-      author: 'نیما کریمی',
-      views: 178
-    },
-    {
-      id: '8',
-      title: 'آنگولار بهتر است یا ری اکت؟',
-      excerpt: 'مقایسه دو فریمورک محبوب فرانت اند و بررسی نقاط قوت و ضعف آنها برای پروژه های مختلف...',
-      image: '/lovable-uploads/news.png',
-      date: '۱۴۰۲/۰۱/۲۰',
-      author: 'زهرا محمدی',
-      views: 132
-    },
-    {
-      id: '9',
-      title: 'آنگولار بهتر است یا ری اکت؟',
-      excerpt: 'مقایسه دو فریمورک محبوب فرانت اند و بررسی نقاط قوت و ضعف آنها برای پروژه های مختلف...',
-      image: '/lovable-uploads/news.png',
-      date: '۱۴۰۲/۰۱/۱۵',
-      author: 'علی رضایی',
-      views: 205
-    }
-  ];
+    fetchArticles();
+  }, []);
+
+  
+  
+  
   
   const recommendedPosts = [
     {
@@ -173,7 +115,7 @@ const BlogPage: React.FC = () => {
                     <div key={article.id} className="bg-white rounded-lg shadow-md overflow-hidden">
                       <Link to={`/blog/${article.id}`}>
                         <img 
-                          src={article.image} 
+                          src={article.image || '/default.jpg'} 
                           alt={article.title}
                           className="w-full h-48 object-cover"
                         />
