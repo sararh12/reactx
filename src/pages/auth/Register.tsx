@@ -5,34 +5,103 @@ import Logo from '@/components/Logo';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
+import axios from 'axios'
 
 const Register = () => {
   const [step, setStep] = useState(1);
-  const [phone, setPhone] = useState('');
-  const [code, setCode] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [verifyCode, setVerifyCode] = useState('');
+  const [gmail, setGmail] = useState('');
+  const [password,setPassword] = useState('');
+  const [repeatPassword,setRepeatPassword] = useState('');
   const { toast } = useToast();
   
-  const handleSendCode = (e: React.FormEvent) => {
+  const handleSendCode = async (e: React.FormEvent) => {
     e.preventDefault();
     setStep(2);
-    toast({
+
+    try{
+      const response=await axios.post("https://classapi.sepehracademy.ir/api/Sign/SendVerifyMessage",{phoneNumber})
+
+      if (response.status !== 200) {
+        throw new Error('خطا در ارسال کد تایید');
+      }
+
+       toast({
       title: "کد تأیید ارسال شد",
       description: "کد تأیید به شماره موبایل شما ارسال شد.",
       duration: 3000,
     });
+    }catch (error) {
+      toast({
+        title: "خطا",
+        description: error.message || 'مشکلی پیش آمد.',
+        variant: 'destructive',
+      });
+    }
+
+
+   
   };
   
-  const handleVerifyCode = (e: React.FormEvent) => {
+  const handleVerifyCode = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    toast({
-      title: "ثبت نام موفقیت آمیز",
-      description: "حساب کاربری شما با موفقیت ایجاد شد.",
-      duration: 3000,
-    });
-    
-    // Navigate to next step or login
-    setStep(3);
+  
+    try {
+      const response = await axios.post('https://classapi.sepehracademy.ir/api/Sign/VerifyMessage', {
+        phoneNumber,
+        verifyCode,
+      });
+  
+      if (response.status !== 200) {
+        throw new Error('کد تایید اشتباه است');
+      }
+  
+      toast({
+        title: "ثبت نام موفقیت آمیز",
+        description: "حساب کاربری شما با موفقیت ایجاد شد.",
+        duration: 3000,
+      });
+  
+      setStep(3);
+    } catch (error) {
+      toast({
+        title: "خطا",
+        description: error.message || 'مشکلی پیش آمد.',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleRegisterFinal = async (e: React.FormEvent) => {
+    e.preventDefault();
+  
+    try {
+      const response = await axios.post("https://classapi.sepehracademy.ir/api/Sign/Register", {
+        gmail,
+        password,
+        phoneNumber
+      });
+  
+      if (response.status !== 200) {
+        throw new Error('خطا در ثبت‌نام');
+      }
+  
+      toast({
+        title: "ثبت‌نام کامل شد",
+        description: "اکنون می‌توانید وارد حساب خود شوید.",
+        duration: 3000,
+      });
+  
+      window.location.href = '/auth/login';
+  
+    } catch (error: any) {
+      toast({
+        title: "خطا",
+        description: error.response?.data?.message || error.message || 'مشکلی پیش آمد.',
+        variant: 'destructive',
+      });
+    }
   };
   
   return (
@@ -78,11 +147,11 @@ const Register = () => {
                         شماره همراه
                       </label>
                       <Input
-                        id="phone"
+                        id="phoneNumber"
                         type="tel" 
                         placeholder="شماره همراه"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
                         required
                         className="w-full"
                         dir="ltr"
@@ -110,7 +179,7 @@ const Register = () => {
               <>
                 <h2 className="text-2xl font-bold mb-6 text-center">کد تأیید</h2>
                 <p className="text-sm text-gray-600 mb-6 text-center">
-                  کد تأیید به شماره {phone} ارسال شده است. در صورت تمایل، برای ویرایش <button onClick={() => setStep(1)} className="text-luko-teal underline">اینجا</button> کلیک کنید.
+                  کد تأیید به شماره {phoneNumber} ارسال شده است. در صورت تمایل، برای ویرایش <button onClick={() => setStep(1)} className="text-luko-teal underline">اینجا</button> کلیک کنید.
                 </p>
                 
                 <form onSubmit={handleVerifyCode}>
@@ -121,8 +190,8 @@ const Register = () => {
                           type="text"
                           placeholder="_ _ _ _ _ _"
                           className="text-center text-xl"
-                          value={code}
-                          onChange={(e) => setCode(e.target.value)}
+                          value={verifyCode}
+                          onChange={(e) => setVerifyCode(e.target.value)}
                           required
                           dir="ltr"
                         />
@@ -147,22 +216,72 @@ const Register = () => {
             )}
             
             {step === 3 && (
+              <>
               <div className="text-center">
-                <div className="mb-6">
+                {/* <div className="mb-6">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-green-500 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                </div>
-                <h2 className="text-2xl font-bold mb-4">ثبت نام موفقیت آمیز</h2>
-                <p className="text-gray-600 mb-6">
-                  حساب کاربری شما با موفقیت ایجاد شد.
-                </p>
+                </div> */}
+                <h2 className="text-2xl font-bold mb-6 text-center">ورود به حساب کاربری</h2>
+                <form onSubmit={handleRegisterFinal}>
+                  <div className='space-y-4'>
+                    <div>
+                      <label htmlFor='gmail' className="block text-sm font-medium text-gray-700 mb-1">
+                        ایمیل
+                      </label>
+                      <Input
+                      id='gmail'
+                      type='text'
+                      placeholder='ایمیل'
+                      value={gmail}
+                      onChange={(e) => setGmail(e.target.value)}
+                      required
+                      className="w-full"
+                      />
+                    </div>
+                    <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label htmlFor='password' className="block text-sm font-medium text-gray-700">
+                        رمز عبور
+                      </label>
+                      <Input
+                      id='password'
+                      type='password'
+                      placeholder='رمز عبور'
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      className='w-full'
+                      />
+
+                    </div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label htmlFor='password' className="block text-sm font-medium text-gray-700" >
+                        تکرار رمز عبور
+                      </label>
+                      <Input
+                      id='password'
+                      type='password'
+                      placeholder='تکرار رمز عبور '
+                      value={repeatPassword}
+                      onChange={(e) => setRepeatPassword(e.target.value)}
+                      required
+                      className='w-full'
+                      />
+                    </div>
+                    </div>
+                  </div>
+                </form>
+
+                
                 <Link to="/auth/login">
                   <Button className="w-full bg-luko-teal hover:bg-luko-teal/90">
-                    ورود به حساب کاربری
+                    تکمیل ثبت نام
                   </Button>
                 </Link>
               </div>
+              </>
             )}
           </div>
           

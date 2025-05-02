@@ -20,7 +20,7 @@ const Login = () => {
 
 
     try {
-      const response = await fetch('https://classapi.sepehracademy.ir/Sign/Login', {
+      const response = await fetch('https://classapi.sepehracademy.ir/api/Sign/Login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
