@@ -63,8 +63,8 @@ const CoursesPage: React.FC = () => {
     .then(response => {
       console.log(response.data);
       if (response.data && Array.isArray(response.data.courseFilterDtos)) {
-        setCourses(response.data.courseFilterDtos);  // داده‌ها را در courses ذخیره می‌کنیم
-        setTotalCount(response.data.totalCount);  // تعداد کل دوره‌ها را ذخیره می‌کنیم
+        setCourses(response.data.courseFilterDtos);  
+        setTotalCount(response.data.totalCount); 
       } else {
         console.error("داده‌ها به درستی دریافت نشدند یا ساختار متفاوت است.");
       }
@@ -387,9 +387,9 @@ useEffect(() => {
                 
                 {currentCourses.length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-  {currentCourses.map((course) => (
-  <CourseCard key={course.courseId} course={course} />
-))}
+                 {currentCourses.map((course) => (
+                      <CourseCard key={course.courseId} course={course} />
+                ))}
                   </div>
                 ) : (
                   <div className="text-center py-12">
