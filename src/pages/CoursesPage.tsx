@@ -7,6 +7,27 @@ import { Search } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import axios from 'axios';
 
+interface CourseCardProps {
+  course: {
+    courseId: string;
+    title: string;
+    describe: string;
+    cost: number;
+    courseRate: number;
+    levelName: string;
+    statusName: string;
+    teacherName: string;
+    classRoomName: string;
+    technologyList: string;
+    likeCount: number;
+    dissLikeCount: number;
+    currentRegistrants: number;
+    tumbImageAddress: string | null;
+    lastUpdate: string;
+    userFavorite: boolean;
+  };
+}
+
 
 const CoursesPage: React.FC = () => {
   const [courses, setCourses] = useState<any[]>([]);
@@ -366,19 +387,9 @@ useEffect(() => {
                 
                 {currentCourses.length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {currentCourses.map((course) => (
-                      <CourseCard
-                        key={course.id}
-                        id={course.id}
-                        title={course.title}
-                        instructor={course.instructor}
-                        rating={course.rating}
-                        students={course.students}
-                        price={course.price}
-                        discountPrice={course.discountPrice}
-                        image={course.image}
-                      />
-                    ))}
+  {currentCourses.map((course) => (
+  <CourseCard key={course.courseId} course={course} />
+))}
                   </div>
                 ) : (
                   <div className="text-center py-12">
@@ -404,7 +415,7 @@ useEffect(() => {
                   </button>
                   <button
                     onClick={() => paginate(currentPage + 1)}
-                    disabled={currentPage * coursesPerPage >= courses.length}
+                    disabled={currentPage * coursesPerPage >= totalCount}
                     className="px-4 py-2 bg-gray-300 rounded-r-md"
                   >
                     بعدی
