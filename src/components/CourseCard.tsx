@@ -2,27 +2,34 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-interface CourseCardProps {
-  id: string;
+interface Course {
+  courseId: string;
   title: string;
   instructor: string;
   rating: number;
   students: number;
-  price: number;
+  cost: number;
   discountPrice?: number;
   image: string;
 }
 
-const CourseCard: React.FC<CourseCardProps> = ({
-  id,
-  title,
-  instructor,
-  rating,
-  students,
-  price,
-  discountPrice,
-  image,
-}) => {
+interface CourseCardProps {
+  course: Course;
+}
+
+const CourseCard: React.FC<CourseCardProps> = ({course}) => {
+
+  const {
+    courseId,
+    title,
+    instructor,
+    rating,
+    students,
+    cost,
+    discountPrice,
+    image,
+  } = course;
+
   const renderStars = () => {
     const stars = [];
     const fullStars = Math.floor(rating);
@@ -53,7 +60,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
   return (
     <div className="course-card bg-white rounded-lg overflow-hidden shadow-md rtl">
       <div className="relative">
-        <Link to={`/courses/${id}`}>
+        <Link to={`/courses/${courseId}`}>
           <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-48 w-full rounded-t-lg overflow-hidden">
             <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full w-16 h-16 m-auto">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" viewBox="0 0 20 20" fill="currentColor">
@@ -64,7 +71,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
         </Link>
       </div>
       <div className="p-4">
-        <Link to={`/courses/${id}`} className="block">
+        <Link to={`/courses/${courseId}`} className="block">
           <h3 className="font-bold text-lg mb-2 text-gray-800">{title}</h3>
         </Link>
         <div className="flex items-center text-sm text-gray-600 mb-2">
@@ -87,11 +94,11 @@ const CourseCard: React.FC<CourseCardProps> = ({
           <div className="ltr">
             {discountPrice ? (
               <div className="flex flex-col items-end">
-                <span className="text-gray-500 line-through text-sm">{price.toLocaleString()} تومان</span>
+                <span className="text-gray-500 line-through text-sm">{cost.toLocaleString()} تومان</span>
                 <span className="text-luko-teal font-bold">{discountPrice.toLocaleString()} تومان</span>
               </div>
             ) : (
-              <span className="text-luko-teal font-bold">{price.toLocaleString()} تومان</span>
+              <span className="text-luko-teal font-bold">{cost.toLocaleString()} تومان</span>
             )}
           </div>
           <button className="bg-luko-teal text-white p-2 rounded-md">
