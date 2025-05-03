@@ -9,80 +9,62 @@ import axios from 'axios';
 
 
 const CoursesPage: React.FC = () => {
-  const [courses, setCourses] = useState([]);
+  const [courses, setCourses] = useState<any[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const coursesPerPage = 6;
-  const [filteredCourses, setFilteredCourses] = useState(initialCourses);
   const [selectedFilters, setSelectedFilters] = useState({
     technologies: [] as string[],
     status: [] as string[],
     rating: [] as number[],
     level: [] as string[],
-    price: [] as string[],
+    cost: [] as string[],
     priceRange: 3000000,
   });
   
-  // Filter courses based on search term and filters
-  useEffect(() => {
-    let result = initialCourses;
-    
-    // Apply search filter
-    if (searchTerm) {
-      result = result.filter(
-        course =>
-          course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          course.instructor.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-    
-    // Apply technology filters
-    if (selectedFilters.technologies.length > 0) {
-      result = result.filter(course =>
-        course.technologies.some(tech => selectedFilters.technologies.includes(tech))
-      );
-    }
-    
-    // Apply status filters
-    if (selectedFilters.status.length > 0) {
-      result = result.filter(course => selectedFilters.status.includes(course.status));
-    }
-    
-    // Apply rating filters
-    if (selectedFilters.rating.length > 0) {
-      result = result.filter(course =>
-        selectedFilters.rating.some(rating => Math.floor(course.rating) === rating)
-      );
-    }
-    
-    // Apply level filters
-    if (selectedFilters.level.length > 0) {
-      result = result.filter(course => selectedFilters.level.includes(course.level));
-    }
-    
-    // Apply price filters
-    if (selectedFilters.price.length > 0) {
-      const isFreeSelected = selectedFilters.price.includes('free');
-      const isPaidSelected = selectedFilters.price.includes('paid');
-      
-      if (isFreeSelected && !isPaidSelected) {
-        result = result.filter(course => course.isFree);
-      } else if (!isFreeSelected && isPaidSelected) {
-        result = result.filter(course => !course.isFree);
+  const fetchCourses = () => {
+    const { technologies, status, rating, level, cost, priceRange } = selectedFilters;
+
+    const filterParams = new URLSearchParams();
+    filterParams.append('PageNumber', String(currentPage));
+    filterParams.append('RowsOfPage', String(coursesPerPage));
+
+    if (searchTerm) filterParams.append('Query', searchTerm);
+    if (technologies.length > 0) filterParams.append('ListTech', technologies.join(','));
+    if (status.length > 0) filterParams.append('Status', status.join(','));
+    if (rating.length > 0) filterParams.append('Rating', rating.join(','));
+    if (level.length > 0) filterParams.append('Level', level.join(','));
+    if (cost.length > 0) filterParams.append('cost', cost.join(','));
+    if (priceRange) filterParams.append('PriceRange', String(priceRange));
+
+    axios.get(`https://classapi.sepehracademy.ir/api/Home/GetCoursesWithPagination?${filterParams.toString()}`)
+    .then(response => {
+      console.log(response.data);
+      if (response.data && Array.isArray(response.data.courseFilterDtos)) {
+        setCourses(response.data.courseFilterDtos);  // داده‌ها را در courses ذخیره می‌کنیم
+        setTotalCount(response.data.totalCount);  // تعداد کل دوره‌ها را ذخیره می‌کنیم
+      } else {
+        console.error("داده‌ها به درستی دریافت نشدند یا ساختار متفاوت است.");
       }
-    }
-    
-    // Apply price range filter
-    result = result.filter(course => course.price <= selectedFilters.priceRange);
-    
-    setFilteredCourses(result);
-    setCurrentPage(1); // Reset to first page when filters change
-  }, [searchTerm, selectedFilters]);
+    })
+    .catch(error => {
+      console.error("خطا در دریافت لیست دوره‌ها:", error);
+    });
+};
+
+
+
+useEffect(() => {
+  fetchCourses();
+}, [selectedFilters, currentPage, searchTerm]);
+
+
   
   // Get current courses for pagination
   const indexOfLastCourse = currentPage * coursesPerPage;
   const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
-  const currentCourses = filteredCourses.slice(indexOfFirstCourse, indexOfLastCourse);
+  const currentCourses = courses.slice(indexOfFirstCourse, indexOfLastCourse);
   
   // Change page
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
@@ -124,15 +106,16 @@ const CoursesPage: React.FC = () => {
       status: [],
       rating: [],
       level: [],
-      price: [],
+      cost: [],
       priceRange: 3000000,
     });
     setSearchTerm('');
+    setCurrentPage(1);
   };
   
   // Format price to Persian format
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('fa-IR').format(price);
+  const formatPrice = (cost: number) => {
+    return new Intl.NumberFormat('fa-IR').format(cost);
   };
 
   return (
@@ -317,16 +300,16 @@ const CoursesPage: React.FC = () => {
                       <div className="flex items-center">
                         <Checkbox 
                           id="price-free"
-                          checked={selectedFilters.price.includes('free')}
-                          onCheckedChange={() => handleFilterChange('price', 'free')}
+                          checked={selectedFilters.cost.includes('free')}
+                          onCheckedChange={() => handleFilterChange('cost', 'free')}
                         />
                         <label htmlFor="price-free" className="mr-2 text-sm cursor-pointer">رایگان</label>
                       </div>
                       <div className="flex items-center">
                         <Checkbox 
                           id="price-paid"
-                          checked={selectedFilters.price.includes('paid')}
-                          onCheckedChange={() => handleFilterChange('price', 'paid')}
+                          checked={selectedFilters.cost.includes('paid')}
+                          onCheckedChange={() => handleFilterChange('cost', 'paid')}
                         />
                         <label htmlFor="price-paid" className="mr-2 text-sm cursor-pointer">غیر رایگان</label>
                       </div>
@@ -377,7 +360,7 @@ const CoursesPage: React.FC = () => {
                   </div>
                   
                   <div className="text-sm text-gray-600">
-                    نمایش {currentCourses.length} دوره از {filteredCourses.length} نتیجه
+                    نمایش {currentCourses.length} دوره از {totalCount} نتیجه
                   </div>
                 </div>
                 
@@ -411,41 +394,22 @@ const CoursesPage: React.FC = () => {
                 )}
                 
                 {/* Pagination */}
-                {filteredCourses.length > coursesPerPage && (
-                  <div className="mt-10 flex justify-center">
-                    <div className="flex space-x-1 space-x-reverse">
-                      <button 
-                        onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                        className="px-3 py-1 bg-white border border-gray-300 rounded-md hover:bg-gray-100"
-                        disabled={currentPage === 1}
-                      >
-                        قبلی
-                      </button>
-                      
-                      {Array.from({ length: Math.ceil(filteredCourses.length / coursesPerPage) }).map((_, index) => (
-                        <button
-                          key={index}
-                          onClick={() => paginate(index + 1)}
-                          className={`px-3 py-1 rounded-md ${
-                            currentPage === index + 1
-                              ? 'bg-luko-teal text-white'
-                              : 'bg-white border border-gray-300 hover:bg-gray-100'
-                          }`}
-                        >
-                          {index + 1}
-                        </button>
-                      ))}
-                      
-                      <button 
-                        onClick={() => setCurrentPage(Math.min(Math.ceil(filteredCourses.length / coursesPerPage), currentPage + 1))}
-                        className="px-3 py-1 bg-white border border-gray-300 rounded-md hover:bg-gray-100"
-                        disabled={currentPage === Math.ceil(filteredCourses.length / coursesPerPage)}
-                      >
-                        بعدی
-                      </button>
-                    </div>
-                  </div>
-                )}
+                <div className="flex justify-center mt-8">
+                  <button
+                    onClick={() => paginate(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="px-4 py-2 bg-gray-300 rounded-l-md"
+                  >
+                    قبلی
+                  </button>
+                  <button
+                    onClick={() => paginate(currentPage + 1)}
+                    disabled={currentPage * coursesPerPage >= courses.length}
+                    className="px-4 py-2 bg-gray-300 rounded-r-md"
+                  >
+                    بعدی
+                  </button>
+                </div>
               </div>
             </div>
           </div>
