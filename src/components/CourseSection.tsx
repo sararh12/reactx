@@ -22,21 +22,18 @@ const CourseSection: React.FC<{fetchedData:any}> = ({fetchedData})=> {
     return<div>Loading...</div>
   }
 
-  const courses = fetchedData.map((courses:any)=>{
-    return <CourseCard
-      key={courses.courseId}
-      id={courses.courseId}
-      title={courses.classRoomName}
-      instructor={courses.teacherName}
-      rating={courses.rating}
-      students={courses.students}
-      price={courses.cost}
-      discountPrice={courses.discountPrice}
-      image={courses.image}
-
-
-    />
-  })
+  const courses = fetchedData.map((course: any) => (
+    <CourseCard key={course.courseId} course={{
+      courseId: course.courseId,
+      title: course.title,
+      teacherName: course.teacherName,
+      courseRate: course.courseRate,
+      currentRegistrants: course.currentRegistrants,
+      cost: course.cost,
+      discountPrice: course.discountPrice,
+      image: course.image || '', // اگر ممکنه مقدار null باشه
+    }} />
+  ));
    
 
   return (

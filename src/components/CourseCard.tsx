@@ -5,9 +5,9 @@ import { Link } from 'react-router-dom';
 interface Course {
   courseId: string;
   title: string;
-  instructor: string;
-  rating: number;
-  students: number;
+  teacherName: string;
+  courseRate: number;
+  currentRegistrants: number;
   cost: number;
   discountPrice?: number;
   image: string;
@@ -19,12 +19,16 @@ interface CourseCardProps {
 
 const CourseCard: React.FC<CourseCardProps> = ({course}) => {
 
+  if (!course) {
+    return <div>در حال بارگذاری...</div>;
+  }
+
   const {
     courseId,
     title,
-    instructor,
-    rating,
-    students,
+    teacherName,
+    courseRate,
+    currentRegistrants,
     cost,
     discountPrice,
     image,
@@ -32,8 +36,8 @@ const CourseCard: React.FC<CourseCardProps> = ({course}) => {
 
   const renderStars = () => {
     const stars = [];
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 >= 0.5;
+    const fullStars = Math.floor(courseRate);
+    const hasHalfStar = courseRate % 1 >= 0.5;
 
     for (let i = 0; i < fullStars; i++) {
       stars.push(
@@ -78,17 +82,17 @@ const CourseCard: React.FC<CourseCardProps> = ({course}) => {
           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
           </svg>
-          <span>{instructor}</span>
+          <span>{teacherName}</span>
         </div>
         <div className="flex items-center mb-2">
           <div className="flex text-lg">{renderStars()}</div>
-          <span className="text-sm text-gray-500 mr-1">({rating})</span>
+          <span className="text-sm text-gray-500 mr-1">({courseRate})</span>
         </div>
         <div className="flex items-center text-sm text-gray-600 mb-4">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
           </svg>
-          <span>{students} دانشجو</span>
+          <span>{currentRegistrants} دانشجو</span>
         </div>
         <div className="flex items-center justify-between mt-4">
           <div className="ltr">

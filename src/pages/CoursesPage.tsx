@@ -7,7 +7,7 @@ import { Search } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import axios from 'axios';
 
-interface CourseCardProps {
+export interface Course {
   course: {
     courseId: string;
     title: string;
@@ -36,26 +36,26 @@ const CoursesPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const coursesPerPage = 6;
   const [selectedFilters, setSelectedFilters] = useState({
-    technologies: [] as string[],
-    status: [] as string[],
-    rating: [] as number[],
-    level: [] as string[],
+    technologyList: [] as string[],
+    statusName: [] as string[],
+    courseRate: [] as number[],
+    levelName: [] as string[],
     cost: [] as string[],
     priceRange: 3000000,
   });
   
   const fetchCourses = () => {
-    const { technologies, status, rating, level, cost, priceRange } = selectedFilters;
+    const { technologyList, statusName, courseRate, levelName, cost, priceRange } = selectedFilters;
 
     const filterParams = new URLSearchParams();
     filterParams.append('PageNumber', String(currentPage));
     filterParams.append('RowsOfPage', String(coursesPerPage));
 
     if (searchTerm) filterParams.append('Query', searchTerm);
-    if (technologies.length > 0) filterParams.append('ListTech', technologies.join(','));
-    if (status.length > 0) filterParams.append('Status', status.join(','));
-    if (rating.length > 0) filterParams.append('Rating', rating.join(','));
-    if (level.length > 0) filterParams.append('Level', level.join(','));
+    if (technologyList.length > 0) filterParams.append('ListTech', technologyList.join(','));
+    if (statusName.length > 0) filterParams.append('Status', statusName.join(','));
+    if (courseRate.length > 0) filterParams.append('Rating', courseRate.join(','));
+    if (levelName.length > 0) filterParams.append('Level', levelName.join(','));
     if (cost.length > 0) filterParams.append('cost', cost.join(','));
     if (priceRange) filterParams.append('PriceRange', String(priceRange));
 
@@ -85,7 +85,6 @@ useEffect(() => {
   // Get current courses for pagination
   const indexOfLastCourse = currentPage * coursesPerPage;
   const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
-  const currentCourses = courses.slice(indexOfFirstCourse, indexOfLastCourse);
   
   // Change page
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
@@ -123,10 +122,10 @@ useEffect(() => {
   // Reset all filters
   const resetFilters = () => {
     setSelectedFilters({
-      technologies: [],
-      status: [],
-      rating: [],
-      level: [],
+      technologyList: [],
+      statusName: [],
+      courseRate: [],
+      levelName: [],
       cost: [],
       priceRange: 3000000,
     });
@@ -202,8 +201,8 @@ useEffect(() => {
                         <div key={tech} className="flex items-center">
                           <Checkbox 
                             id={`tech-${tech.toLowerCase().replace(/\s+/g, '-')}`}
-                            checked={selectedFilters.technologies.includes(tech)}
-                            onCheckedChange={() => handleFilterChange('technologies', tech)}
+                            checked={selectedFilters.technologyList.includes(tech)}
+                            onCheckedChange={() => handleFilterChange('technologyList', tech)}
                           />
                           <label 
                             htmlFor={`tech-${tech.toLowerCase().replace(/\s+/g, '-')}`} 
@@ -227,24 +226,24 @@ useEffect(() => {
                       <div className="flex items-center">
                         <Checkbox 
                           id="status-published"
-                          checked={selectedFilters.status.includes('published')}
-                          onCheckedChange={() => handleFilterChange('status', 'published')}
+                          checked={selectedFilters.statusName.includes('published')}
+                          onCheckedChange={() => handleFilterChange('statusName', 'published')}
                         />
                         <label htmlFor="status-published" className="mr-2 text-sm cursor-pointer">منتشر شده</label>
                       </div>
                       <div className="flex items-center">
                         <Checkbox 
                           id="status-presell"
-                          checked={selectedFilters.status.includes('presell')}
-                          onCheckedChange={() => handleFilterChange('status', 'presell')}
+                          checked={selectedFilters.statusName.includes('presell')}
+                          onCheckedChange={() => handleFilterChange('statusName', 'presell')}
                         />
                         <label htmlFor="status-presell" className="mr-2 text-sm cursor-pointer">در حال پیش فروش</label>
                       </div>
                       <div className="flex items-center">
                         <Checkbox 
                           id="status-completing"
-                          checked={selectedFilters.status.includes('completing')}
-                          onCheckedChange={() => handleFilterChange('status', 'completing')}
+                          checked={selectedFilters.statusName.includes('completing')}
+                          onCheckedChange={() => handleFilterChange('statusName', 'completing')}
                         />
                         <label htmlFor="status-completing" className="mr-2 text-sm cursor-pointer">در حال تکمیل</label>
                       </div>
@@ -259,16 +258,16 @@ useEffect(() => {
                       </svg>
                     </h4>
                     <div className="space-y-2">
-                      {[5, 4, 3, 2, 1].map(rating => (
-                        <div key={rating} className="flex items-center">
+                      {[5, 4, 3, 2, 1].map(courseRate => (
+                        <div key={courseRate} className="flex items-center">
                           <Checkbox 
-                            id={`rating-${rating}`}
-                            checked={selectedFilters.rating.includes(rating)}
-                            onCheckedChange={() => handleFilterChange('rating', rating)}
+                            id={`rating-${courseRate}`}
+                            checked={selectedFilters.courseRate.includes(courseRate)}
+                            onCheckedChange={() => handleFilterChange('courseRate', courseRate)}
                           />
-                          <label htmlFor={`rating-${rating}`} className="mr-2 text-sm flex items-center cursor-pointer">
-                            <span className="text-yellow-500">{Array(rating).fill('★').join('')}</span>
-                            <span className="text-gray-300">{Array(5-rating).fill('★').join('')}</span>
+                          <label htmlFor={`rating-${courseRate}`} className="mr-2 text-sm flex items-center cursor-pointer">
+                            <span className="text-yellow-500">{Array(courseRate).fill('★').join('')}</span>
+                            <span className="text-gray-300">{Array(5-courseRate).fill('★').join('')}</span>
                           </label>
                         </div>
                       ))}
@@ -286,24 +285,24 @@ useEffect(() => {
                       <div className="flex items-center">
                         <Checkbox 
                           id="level-beginner" 
-                          checked={selectedFilters.level.includes('beginner')}
-                          onCheckedChange={() => handleFilterChange('level', 'beginner')}
+                          checked={selectedFilters.levelName.includes('beginner')}
+                          onCheckedChange={() => handleFilterChange('levelName', 'beginner')}
                         />
                         <label htmlFor="level-beginner" className="mr-2 text-sm cursor-pointer">مقدماتی</label>
                       </div>
                       <div className="flex items-center">
                         <Checkbox 
                           id="level-inter"
-                          checked={selectedFilters.level.includes('intermediate')}
-                          onCheckedChange={() => handleFilterChange('level', 'intermediate')}
+                          checked={selectedFilters.levelName.includes('intermediate')}
+                          onCheckedChange={() => handleFilterChange('levelName', 'intermediate')}
                         />
                         <label htmlFor="level-inter" className="mr-2 text-sm cursor-pointer">متوسط</label>
                       </div>
                       <div className="flex items-center">
                         <Checkbox 
                           id="level-advanced"
-                          checked={selectedFilters.level.includes('advanced')}
-                          onCheckedChange={() => handleFilterChange('level', 'advanced')}
+                          checked={selectedFilters.levelName.includes('advanced')}
+                          onCheckedChange={() => handleFilterChange('levelName', 'advanced')}
                         />
                         <label htmlFor="level-advanced" className="mr-2 text-sm cursor-pointer">پیشرفته</label>
                       </div>
@@ -381,13 +380,13 @@ useEffect(() => {
                   </div>
                   
                   <div className="text-sm text-gray-600">
-                    نمایش {currentCourses.length} دوره از {totalCount} نتیجه
+                    نمایش {courses.length} دوره از {totalCount} نتیجه
                   </div>
                 </div>
                 
-                {currentCourses.length > 0 ? (
+                {courses.length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                 {currentCourses.map((course) => (
+                 {courses.map((course) => (
                       <CourseCard key={course.courseId} course={course} />
                 ))}
                   </div>
