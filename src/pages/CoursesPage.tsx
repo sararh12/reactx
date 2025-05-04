@@ -28,12 +28,30 @@ export interface Course {
   };
 }
 
+interface Technology {
+  id: number;
+  techName: string;
+  parentId: number | null;
+  describe: string;
+  iconAddress: string;
+}
+
+interface CourseType {
+  id: number;
+  techName: string;
+  parentId: number | null;
+  describe: string;
+  iconAddress: string;
+}
+
 
 const CoursesPage: React.FC = () => {
   const [courses, setCourses] = useState<any[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [technologies, setTechnologies] = useState<Technology[]>([]);
+  const [courseTypes, setCourseTypes] = useState<CourseType[]>([]);
   const coursesPerPage = 6;
   const [selectedFilters, setSelectedFilters] = useState({
     technologyList: [] as string[],
@@ -73,6 +91,29 @@ const CoursesPage: React.FC = () => {
       console.error("خطا در دریافت لیست دوره‌ها:", error);
     });
 };
+
+useEffect(() => {
+  axios.get('https://classapi.sepehracademy.ir/api/Home/GetTechnologies')
+    .then(response => {
+      if (Array.isArray(response.data)) {
+        setTechnologies(response.data);
+      }
+    })
+    .catch(err => console.error("خطا در دریافت تکنولوژی‌ها", err));
+}, []);
+
+useEffect(() => {
+  const fetchCourseTypes = async () => {
+    try {
+      const response = await axios.get(`https://classapi.sepehracademy.ir/api/CourseType/GetCourseTypes`);
+      setCourseTypes(response.data);
+    } catch (error) {
+      console.error('خطا در دریافت نوع دوره‌ها:', error);
+    }
+  };
+
+  fetchCourseTypes();
+}, []);
 
 
 
@@ -197,21 +238,26 @@ useEffect(() => {
                       </svg>
                     </h4>
                     <div className="space-y-2">
-                      {["Bootstrap", "React", "JavaScript", ".Net Core", "Tailwind"].map((tech) => (
-                        <div key={tech} className="flex items-center">
-                          <Checkbox 
-                            id={`tech-${tech.toLowerCase().replace(/\s+/g, '-')}`}
-                            checked={selectedFilters.technologyList.includes(tech)}
-                            onCheckedChange={() => handleFilterChange('technologyList', tech)}
-                          />
-                          <label 
-                            htmlFor={`tech-${tech.toLowerCase().replace(/\s+/g, '-')}`} 
-                            className="mr-2 text-sm cursor-pointer"
-                          >
-                            {tech}
-                          </label>
-                        </div>
-                      ))}
+                    {technologies.map((tech) => {
+  const techName = tech.techName;
+
+  return (
+    <div key={tech.id} className="flex items-center">
+      <Checkbox 
+        id={`tech-${techName.toLowerCase().replace(/\s+/g, '-')}`}
+        checked={selectedFilters.technologyList.includes(techName)}
+        onCheckedChange={() => handleFilterChange('technologyList', techName)}
+      />
+      <label 
+        htmlFor={`tech-${techName.toLowerCase().replace(/\s+/g, '-')}`} 
+        className="mr-2 text-sm cursor-pointer"
+      >
+        {techName}
+      </label>
+    </div>
+  );
+})}
+
                     </div>
                   </div>
                   

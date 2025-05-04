@@ -8,49 +8,28 @@ import CourseAccordion from '@/components/CourseAccordion';
 
 const CourseDetail: React.FC = () => {
   const { id } = useParams<{id: string}>();
+  const [courseData, setCourseData] = React.useState<any>(null);
+const [loading, setLoading] = React.useState(true);
   
-  // Course sections data
-  const courseSections = [
-    {
-      id: 'section-1',
-      title: 'معرفی دوره و مبانی React',
-      lessons: 5,
-      duration: '۱:۳۰:۰۰',
-      content: [
-        'معرفی دوره و پیش نیازها',
-        'مفاهیم پایه جاوااسکریپت مورد نیاز',
-        'نصب و راه‌اندازی ابزارها',
-        'ساخت اولین پروژه React',
-        'آشنایی با JSX'
-      ]
-    },
-    {
-      id: 'section-2',
-      title: 'کار با JSX و Props',
-      lessons: 8,
-      duration: '۲:۴۵:۰۰',
-      content: [
-        'مفهوم کامپوننت در React',
-        'ساخت کامپوننت‌های کاربردی',
-        'انتقال داده با Props',
-        'مفهوم children',
-        'Prop drilling و راه‌حل‌های آن'
-      ]
-    },
-    {
-      id: 'section-3',
-      title: 'مدیریت State در ری‌اکت',
-      lessons: 10,
-      duration: '۳:۲۰:۰۰',
-      content: [
-        'معرفی State و کاربرد آن',
-        'استفاده از useState',
-        'فرم‌ها در React',
-        'مدیریت وضعیت فرم‌ها',
-        'ارتباط بین کامپوننت‌ها'
-      ]
+React.useEffect(() => {
+  const fetchCourse = async () => {
+    try {
+      const response = await fetch(`https://classapi.sepehracademy.ir/api/Home/GetCourseDetails?CourseId=${id}`);
+      const data = await response.json();
+      setCourseData(data);
+    } catch (error) {
+      console.error('خطا در دریافت اطلاعات دوره:', error);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  fetchCourse();
+}, [id]);
+
+if (loading) return <div className="text-center py-10">در حال بارگذاری...</div>;
+if (!courseData) return <div className="text-center py-10">اطلاعات دوره یافت نشد.</div>;
+ 
   
   return (
     <div className="flex flex-col min-h-screen">
@@ -62,26 +41,29 @@ const CourseDetail: React.FC = () => {
           <div className="bg-black rounded-lg overflow-hidden mb-8">
             <div className="flex flex-col md:flex-row">
               <div className="md:w-1/2 p-8">
-                <h1 className="text-3xl font-bold text-white mb-2">کاملترین دوره آموزش ReactJS</h1>
-                <div className="text-white text-lg mb-6">دوره تخصصی و جامع ریکت</div>
+                <h1 className="text-3xl font-bold text-white mb-2"> {courseData.title} </h1>
+                <div className="text-white text-lg mb-6"> {courseData.subTitle}  </div>
                 <p className="text-gray-300 mb-4">
-                  در این دوره آموزشی از صفر تا صد React.JS را یاد می‌گیرید. این دوره مناسب همه سطوح است و پیش نیاز آن آشنایی با جاوااسکریپت است.
+                {courseData.description}
                 </p>
+
                 
-                <div className="flex items-center text-white mb-6">
-                  <img 
-                    src="/lovable-uploads/36442ea6-4bc0-445a-9514-5882fa052e96.png" 
-                    alt="مدرس دوره" 
-                    className="w-12 h-12 rounded-full object-cover border-2 border-luko-teal"
-                  />
-                  <div className="mr-3">
-                    <div className="font-bold">مهندس مهدی محمدی</div>
-                    <div className="text-sm text-gray-300">مدرس و برنامه‌نویس ارشد</div>
+                {courseData.teacherName && (
+                  <div className="flex items-center text-white mb-6">
+                    <img
+                      src={courseData.teacherName.imageUrl}
+                      alt="مدرس"
+                      className="w-12 h-12 rounded-full object-cover border-2 border-luko-teal"
+                    />
+                    <div className="mr-3">
+                      <div className="font-bold">{courseData.teacherName.fullName}</div>
+                      <div className="text-sm text-gray-300">{courseData.teacherName.title}</div>
+                    </div>
                   </div>
-                </div>
+                )}
                 
                 <div className="bg-gradient-to-r from-luko-teal to-blue-500 p-6 rounded-lg">
-                  <div className="text-white text-2xl font-bold mb-2">۳,۲۰۰,۰۰۰ تومان</div>
+                  <div className="text-white text-2xl font-bold mb-2">{courseData.price} تومان </div>
                   <Button className="w-full bg-orange-500 hover:bg-orange-600 text-lg h-12">
                     شرکت در دوره
                   </Button>
@@ -90,8 +72,8 @@ const CourseDetail: React.FC = () => {
               
               <div className="md:w-1/2 bg-gradient-to-r from-blue-900 to-black p-8 flex items-center justify-center">
                 <img 
-                  src="/lovable-uploads/pic.png" 
-                  alt="React JS" 
+                  src={courseData.imageUrl} 
+                  alt={courseData.title} 
                   className="max-w-full h-auto"
                 />
               </div>
@@ -185,7 +167,7 @@ const CourseDetail: React.FC = () => {
               <h2 className="text-xl font-bold">سرفصل‌ها</h2>
             </div>
             
-            <CourseAccordion sections={courseSections} />
+            <CourseAccordion sections={courseData.sections} />
             
             <div className="p-4 text-center">
               <Button variant="link" className="text-luko-teal">
@@ -200,16 +182,16 @@ const CourseDetail: React.FC = () => {
             <div className="flex flex-col md:flex-row">
               <div className="md:w-1/4 mb-4 md:mb-0">
                 <img 
-                  src="/lovable-uploads/36442ea6-4bc0-445a-9514-5882fa052e96.png" 
+                  src={courseData.teacherName.imageUrl}
                   alt="مدرس دوره" 
                   className="w-32 h-32 rounded-full object-cover mx-auto border-4 border-luko-teal"
                 />
               </div>
               <div className="md:w-3/4 md:pr-6">
-                <h3 className="text-lg font-bold mb-2">مهدی محمدی</h3>
-                <div className="text-gray-500 mb-4">متخصص برنامه نویسی فرانت اند</div>
+                <h3 className="text-lg font-bold mb-2"> {courseData.teacherName.fullName}</h3>
+                <div className="text-gray-500 mb-4">   {courseData.teacherName.title} </div>
                 <p className="text-gray-700 mb-4">
-                  مهندس مهدی محمدی با بیش از 10 سال تجربه در زمینه توسعه وب و برنامه‌نویسی فرانت‌اند، یکی از مدرسان برجسته در زمینه ReactJS است. او تاکنون بیش از ۵۰ پروژه تجاری بزرگ را با استفاده از React توسعه داده ا��ت و تجربیات خود را در این دوره با شما به اشتراک می‌گذارد.
+                {courseData.teacherName.bio}
                 </p>
                 <Button variant="outline" className="text-luko-teal border-luko-teal hover:bg-luko-teal/10">
                   مشاهده پروفایل مدرس
