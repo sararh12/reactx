@@ -8,25 +8,24 @@ import { Checkbox } from '@/components/ui/checkbox';
 import axios from 'axios';
 
 export interface Course {
-  course: {
-    courseId: string;
-    title: string;
-    describe: string;
-    cost: number;
-    courseRate: number;
-    levelName: string;
-    statusName: string;
-    teacherName: string;
-    classRoomName: string;
-    technologyList: string;
-    likeCount: number;
-    dissLikeCount: number;
-    currentRegistrants: number;
-    tumbImageAddress: string | null;
-    lastUpdate: string;
-    userFavorite: boolean;
-  };
+  courseId: string;
+  title: string;
+  describe: string;
+  cost: number;
+  courseRate: number;
+  levelName: string;
+  statusName: string;
+  teacherName: string;
+  classRoomName: string;
+  technologyList: string;
+  likeCount: number;
+  dissLikeCount: number;
+  currentRegistrants: number;
+  tumbImageAddress: string | null;
+  lastUpdate: string;
+  userFavorite: boolean;
 }
+
 
 interface Technology {
   id: number;
@@ -44,6 +43,14 @@ interface CourseType {
   iconAddress: string;
 }
 
+type SelectedFilterKeys =
+  | "technologyIds"
+  | "statusName"
+  | "courseRate"
+  | "levelName"
+  | "cost"
+  | "priceRange";
+
 
 const CoursesPage: React.FC = () => {
   const [courses, setCourses] = useState<any[]>([]);
@@ -53,42 +60,64 @@ const CoursesPage: React.FC = () => {
   const [technologies, setTechnologies] = useState<Technology[]>([]);
   const [courseTypes, setCourseTypes] = useState<CourseType[]>([]);
   const coursesPerPage = 6;
-  const [selectedFilters, setSelectedFilters] = useState({
-    technologyList: [] as string[],
-    statusName: [] as string[],
-    courseRate: [] as number[],
-    levelName: [] as string[],
-    cost: [] as string[],
+  const [selectedFilters, setSelectedFilters] = useState<{
+    technologyIds: number[];
+    statusName: string[];
+    courseRate: number[];
+    levelName: string[];
+    cost: string[];
+    priceRange: number;
+  }>({
+    technologyIds: [],
+    statusName: [],
+    courseRate: [],
+    levelName: [],
+    cost: [],
     priceRange: 3000000,
   });
   
   const fetchCourses = () => {
-    const { technologyList, statusName, courseRate, levelName, cost, priceRange } = selectedFilters;
+    const { technologyIds, levelName, priceRange, courseRate, statusName } = selectedFilters;
 
     const filterParams = new URLSearchParams();
     filterParams.append('PageNumber', String(currentPage));
     filterParams.append('RowsOfPage', String(coursesPerPage));
 
-    if (searchTerm) filterParams.append('Query', searchTerm);
-    if (technologyList.length > 0) filterParams.append('ListTech', technologyList.join(','));
-    if (statusName.length > 0) filterParams.append('Status', statusName.join(','));
-    if (courseRate.length > 0) filterParams.append('Rating', courseRate.join(','));
-    if (levelName.length > 0) filterParams.append('Level', levelName.join(','));
-    if (cost.length > 0) filterParams.append('cost', cost.join(','));
-    if (priceRange) filterParams.append('PriceRange', String(priceRange));
+    if (searchTerm.trim()) {
+      filterParams.append("Query", searchTerm.trim());
+    }
+
+    if (levelName.length > 0) {
+      filterParams.append("courseLevelId", levelName.join(","));
+    }
+
+    if (technologyIds.length > 0) {
+      filterParams.append("ListTech", technologyIds.join(","));
+      filterParams.append("TechCount", String(technologyIds.length));
+    }
+
+    filterParams.append("CostDown", "0");
+    filterParams.append("CostUp", String(priceRange));
+
 
     axios.get(`https://classapi.sepehracademy.ir/api/Home/GetCoursesWithPagination?${filterParams.toString()}`)
     .then(response => {
-      console.log(response.data);
       if (response.data && Array.isArray(response.data.courseFilterDtos)) {
         setCourses(response.data.courseFilterDtos);  
         setTotalCount(response.data.totalCount); 
       } else {
-        console.error("داده‌ها به درستی دریافت نشدند یا ساختار متفاوت است.");
+        console.error(
+          "Invalid data structure received from API:",
+          response.data
+        );
+        setCourses([]);
+        setTotalCount(0);
       }
     })
     .catch(error => {
       console.error("خطا در دریافت لیست دوره‌ها:", error);
+      setCourses([]);
+        setTotalCount(0);
     });
 };
 
@@ -97,6 +126,12 @@ useEffect(() => {
     .then(response => {
       if (Array.isArray(response.data)) {
         setTechnologies(response.data);
+      }else {
+        console.error(
+          "Invalid data structure received for technologies:",
+          response.data
+        );
+        setTechnologies([]);
       }
     })
     .catch(err => console.error("خطا در دریافت تکنولوژی‌ها", err));
@@ -105,12 +140,22 @@ useEffect(() => {
 useEffect(() => {
   const fetchCourseTypes = async () => {
     try {
-      const response = await axios.get(`https://classapi.sepehracademy.ir/api/CourseType/GetCourseTypes`);
-      setCourseTypes(response.data);
+      const response = await axios.get(
+        `https://classapi.sepehracademy.ir/api/CourseType/GetCourseTypes`
+      );
+      if (Array.isArray(response.data)) {
+        setCourseTypes(response.data);
+      } else {
+        console.error(
+          "Invalid data structure received for course types:",
+          response.data
+        );
+        setCourseTypes([]);
+      }
     } catch (error) {
-      console.error('خطا در دریافت نوع دوره‌ها:', error);
+      console.error("Error fetching course types:", error);
     }
-  };
+      }
 
   fetchCourseTypes();
 }, []);
@@ -123,61 +168,74 @@ useEffect(() => {
 
 
   
-  // Get current courses for pagination
-  const indexOfLastCourse = currentPage * coursesPerPage;
-  const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
+const paginate = (pageNumber: number) => {
+  if (
+    pageNumber >= 1 &&
+    (pageNumber - 1) * coursesPerPage < totalCount
+  ) {
+    setCurrentPage(pageNumber);
+  }
+};
   
-  // Change page
-  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
-  
-  // Handle filter changes
-  const handleFilterChange = (category: string, value: string | number) => {
-    setSelectedFilters(prev => {
-      const newFilters = { ...prev };
-      const categoryArray = newFilters[category as keyof typeof selectedFilters] as Array<string | number>;
-      
+const handleFilterChange = (
+  category: SelectedFilterKeys,
+  value: string | number
+) => {
+  setSelectedFilters((prev) => {
+    const newFilters = { ...prev };
+    const currentFilterValue = newFilters[category];
+
+    if (Array.isArray(currentFilterValue)) {
+      const categoryArray = currentFilterValue as Array<string | number>;
       if (categoryArray.includes(value)) {
-        // Remove filter if already selected
         return {
           ...newFilters,
-          [category]: categoryArray.filter(item => item !== value)
+          [category]: categoryArray.filter((item) => item !== value),
         };
       } else {
-        // Add filter if not selected
         return {
           ...newFilters,
-          [category]: [...categoryArray, value]
+          [category]: [...categoryArray, value],
         };
       }
-    });
-  };
+    } else {
+      return {
+        ...newFilters,
+        [category]: value,
+      };
+    }
+  });
+  setCurrentPage(1);
+};
+
   
-  // Handle price range change
-  const handlePriceRangeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectedFilters(prev => ({
-      ...prev,
-      priceRange: Number(e.target.value)
-    }));
-  };
+const handlePriceRangeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  setSelectedFilters((prev) => ({
+    ...prev,
+    priceRange: Number(e.target.value),
+  }));
+  setCurrentPage(1);
+};
   
-  // Reset all filters
-  const resetFilters = () => {
-    setSelectedFilters({
-      technologyList: [],
-      statusName: [],
-      courseRate: [],
-      levelName: [],
-      cost: [],
-      priceRange: 3000000,
-    });
-    setSearchTerm('');
-    setCurrentPage(1);
-  };
+const resetFilters = () => {
+  setSelectedFilters({
+    technologyIds: [],
+    statusName: [],
+    courseRate: [],
+    levelName: [],
+    cost: [],
+    priceRange: 3000000,
+  });
+  setSearchTerm("");
+  setCurrentPage(1);
+};
   
-  // Format price to Persian format
-  const formatPrice = (cost: number) => {
-    return new Intl.NumberFormat('fa-IR').format(cost);
-  };
+const formatPrice = (price: number) => {
+  if (isNaN(price)) {
+    return "۰";
+  }
+  return new Intl.NumberFormat("fa-IR").format(price);
+};
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -200,7 +258,10 @@ useEffect(() => {
                     placeholder="جستجو در دوره ها..."
                     className="w-full md:w-80 pr-10 py-2 border border-gray-300 rounded-md"
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={(e) => {
+                      setSearchTerm(e.target.value);
+                      setCurrentPage(1);
+                    }}
                   />
                 </div>
               </div>
@@ -237,26 +298,26 @@ useEffect(() => {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                       </svg>
                     </h4>
-                    <div className="space-y-2">
-                    {technologies.map((tech) => {
-  const techName = tech.techName;
-
-  return (
-    <div key={tech.id} className="flex items-center">
-      <Checkbox 
-        id={`tech-${techName.toLowerCase().replace(/\s+/g, '-')}`}
-        checked={selectedFilters.technologyList.includes(techName)}
-        onCheckedChange={() => handleFilterChange('technologyList', techName)}
-      />
-      <label 
-        htmlFor={`tech-${techName.toLowerCase().replace(/\s+/g, '-')}`} 
-        className="mr-2 text-sm cursor-pointer"
-      >
-        {techName}
-      </label>
-    </div>
-  );
-})}
+                    <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
+                    {technologies.map((tech) => (
+                        <div key={tech.id} className="flex items-center">
+                          <Checkbox
+                            id={`tech-${tech.id}`}
+                            checked={selectedFilters.technologyIds.includes(
+                              tech.id
+                            )}
+                            onCheckedChange={() =>
+                              handleFilterChange("technologyIds", tech.id)
+                            }
+                          />
+                          <label
+                            htmlFor={`tech-${tech.id}`}
+                            className="mr-2 text-sm text-gray-600 hover:text-gray-800 cursor-pointer"
+                          >
+                            {tech.techName}
+                          </label>
+                        </div>
+                      ))}
 
                     </div>
                   </div>
@@ -328,30 +389,27 @@ useEffect(() => {
                       </svg>
                     </h4>
                     <div className="space-y-2">
-                      <div className="flex items-center">
-                        <Checkbox 
-                          id="level-beginner" 
-                          checked={selectedFilters.levelName.includes('beginner')}
-                          onCheckedChange={() => handleFilterChange('levelName', 'beginner')}
-                        />
-                        <label htmlFor="level-beginner" className="mr-2 text-sm cursor-pointer">مقدماتی</label>
-                      </div>
-                      <div className="flex items-center">
-                        <Checkbox 
-                          id="level-inter"
-                          checked={selectedFilters.levelName.includes('intermediate')}
-                          onCheckedChange={() => handleFilterChange('levelName', 'intermediate')}
-                        />
-                        <label htmlFor="level-inter" className="mr-2 text-sm cursor-pointer">متوسط</label>
-                      </div>
-                      <div className="flex items-center">
-                        <Checkbox 
-                          id="level-advanced"
-                          checked={selectedFilters.levelName.includes('advanced')}
-                          onCheckedChange={() => handleFilterChange('levelName', 'advanced')}
-                        />
-                        <label htmlFor="level-advanced" className="mr-2 text-sm cursor-pointer">پیشرفته</label>
-                      </div>
+                    {[
+                        { id: "مقدماتی", label: "مقدماتی" },
+                        { id: "متوسط", label: "متوسط" },
+                        { id: "پیشرفته", label: "پیشرفته" },
+                      ].map((level) => (
+                        <div key={level.id} className="flex items-center">
+                          <Checkbox
+                            id={`level-${level.id}`}
+                            checked={selectedFilters.levelName.includes(level.id)}
+                            onCheckedChange={() =>
+                              handleFilterChange("levelName", level.id)
+                            }
+                          />
+                          <label
+                            htmlFor={`level-${level.id}`}
+                            className="mr-2 text-sm text-gray-600 hover:text-gray-800 cursor-pointer"
+                          >
+                            {level.label}
+                          </label>
+                        </div>
+                      ))}
                     </div>
                   </div>
                   
@@ -432,8 +490,8 @@ useEffect(() => {
                 
                 {courses.length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                 {courses.map((course) => (
-                      <CourseCard key={course.courseId} course={course} />
+                 {courses.map((courseData) => (
+                      <CourseCard key={courseData.courseId} course={courseData} />
                 ))}
                   </div>
                 ) : (
@@ -449,23 +507,29 @@ useEffect(() => {
                   </div>
                 )}
                 
-                {/* Pagination */}
+                {totalCount > coursesPerPage && (
                 <div className="flex justify-center mt-8">
                   <button
                     onClick={() => paginate(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className="px-4 py-2 bg-gray-300 rounded-l-md"
+                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     قبلی
                   </button>
+
+                  <span className="text-sm text-gray-500">
+                      صفحه {currentPage} از {Math.ceil(totalCount / coursesPerPage)}
+                    </span>
+
                   <button
                     onClick={() => paginate(currentPage + 1)}
                     disabled={currentPage * coursesPerPage >= totalCount}
-                    className="px-4 py-2 bg-gray-300 rounded-r-md"
+                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     بعدی
                   </button>
                 </div>
+                )}
               </div>
             </div>
           </div>
