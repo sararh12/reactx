@@ -16,6 +16,7 @@ const Register = () => {
   const [repeatPassword,setRepeatPassword] = useState('');
   const { toast } = useToast();
   
+  
   const handleSendCode = async (e: React.FormEvent) => {
     e.preventDefault();
     setStep(2);
