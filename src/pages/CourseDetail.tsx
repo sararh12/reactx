@@ -6,29 +6,71 @@ import { Button } from '@/components/ui/button';
 import { Check } from 'lucide-react';
 import CourseAccordion from '@/components/CourseAccordion';
 
+interface Teacher {
+  imageUrl?: string; 
+  teacherName: string;
+  title?: string;
+  bio?: string;
+}
+
+interface CourseDetailData {
+  courseId: string; 
+  title: string;
+  subTitle?: string; 
+  description: string;
+  teacherName: string; 
+  cost: number;
+  capacity:number; 
+  imageAddress: string | null;
+  sections: {
+    id: string; 
+    title: string;
+    lessons: number; 
+    duration: string;
+  }[];
+  
+  courseRate?: number;
+  currentRegistrants?: number;
+}
+
 const CourseDetail: React.FC = () => {
   const { id } = useParams<{id: string}>();
-  const [courseData, setCourseData] = React.useState<any>(null);
+  const [courseData, setCourseData] = React.useState<CourseDetailData | null>(null);
 const [loading, setLoading] = React.useState(true);
   
 React.useEffect(() => {
   const fetchCourse = async () => {
     try {
       const response = await fetch(`https://classapi.sepehracademy.ir/api/Home/GetCourseDetails?CourseId=${id}`);
+      if (!response.ok) {
+
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
       const data = await response.json();
-      setCourseData(data);
+
+      setCourseData(data as CourseDetailData);
     } catch (error) {
-      console.error('خطا در دریافت اطلاعات دوره:', error);
+      console.error("Error fetching course details:", error);
+      setCourseData(null);
     } finally {
       setLoading(false);
     }
   };
 
-  fetchCourse();
+  if (id) {
+    fetchCourse();
+  } else {
+    console.error("Course ID is missing");
+    setLoading(false);
+    setCourseData(null);
+  }
 }, [id]);
+
 
 if (loading) return <div className="text-center py-10">در حال بارگذاری...</div>;
 if (!courseData) return <div className="text-center py-10">اطلاعات دوره یافت نشد.</div>;
+
+const teacher = courseData.teacherName;
  
   
   return (
@@ -51,19 +93,19 @@ if (!courseData) return <div className="text-center py-10">اطلاعات دور
                 {courseData.teacherName && (
                   <div className="flex items-center text-white mb-6">
                     <img
-                      src={courseData.teacherName.imageUrl}
-                      alt="مدرس"
+                      src={courseData.imageAddress}
+                      alt={courseData.teacherName || "مدرس"}
                       className="w-12 h-12 rounded-full object-cover border-2 border-luko-teal"
                     />
                     <div className="mr-3">
-                      <div className="font-bold">{courseData.teacherName.fullName}</div>
-                      <div className="text-sm text-gray-300">{courseData.teacherName.title}</div>
+                      <div className="font-bold">{courseData.teacherName}</div>
+                      <div className="text-sm text-gray-300">{courseData.title}</div>
                     </div>
                   </div>
                 )}
                 
                 <div className="bg-gradient-to-r from-luko-teal to-blue-500 p-6 rounded-lg">
-                  <div className="text-white text-2xl font-bold mb-2">{courseData.price} تومان </div>
+                  <div className="text-white text-2xl font-bold mb-2">{courseData.cost} تومان </div>
                   <Button className="w-full bg-orange-500 hover:bg-orange-600 text-lg h-12">
                     شرکت در دوره
                   </Button>
@@ -72,7 +114,7 @@ if (!courseData) return <div className="text-center py-10">اطلاعات دور
               
               <div className="md:w-1/2 bg-gradient-to-r from-blue-900 to-black p-8 flex items-center justify-center">
                 <img 
-                  src={courseData.imageUrl} 
+                  src={courseData.imageAddress} 
                   alt={courseData.title} 
                   className="max-w-full h-auto"
                 />
@@ -85,7 +127,7 @@ if (!courseData) return <div className="text-center py-10">اطلاعات دور
             <div className="bg-white p-6 rounded-lg shadow-md">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-amber-500 text-2xl font-bold">۴.۹</div>
+                  <div className="text-amber-500 text-2xl font-bold">{courseData.courseRate}</div>
                   <div className="text-sm text-gray-500">امتیاز دوره</div>
                 </div>
                 <div className="text-amber-500">
@@ -102,7 +144,7 @@ if (!courseData) return <div className="text-center py-10">اطلاعات دور
             
             <div className="bg-white p-6 rounded-lg shadow-md">
               <div className="flex flex-col">
-                <div className="text-luko-teal text-2xl font-bold">۹۱۶</div>
+                <div className="text-luko-teal text-2xl font-bold">{courseData.currentRegistrants}</div>
                 <div className="text-sm text-gray-500">تعداد دانشجویان</div>
                 <div className="flex items-center mt-2">
                   <div className="flex -space-x-2">
@@ -110,7 +152,7 @@ if (!courseData) return <div className="text-center py-10">اطلاعات دور
                     <div className="w-8 h-8 rounded-full bg-gray-400"></div>
                     <div className="w-8 h-8 rounded-full bg-gray-500"></div>
                   </div>
-                  <div className="mr-4 text-xs text-gray-500">و ۹۱۳ نفر دیگر</div>
+                  <div className="mr-4 text-xs text-gray-500">و {courseData.capacity} نفر دیگر</div>
                 </div>
               </div>
             </div>
@@ -167,7 +209,7 @@ if (!courseData) return <div className="text-center py-10">اطلاعات دور
               <h2 className="text-xl font-bold">سرفصل‌ها</h2>
             </div>
             
-            <CourseAccordion sections={courseData.sections} />
+            <CourseAccordion sections={courseData.sections || []} />
             
             <div className="p-4 text-center">
               <Button variant="link" className="text-luko-teal">
@@ -177,21 +219,22 @@ if (!courseData) return <div className="text-center py-10">اطلاعات دور
           </div>
           
           {/* Instructor */}
+          {teacher && (
           <div className="bg-white rounded-lg shadow-md mb-8 p-6">
             <h2 className="text-xl font-bold mb-4">مدرس</h2>
             <div className="flex flex-col md:flex-row">
               <div className="md:w-1/4 mb-4 md:mb-0">
                 <img 
-                  src={courseData.teacherName.imageUrl}
-                  alt="مدرس دوره" 
+                  src={courseData.imageAddress || "/placeholder-avatar.png"}
+                  alt={courseData.teacherName || "مدرس دوره"} 
                   className="w-32 h-32 rounded-full object-cover mx-auto border-4 border-luko-teal"
                 />
               </div>
               <div className="md:w-3/4 md:pr-6">
-                <h3 className="text-lg font-bold mb-2"> {courseData.teacherName.fullName}</h3>
-                <div className="text-gray-500 mb-4">   {courseData.teacherName.title} </div>
+                <h3 className="text-lg font-bold mb-2"> {courseData.teacherName}</h3>
+                <div className="text-gray-500 mb-4">   {courseData.title} </div>
                 <p className="text-gray-700 mb-4">
-                {courseData.teacherName.bio}
+                {courseData.bio}
                 </p>
                 <Button variant="outline" className="text-luko-teal border-luko-teal hover:bg-luko-teal/10">
                   مشاهده پروفایل مدرس
@@ -199,6 +242,7 @@ if (!courseData) return <div className="text-center py-10">اطلاعات دور
               </div>
             </div>
           </div>
+          )}
           
           {/* Reviews */}
           <div className="bg-white rounded-lg shadow-md p-6 mb-8">
