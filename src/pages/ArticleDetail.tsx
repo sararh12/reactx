@@ -16,10 +16,6 @@ interface NewsDetailData{
   autor:string;
   pictureAddress: string | null;
   tags: ['ری اکت', 'جاوااسکریپت', 'فرانت اند'];
-  comments: [
-    { id: '1', author: 'محمد حسینی', date: '۱۴۰۲/۰۲/۱۶', content: 'مقاله بسیار مفیدی بود. ممنون از اشتراک گذاری این اطلاعات ارزشمند.', avatar: '/lovable-uploads/dab28740-378c-4bde-a459-8122ce2f6957.png', likes: 12 },
-    { id: '2', author: 'سارا کریمی', date: '۱۴۰۲/۰۲/۱۵', content: 'من تازه می‌خوام یادگیری ری‌اکت رو شروع کنم و این مقاله خیلی کمکم کرد. ممنون.', avatar: '/lovable-uploads/dab28740-378c-4bde-a459-8122ce2f6957.png', likes: 8 },
-  ],
   relatedCourses: [
     { id: '1', title: 'دوره جامع React.js', image: '/lovable-uploads/news.png' },
     { id: '2', title: 'آموزش پیشرفته React.js', image: '/lovable-uploads/news.png' },
