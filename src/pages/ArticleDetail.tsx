@@ -8,129 +8,237 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
 import axios from "axios";
 
-interface NewsDetailData{
-  newsId:string;
-  inserDate:number;
-  title:string;
-  describe:string;
-  autor:string;
+interface Comment {
+  id: string;
+  newsId: string;
+  parentId: string;
+  currentUserLikeId: string;
+  inserDate: string;
+  title: string;
+  describe: string;
+  likeCount: number;
+  dissLikeCount: number;
+  replyCount: number;
+  currentUserIsLike: boolean;
+  currentUserIsDissLike: boolean;
+  autor: string;
   pictureAddress: string | null;
-  tags: ['ری اکت', 'جاوااسکریپت', 'فرانت اند'];
-  relatedCourses: [
-    { id: '1', title: 'دوره جامع React.js', image: '/lovable-uploads/news.png' },
-    { id: '2', title: 'آموزش پیشرفته React.js', image: '/lovable-uploads/news.png' },
-    { id: '3', title: 'React Native برای همه', image: '/lovable-uploads/news.png' },
-    { id: '4', title: 'جاوااسکریپت پیشرفته', image: '/lovable-uploads/news.png' },
-  ],
-  relatedArticles: [
-    { id: '101', title: 'آموزش کامل و جامع Redux', date: '۱۴۰۲/۰۲/۱۰', image: '/lovable-uploads/pic.png' },
-    { id: '102', title: 'معرفی هوک‌های جدید React', date: '۱۴۰۲/۰۲/۰۵', image: '/lovable-uploads/pic.png' },
-    { id: '103', title: 'مقایسه React و Vue', date: '۱۴۰۲/۰۲/۰۱', image: '/lovable-uploads/pic.png' },
-  ],
-  sections: [
-    {
-      id: 'section1',
-      title: 'معرفی React.js',
-      lessons: 5,
-      duration: '45 دقیقه',
-      content: [
-        'تاریخچه React.js',
-        'مفاهیم اصلی React',
-        'مقایسه با دیگر فریمورک‌ها',
-        'نصب و راه‌اندازی React',
-        'اولین کامپوننت React'
-      ]
-    },
-    {
-      id: 'section2',
-      title: 'کامپوننت‌ها و Props',
-      lessons: 4,
-      duration: '35 دقیقه',
-      content: [
-        'ساختار کامپوننت‌ها',
-        'Props و انتقال داده',
-        'کامپوننت‌های کلاس و فانکشنال',
-        'Conditional Rendering'
-      ]
-    },
-    {
-      id: 'section3',
-      title: 'State و Lifecycle',
-      lessons: 6,
-      duration: '55 دقیقه',
-      content: [
-        'مدیریت State',
-        'چرخه حیات کامپوننت',
-        'Hook های اصلی',
-        'useState و useEffect',
-        'useContext و useReducer',
-        'Custom Hooks'
-      ]
-    }
-  ]
+}
+
+interface ArticleDetails{
+  id: string;
+  title: string;
+  googleTitle: string;
+  googleDescribe: string;
+  miniDescribe: string;
+  describe: string;
+  keyword: string;
+  shortLink: string | null;
+  currentImageAddress: string | null;
+  currentImageAddressTumb: string | null;
+  insertDate: string;
+  updateDate: string;
+  currentRate: number;
+  currentView: number;
+  currentLikeCount: number;
+  isSlider: boolean;
+  active: boolean;
+  userId: number;
+  addUserFullName: string;
+  newsCatregoryId: number;
+  newsCatregoryName: string;
+  commentsCount: number;
+  inUsersFavoriteCount: number;
+  currentUserFavoriteId: string;
+  isCurrentUserFavorite: boolean;
+  currentUserSetRate: boolean;
+  currentUserRateNumber: number;
+  currentUserIsLike: boolean;
+  likeId: string;
+  currentUserIsDissLike: boolean;
+  currentDissLikeCount: number;
+}
+
+interface NewsDetailData {
+  commentDtos: Comment[];
+  detailsNewsDto: ArticleDetails;
 }
 
 const ArticleDetail: React.FC = () => {
-  const { id } = useParams<{id: string}>();
+  const { id: articleId } = useParams<{id: string}>();
   const { toast } = useToast();
   const [showAllContent, setShowAllContent] = useState(false);
   const [activeTab, setActiveTab] = useState('content');
   const [articleLiked, setArticleLiked] = useState(false);
   const [commentText, setCommentText] = useState('');
-  const [likedComments, setLikedComments] = useState<Record<string, boolean>>({});
-  const [loading, setLoading] = React.useState(true);
+  const [likedComments, setLikedComments] = useState<Record<string, boolean>>(
+    {}
+  );
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState("");
   const [articleData, setArticleData] = React.useState<NewsDetailData | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const [loadedReplies, setLoadedReplies] = useState<Record<string, Comment[]>>({});
+  const [expandedReplies, setExpandedReplies] = useState<Record<string, boolean>>({});
+  const [loadingReplies, setLoadingReplies] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     const fetchArticle = async () => {
       try {
-        const response = await axios.get<NewsDetailData>(`https://classapi.sepehracademy.ir/api/News/${id}`);
+        const response = await axios.get<NewsDetailData>(
+          `https://classapi.sepehracademy.ir/api/News/${articleId}`
+        );
         setArticleData(response.data);
+        if (response.data.detailsNewsDto.currentUserIsLike) {
+          setArticleLiked(true);
+        }
       } catch (err) {
         setError("خطا در دریافت اطلاعات مقاله.");
-        console.error(err);
+        console.error("Error fetching article:", err);
       }
     };
 
     fetchArticle();
-  }, [id]);
+  }, [articleId]);
+
+  const refetchArticleData = async () => {
+    try {
+      const response = await axios.get<NewsDetailData>(
+        `https://classapi.sepehracademy.ir/api/News/${articleId}`
+      );
+      setArticleData(response.data);
+      if (response.data.detailsNewsDto.currentUserIsLike) {
+        setArticleLiked(true);
+      } else {
+        setArticleLiked(false);
+      }
+      setLikedComments({});
+    } catch (err) {
+      setError("خطا در به‌روزرسانی اطلاعات مقاله.");
+      console.error("Error refetching article:", err);
+    }
+  };
 
   if (error) {
     return <div className="text-red-500 text-center py-10">{error}</div>;
   }
 
   if (!articleData) {
-    return <div className="text-center py-10 text-gray-500">در حال بارگذاری مقاله...</div>;
+    return (
+      <div className="text-center py-10 text-gray-500">
+        در حال بارگذاری مقاله...
+      </div>
+    );
   }
 
-  
 
-  
+  const article = articleData.detailsNewsDto;
+  const comments = articleData.commentDtos;
+
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("fa-IR", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+  };
+
   const handleArticleLike = () => {
     setArticleLiked(!articleLiked);
     toast({
-      title: articleLiked ? "از لیست علاقه‌مندی‌ها حذف شد" : "به لیست علاقه‌مندی‌ها اضافه شد",
-      description: articleLiked ? "این مقاله از لیست علاقه‌مندی‌های شما حذف شد" : "این مقاله به لیست علاقه‌مندی‌های شما اضافه شد",
+      title: articleLiked
+        ? "از لیست علاقه‌مندی‌ها حذف شد"
+        : "به لیست علاقه‌مندی‌ها اضافه شد",
     });
   };
 
-  const handleCommentLike = (commentId: string) => {
-    setLikedComments(prev => ({
-      ...prev,
-      [commentId]: !prev[commentId]
-    }));
-    toast({
-      title: likedComments[commentId] ? "پسندیدن لغو شد" : "نظر پسندیده شد",
-      description: likedComments[commentId] ? "پسندیدن این نظر لغو شد" : "این نظر به لیست پسندیده‌های شما اضافه شد",
-    });
+  const handleCommentLikeDislike = async (commentId: string, likeType: boolean) => {
+    const token = localStorage.getItem("token");
+    const comment = comments.find(c => c.id === commentId);
+
+    if (!comment) return;
+
+    const isUndoingLike = likeType === true && comment.currentUserIsLike;
+    const isUndoingDislike = likeType === false && comment.currentUserIsDissLike;
+
+    try {
+      if (isUndoingLike || isUndoingDislike) {
+        if (comment.currentUserLikeId && comment.currentUserLikeId !== "00000000-0000-0000-0000-000000000000") {
+          await axios.delete(`https://classapi.sepehracademy.ir/api/News/DeleteCommentLikeNews`, {
+            headers: { Authorization: `Bearer ${token}` },
+            data: { deleteEntityId: comment.currentUserLikeId },
+          });
+          toast({ title: "بازخورد شما حذف شد" });
+        }
+      } else {
+        await axios.post(
+          `https://classapi.sepehracademy.ir/api/News/CommentLike/${commentId}?LikeType=${likeType}`,
+          {},
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        toast({ title: likeType ? "نظر پسندیده شد" : "نظر دیسلایک شد" });
+      }
+      refetchArticleData();
+    } catch (err) {
+      console.error("Error liking/disliking comment:", err);
+      toast({
+        title: "خطا در ثبت بازخورد",
+        description: "لطفا دوباره تلاش کنید.",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleSaveArticle = () => {
-    toast({
-      title: "مقاله ذخیره شد",
-      description: "این مقاله در لیست ذخیره‌های شما قرار گرفت",
-    });
+
+  const handleSaveArticle = async () => {
+    const token = localStorage.getItem("token");
+    if (!token || !articleData || !articleId) {
+      toast({
+        title: "خطا",
+        description: "اطلاعات مورد نیاز برای ذخیره مقاله در دسترس نیست.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const isCurrentlyFavorite = articleData.detailsNewsDto.isCurrentUserFavorite;
+    const favoriteId = articleData.detailsNewsDto.currentUserFavoriteId;
+
+    try {
+      if (isCurrentlyFavorite) {
+        // Article is currently a favorite, so we need to remove it.
+        if (favoriteId && favoriteId !== "00000000-0000-0000-0000-000000000000") {
+          await axios.delete(`https://classapi.sepehracademy.ir/api/News/DeleteFavoriteNews`, {
+            headers: { Authorization: `Bearer ${token}` },
+            data: { deleteEntityId: favoriteId },
+          });
+          toast({ title: "مقاله از علاقه‌مندی‌ها حذف شد" });
+        } else {
+          // This case should ideally not happen if isCurrentUserFavorite is true
+          toast({ title: "خطا", description: "شناسه علاقه‌مندی یافت نشد.", variant: "destructive" });
+          return;
+        }
+      } else {
+        // Article is not a favorite, so add it.
+        await axios.post(
+          `https://classapi.sepehracademy.ir/api/News/AddFavoriteNews?NewsId=${articleId}`,
+          {},
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        toast({ title: "مقاله به علاقه‌مندی‌ها اضافه شد" });
+      }
+      refetchArticleData(); // Refetch to update UI and favorite status
+    } catch (err) {
+      console.error("Error saving/unsaving article:", err);
+      toast({
+        title: "خطا در ذخیره‌سازی مقاله",
+        description: "لطفا دوباره تلاش کنید.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleShare = () => {
@@ -141,350 +249,559 @@ const ArticleDetail: React.FC = () => {
     });
   };
 
-  const handleSubmitComment = (e: React.FormEvent) => {
+  const handleSubmitCommentOrReply = async (e: React.FormEvent, parentId?: string) => {
     e.preventDefault();
-    if (commentText.trim()) {
-      toast({
-        title: "نظر شما ثبت شد",
-        description: "نظر شما پس از تایید نمایش داده خواهد شد",
-      });
-      setCommentText('');
-    } else {
+    const currentUserId = 123;
+    const token = localStorage.getItem("token");
+    const textToSubmit = parentId ? replyText : commentText;
+    const titleForComment = parentId ? `پاسخ به ${comments.find(c => c.id === parentId)?.autor || 'نظر'}` : "نظر جدید";
+
+    if (!textToSubmit.trim() || !articleId || !currentUserId) {
       toast({
         title: "خطا",
-        description: "لطفا نظر خود را وارد کنید",
+        description: parentId ? "لطفا متن پاسخ را وارد کنید" : "لطفا نظر خود را وارد کنید",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const payload = {
+      newsId: articleId,
+      title: titleForComment,
+      describe: textToSubmit,
+      userId: currentUserId,
+      ...(parentId && { parentId }),
+    };
+
+    const endpoint = parentId
+      ? `https://classapi.sepehracademy.ir/api/News/CreateNewsReplyComment`
+      : `https://classapi.sepehracademy.ir/api/News/CreateNewsComment`;
+
+    try {
+      await axios.post(endpoint, payload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      toast({
+        title: parentId ? "پاسخ شما ثبت شد" : "نظر شما ثبت شد",
+        description: "پس از تایید نمایش داده خواهد شد",
+      });
+      if (parentId) {
+        setReplyText("");
+        setReplyingTo(null);
+      } else {
+        setCommentText("");
+      }
+      refetchArticleData();
+    } catch (err) {
+      console.error("Error submitting comment/reply:", err);
+      toast({
+        title: "خطا در ارسال",
+        description: "لطفا دوباره تلاش کنید.",
         variant: "destructive",
       });
     }
   };
 
-  const handleReply = (commentId: string) => {
-    toast({
-      title: "پاسخ به نظر",
-      description: "در حال حاضر امکان پاسخ به نظرات فعال نیست",
-    });
+  const handleInitiateReply = (commentId: string) => {
+    setReplyingTo(commentId);
+    setReplyText("");
   };
 
-  const handleViewProfile = () => {
-    toast({
-      title: "پروفایل مدرس",
-      description: "در حال انتقال به صفحه پروفایل مدرس",
-    });
+  
+
+  const handleToggleReplies = async (parentCommentId: string) => {
+    const token = localStorage.getItem("token");
+    if (loadedReplies[parentCommentId]) {
+      setExpandedReplies(prev => ({ ...prev, [parentCommentId]: !prev[parentCommentId] }));
+      return;
+    }
+
+    setLoadingReplies(prev => ({ ...prev, [parentCommentId]: true }));
+    try {
+      const response = await axios.get<Comment[]>(
+        `https://classapi.sepehracademy.ir/api/News/GetRepliesComments?Id=${parentCommentId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setLoadedReplies(prev => ({ ...prev, [parentCommentId]: response.data }));
+      setExpandedReplies(prev => ({ ...prev, [parentCommentId]: true }));
+    } catch (err) {
+      console.error(`Error fetching replies for comment ${parentCommentId}:`, err);
+      toast({
+        title: "خطا در دریافت پاسخ‌ها",
+        variant: "destructive",
+      });
+    } finally {
+      setLoadingReplies(prev => ({ ...prev, [parentCommentId]: false }));
+    }
   };
 
+  const keywords = article.keyword ? article.keyword.split(" ") : [];
+
+
+
+
+  
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-gray-50">
       <Navbar />
-      
-      <main className="flex-grow rtl">
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex flex-col md:flex-row gap-8">
-            <div className="md:w-2/3">
-              <div className="bg-white rounded-lg shadow-md overflow-hidden mb-8">
-                <img 
-                  src={articleData.pictureAddress} 
-                  alt={articleData.title}
-                  className="w-full h-64 object-cover"
-                />
-                
-                <div className="p-6">
-                  <div className="flex flex-wrap items-center text-sm text-gray-600 mb-4">
-                    <div className="ml-4 flex items-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                      <span>{articleData.inserDate}</span>
-                    </div>
-                    <div className="ml-4 flex items-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
-                      <span>{articleData.autor}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                      </svg>
-                      <span>20</span>
-                    </div>
+
+      <main className="flex-grow rtl container mx-auto px-4 py-8">
+        <div className="grid grid-cols-12 gap-8">
+          <div className="col-span-12 lg:col-span-8">
+            <article className="bg-white rounded-lg shadow-lg overflow-hidden">
+              <div className="p-6">
+                <h1 className="text-3xl font-bold mb-3 text-gray-800">
+                  {article.title}
+                </h1>
+                <div className="flex flex-wrap items-center text-sm text-gray-500 mb-6 gap-x-4 gap-y-2">
+                  <div className="flex items-center">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4 ml-1.5 text-gray-400"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
+                    </svg>
+                    <span>{formatDate(article.insertDate)}</span>
                   </div>
-                  
-                  <h1 className="text-2xl md:text-3xl font-bold mb-6">{articleData.title}</h1>
-                  
-                  <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                    <TabsList className="w-full bg-gray-100 p-0 h-12">
-                      <TabsTrigger value="content" className="flex-1 h-full">محتوا</TabsTrigger>
-                      <TabsTrigger value="sections" className="flex-1 h-full">سرفصل‌ها</TabsTrigger>
-                      <TabsTrigger value="comments" className="flex-1 h-full">نظرات</TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="content">
-                      <div className="prose max-w-none mt-4" dangerouslySetInnerHTML={{ __html: articleData.describe }} />
-                      
-                      <div className="flex flex-wrap gap-2 mt-6">
-                        {articleData.tags.map((tag, index) => (
-                          <Link 
-                            key={index} 
-                            to={`/tag/${tag}`} 
-                            className="bg-gray-100 text-gray-800 px-3 py-1 rounded-md text-sm hover:bg-luko-teal hover:text-white transition-colors"
-                          >
-                            #{tag}
-                          </Link>
-                        ))}
-                      </div>
-                    </TabsContent>
-                    <TabsContent value="sections">
-                      <div className="mt-4">
-                        {articleData.sections.map((section) => (
-                          <div key={section.id} className="border-b py-4">
-                            <div className="flex items-center justify-between mb-2">
-                              <h3 className="font-bold text-lg">{section.title}</h3>
-                              <div className="text-sm text-gray-500">{section.lessons} جلسه - {section.duration}</div>
+                  <div className="flex items-center">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4 ml-1.5 text-gray-400"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    <span>{article.addUserFullName}</span>
+                  </div>
+                  <div className="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    <span>{article.currentView} بازدید</span>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    className={`flex items-center text-gray-500 hover:text-luko-teal ${articleData?.detailsNewsDto.isCurrentUserFavorite ? "text-luko-teal font-semibold" : ""
+                      }`}
+                    onClick={handleSaveArticle}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5 ml-1.5"
+                      viewBox="0 0 24 24"
+                      fill={articleData?.detailsNewsDto.isCurrentUserFavorite ? "currentColor" : "none"}
+                      stroke="currentColor"
+                      strokeWidth={1.5}
+                    >
+                      {articleData?.detailsNewsDto.isCurrentUserFavorite ? (
+                        <path fillRule="evenodd" d="M6.32 2.577a49.255 49.255 0 0111.36 0c1.497.174 2.57 1.46 2.57 2.93V21a.75.75 0 01-1.085.67L12 18.089l-7.165 3.583A.75.75 0 013.75 21V5.507c0-1.47 1.073-2.756 2.57-2.93z" clipRule="evenodd" />
+                      ) : (
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c-1.1.128-2.13.526-3.026 1.158a9.703 9.703 0 00-4.96 0C8.607 4.402 7.577 4.004 6.477 3.876A49.022 49.022 0 004.5 4.752V19.5a.75.75 0 001.125.67l5.625-4.219 5.625 4.219A.75.75 0 0018 19.5V4.752c0-.87-.707-1.566-1.407-1.43z" />
+                      )}
+                    </svg>
+                    {articleData?.detailsNewsDto.isCurrentUserFavorite ? "ذخیره شده" : "ذخیره"}
+                  </Button>
+                </div>
+              </div>
+
+              {article.currentImageAddress && (
+                <img
+                  src={article.currentImageAddress}
+                  alt={article.title}
+                  className="w-full h-auto object-cover"
+                />
+              )}
+
+              <div className="p-6">
+                <div className="text-sm text-gray-600 mb-6 leading-relaxed">
+                  {article.miniDescribe}
+                </div>
+
+                <div
+                  className="prose prose-sm sm:prose lg:prose-lg xl:prose-xl max-w-none text-gray-700 leading-relaxed"
+                  dangerouslySetInnerHTML={{
+                    __html: article.describe,
+                  }}
+                />
+
+                {keywords && keywords.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-8 pt-4 border-t border-gray-200">
+                    {keywords.map((tag, index) => (
+                      <Link
+                        key={index}
+                        to={`/tag/${tag}`}
+                        className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-md text-xs hover:bg-luko-teal hover:text-white transition-colors"
+                      >
+                        {tag}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+
+                <div className="mt-8 pt-6 border-t border-gray-200 flex items-center justify-between">
+                  <div className="flex space-x-3 space-x-reverse">
+                    <Button
+                      variant="ghost"
+                      className={`text-gray-600 hover:text-luko-teal ${articleLiked ? "text-luko-teal font-semibold" : ""
+                        }`}
+                      onClick={handleArticleLike}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5 ml-2"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.865.8L2 10.5z" />
+                      </svg>
+                      {articleLiked ? "پسندیدم" : "میپسندم"}
+                      <span className="mr-1 text-xs">({article.currentLikeCount})</span>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      className="text-gray-600 hover:text-luko-teal"
+                      onClick={handleShare}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5 ml-2"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z" />
+                      </svg>
+                      اشتراک گذاری
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </article>
+
+            <div className="bg-white rounded-lg shadow-lg mt-8 p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-semibold text-gray-800">
+                  نظرات{" "}
+                  {comments && comments.length > 0 ? `(${article.commentsCount})` : "(۰)"}
+                </h2>
+                <div className="flex items-center">
+                  <span className="text-sm text-gray-600 ml-2">امتیاز: {article.currentRate} نفر</span>
+                  {[...Array(5)].map((_, i) => (
+                    <svg key={i} className={`w-5 h-5 ${i < article.currentRate ? 'text-yellow-400' : 'text-gray-300'}`} fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  ))}
+                </div>
+              </div>
+
+              <form onSubmit={handleSubmitCommentOrReply} className="mb-8">
+                <textarea
+                  placeholder="نظر خود را بنویسید..."
+                  className="w-full border border-gray-300 rounded-lg p-3 mb-4 focus:ring-2 focus:ring-luko-teal focus:border-transparent transition-shadow"
+                  rows={4}
+                  value={commentText}
+                  onChange={(e) => setCommentText(e.target.value)}
+                ></textarea>
+                <Button
+                  type="submit"
+                  className="bg-luko-teal hover:bg-luko-teal/90 text-white px-6 py-2 rounded-lg transition-colors"
+                >
+                  ارسال دیدگاه جدید
+                </Button>
+              </form>
+
+              {comments && comments.length > 0 ? (
+                <div className="space-y-6">
+                  {comments.map((comment) => (
+                    <div key={comment.id} className="border rounded-lg p-4 bg-gray-50/50">
+                      <div className="flex items-start">
+                        <div className="w-10 h-10 rounded-full bg-luko-teal/20 flex items-center justify-center overflow-hidden">
+                          {comment.pictureAddress ? (
+                            <img
+                              src={comment.pictureAddress}
+                              alt={comment.autor}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <span className="text-luko-teal font-bold">{comment.autor}</span>
+                          )}
+                        </div>
+                        <div className="mr-4 flex-1">
+                          <div className="flex justify-between items-center mb-1">
+                            <h4 className="font-semibold text-gray-800">
+                              {comment.autor}
+                            </h4>
+                            <div className="text-xs text-gray-500">
+                              {formatDate(comment.inserDate)}
                             </div>
-                            <ul className="space-y-2 text-gray-700">
-                              {section.content?.map((item, index) => (
-                                <li key={index} className="flex items-center">
-                                  <span className="ml-2 text-luko-teal">•</span>
-                                  {item}
-                                </li>
-                              ))}
-                            </ul>
                           </div>
-                        ))}
-                        <div className="mt-4 text-center">
-                          <Button 
-                            onClick={() => setShowAllContent(!showAllContent)}
-                            className="bg-luko-teal hover:bg-luko-teal/90"
-                          >
-                            {showAllContent ? "بستن سرفصل‌ها" : "نمایش تمام سرفصل‌ها"}
-                          </Button>
+                          {comment.title && (
+                            <div className="font-medium text-sm text-gray-700 mb-1">{comment.title}</div>
+                          )}
+                          <p className="text-sm text-gray-600 leading-relaxed">
+                            {comment.describe}
+                          </p>
+                          <div className="flex items-center mt-3 text-gray-500 text-xs">
+                            <button
+                              className={`flex items-center ml-4 hover:text-luko-teal transition-colors ${likedComments[comment.id] || comment.currentUserIsLike ? "text-luko-teal" : ""}`}
+                              onClick={() => handleCommentLikeDislike(comment.id, true)}
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-3.5 w-3.5 ml-1"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                              >
+                                <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.865.8L2 10.5z" />
+                              </svg>
+                              {comment.likeCount}
+                            </button>
+                            <button
+                              className={`flex items-center ml-4 hover:text-red-500 transition-colors ${comment.currentUserIsDissLike ? "text-red-500" : ""}`}
+                              onClick={() => handleCommentLikeDislike(comment.id, false)}
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M18 9.5a1.5 1.5 0 01-3 0v-6a1.5 1.5 0 113 0v6zm-4 .167v-5.43a2 2 0 00-1.106-1.79l-.05-.025A4 4 0 0010.057 2H4.642a2 2 0 00-1.962 1.608l-1.2 6A2 2 0 003.439 12H7V8a2 2 0 00-2-2 1 1 0 00-1 1v-.667a4 4 0 01.8-2.4L7.2 4.067a4 4 0 00.865-.8L12 1.5V9.5h2z" />
+                              </svg>
+                              {comment.dissLikeCount}
+                            </button>
+                            {comment.replyCount > 0 && (
+                              <Button
+                                variant="link"
+                                className="text-xs text-luko-teal p-0 h-auto ml-4"
+                                onClick={() => handleToggleReplies(comment.id)}
+                                disabled={loadingReplies[comment.id]}
+                              >
+                                {loadingReplies[comment.id] ? "در حال بارگذاری..." :
+                                  expandedReplies[comment.id]
+                                    ? "مخفی کردن پاسخ‌ها"
+                                    : `نمایش ${comment.replyCount} پاسخ`}
+                              </Button>
+                            )}
+                            <button
+                              className="flex items-center mr-auto hover:text-luko-teal transition-colors"
+                              onClick={() => handleInitiateReply(comment.id)}
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-3.5 w-3.5 ml-1"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"
+                                />
+                              </svg>
+                              پاسخ
+                            </button>
+                          </div>
                         </div>
                       </div>
-                    </TabsContent>
-                    <TabsContent value="comments">
-                      <div className="mt-4">
-                        <h2 className="text-xl font-bold mb-4">نظرات ({articleData.comments.length})</h2>
-                        
-                        {articleData.comments.map((comment) => (
-                          <div key={comment.id} className="border-b pb-6 mb-6">
-                            <div className="flex items-start">
-                              <img 
-                                src={comment.avatar} 
-                                alt={comment.author} 
-                                className="w-12 h-12 rounded-full object-cover"
-                              />
-                              <div className="mr-4 flex-1">
-                                <div className="flex justify-between items-center mb-2">
-                                  <h4 className="font-bold">{comment.author}</h4>
-                                  <div className="text-xs text-gray-500">{comment.date}</div>
+                      {/* Display Replies if expanded and loaded */}
+                      {expandedReplies[comment.id] && loadedReplies[comment.id] && (
+                        <div className="mr-8 mt-3 space-y-3 pl-4 border-r-2 border-luko-teal/20">
+                          {loadedReplies[comment.id].map(reply => (
+                            <div key={reply.id} className="border rounded-lg p-3 bg-white shadow-sm">
+                              <div className="flex items-start">
+                                <div className="w-8 h-8 rounded-full bg-luko-teal/10 flex items-center justify-center overflow-hidden">
+                                  {reply.pictureAddress ? (
+                                    <img src={reply.pictureAddress} alt={reply.autor} className="w-full h-full object-cover" />
+                                  ) : (
+                                    <span className="text-luko-teal font-semibold text-sm">{reply.autor}</span>
+                                  )}
                                 </div>
-                                <p className="text-gray-700">
-                                  {comment.content}
-                                </p>
-                                <div className="flex mt-3 text-gray-400 text-sm">
-                                  <button 
-                                    className="flex items-center ml-4"
-                                    onClick={() => handleCommentLike(comment.id)}
-                                  >
-                                    <svg xmlns="http://www.w3.org/2000/svg" 
-                                         className={`h-4 w-4 ml-1 ${likedComments[comment.id] ? 'text-luko-teal' : ''}`} 
-                                         fill={likedComments[comment.id] ? "currentColor" : "none"} 
-                                         viewBox="0 0 24 24" 
-                                         stroke="currentColor">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
-                                    </svg>
-                                    {comment.likes}
-                                  </button>
-                                  <button 
-                                    className="flex items-center"
-                                    onClick={() => handleReply(comment.id)}
-                                  >
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
-                                    </svg>
-                                    پاسخ
-                                  </button>
+                                <div className="mr-3 flex-1">
+                                  <div className="flex justify-between items-center mb-0.5">
+                                    <h5 className="font-semibold text-sm text-gray-700">{reply.autor}</h5>
+                                    <div className="text-xs text-gray-400">{formatDate(reply.inserDate)}</div>
+                                  </div>
+                                  {reply.title && <div className="font-medium text-xs text-gray-600 mb-1">{reply.title}</div>}
+                                  <p className="text-xs text-gray-600 leading-normal">{reply.describe}</p>
+                                  <div className="flex items-center mt-2 text-gray-500 text-xs">
+                                    <button
+                                      className={`flex items-center ml-3 hover:text-luko-teal transition-colors ${likedComments[reply.id] || reply.currentUserIsLike ? "text-luko-teal" : ""}`}
+                                      onClick={() => handleCommentLikeDislike(reply.id, true)}
+                                    >
+                                      <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 ml-0.5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.865.8L2 10.5z" />
+                                      </svg>
+                                      {reply.likeCount}
+                                    </button>
+                                    <button
+                                      className={`flex items-center ml-3 hover:text-red-500 transition-colors ${reply.currentUserIsDissLike ? "text-red-500" : ""}`}
+                                      onClick={() => handleCommentLikeDislike(reply.id, false)}
+                                    >
+                                      <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 ml-0.5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M18 9.5a1.5 1.5 0 01-3 0v-6a1.5 1.5 0 113 0v6zm-4 .167v-5.43a2 2 0 00-1.106-1.79l-.05-.025A4 4 0 0010.057 2H4.642a2 2 0 00-1.962 1.608l-1.2 6A2 2 0 003.439 12H7V8a2 2 0 00-2-2 1 1 0 00-1 1v-.667a4 4 0 01.8-2.4L7.2 4.067a4 4 0 00.865-.8L12 1.5V9.5h2z" />
+                                      </svg>
+                                      {reply.dissLikeCount}
+                                    </button>
+                                    {/* Reply button for nested replies can be added here if desired */}
+                                  </div>
                                 </div>
                               </div>
                             </div>
-                          </div>
-                        ))}
-                        
-                        <div>
-                          <h3 className="font-bold mb-4">ارسال نظر</h3>
-                          <form onSubmit={handleSubmitComment}>
-                            <textarea 
-                              placeholder="نظر خود را بنویسید..." 
-                              className="w-full border border-gray-300 rounded-md p-3 mb-4"
-                              rows={4}
-                              value={commentText}
-                              onChange={(e) => setCommentText(e.target.value)}
-                            ></textarea>
-                            <Button 
-                              type="submit"
-                              className="bg-luko-teal hover:bg-luko-teal/90"
-                            >
-                              ارسال نظر
-                            </Button>
-                          </form>
+                          ))}
                         </div>
-                      </div>
-                    </TabsContent>
-                  </Tabs>
-                  
-                  <div className="border-t mt-8 pt-6">
-                    <div className="flex items-center justify-between">
-                      <div className="flex space-x-4 space-x-reverse">
-                        <Button 
-                          variant="ghost" 
-                          className={`text-gray-500 hover:text-luko-teal ${articleLiked ? 'text-luko-teal' : ''}`}
-                          onClick={handleArticleLike}
+                      )}
+                      {replyingTo === comment.id && (
+                        <form
+                          onSubmit={(e) => handleSubmitCommentOrReply(e, comment.id)}
+                          className="mt-4 mr-12 pl-4 pb-2 border-r-2 border-luko-teal/30"
                         >
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" fill={articleLiked ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
-                          </svg>
-                          پسندیدم
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          className="text-gray-500 hover:text-luko-teal"
-                          onClick={handleShare}
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                          </svg>
-                          اشتراک گذاری
-                        </Button>
-                      </div>
-                      <Button 
-                        variant="ghost" 
-                        className="text-gray-500 hover:text-luko-teal"
-                        onClick={handleSaveArticle}
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                          <textarea
+                            placeholder={`پاسخ به ${comment.autor}...`}
+                            className="w-full border border-gray-300 rounded-lg p-2 mb-2 focus:ring-1 focus:ring-luko-teal focus:border-transparent transition-shadow text-sm"
+                            rows={3}
+                            value={replyText}
+                            onChange={(e) => setReplyText(e.target.value)}
+                            autoFocus
+                          ></textarea>
+                          <div className="flex justify-end space-x-2 space-x-reverse">
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setReplyingTo(null)}
+                              className="text-xs"
+                            >
+                              لغو
+                            </Button>
+                            <Button
+                              type="submit"
+                              size="sm"
+                              className="bg-luko-teal hover:bg-luko-teal/90 text-white text-xs px-3 py-1"
+                            >
+                              ارسال پاسخ
+                            </Button>
+                          </div>
+                        </form>
+                      )}
+                    </div>
+                  ))}
+                  {article.commentsCount > comments.length && (
+                    <div className="text-center mt-8">
+                      <Button variant="outline" className="border-gray-300 text-gray-600 hover:bg-gray-100 hover:border-gray-400">
+                        مشاهده بیشتر
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                         </svg>
-                        ذخیره
                       </Button>
                     </div>
-                  </div>
+                  )}
                 </div>
-              </div>
-              
-              <div className="mb-8">
-                <h2 className="text-xl font-bold mb-6">مقالات مرتبط</h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {articleData.relatedArticles.map((relatedArticle) => (
-                    <Link 
-                      key={relatedArticle.id}
-                      to={`/blog/${relatedArticle.id}`} 
-                      className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
-                    >
-                      <img 
-                        src={relatedArticle.image} 
-                        alt={relatedArticle.title}
-                        className="w-full h-40 object-cover"
-                      />
-                      <div className="p-4">
-                        <div className="text-xs text-gray-500 mb-2">{relatedArticle.date}</div>
-                        <h3 className="font-bold hover:text-luko-teal transition-colors">
-                          {relatedArticle.title}
-                        </h3>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            </div>
-            
-            <div className="md:w-1/3">
-              <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-                <div className="flex items-center mb-4">
-                  <img 
-                    src="/lovable-uploads/36442ea6-4bc0-445a-9514-5882fa052e96.png" 
-                    alt={articleData.autor}
-                    className="w-16 h-16 rounded-full object-cover"
-                  />
-                  <div className="mr-4">
-                    <h3 className="font-bold">{articleData.autor}</h3>
-                    <p className="text-sm text-gray-600">مدرس و برنامه‌نویس ارشد</p>
-                  </div>
-                </div>
-                <p className="text-gray-600 text-sm mb-4">
-                  مهدی محمدی با بیش از 10 سال تجربه در زمینه توسعه وب و برنامه‌نویسی، مدرس دوره‌های متعدد در زمینه ری‌اکت، جاوااسکریپت و توسعه فرانت‌اند است.
+              ) : (
+                <p className="text-gray-500 text-center py-4">
+                  هنوز نظری ثبت نشده است. اولین نفر باشید!
                 </p>
-                <Button 
-                  variant="outline" 
-                  className="w-full text-luko-teal border-luko-teal hover:bg-luko-teal/10"
-                  onClick={handleViewProfile}
-                >
-                  مشاهده پروفایل مدرس
-                </Button>
-              </div>
-              
-              <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-                <h3 className="font-bold mb-4">دوره‌های مرتبط</h3>
-                <div className="space-y-4">
-                  {articleData.relatedCourses.map((course) => (
-                    <Link 
-                      key={course.id}
-                      to={`/courses/${course.id}`} 
-                      className="flex items-center pb-3 border-b last:border-0 hover:bg-gray-50 p-2 rounded-md transition-colors"
-                    >
-                      <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-md flex items-center justify-center">
-                        <img 
-                          src={course.image}
-                          alt={course.title}
-                          className="w-6 h-6 rounded-full bg-black p-0.5"
-                        />
-                      </div>
-                      <span className="mr-3 text-sm">{course.title}</span>
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-luko-teal mr-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </Link>
-                  ))}
-                </div>
-                <div className="mt-4">
-                  <Link to="/courses">
-                    <Button className="w-full bg-luko-teal hover:bg-luko-teal/90">
-                      مشاهده همه دوره ها
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-              
-              <div className="bg-white p-6 rounded-lg shadow-md">
-                <h3 className="font-bold mb-4">برچسب ها</h3>
-                <div className="flex flex-wrap gap-2">
-                  {articleData.tags.map((tag, index) => (
-                    <Link 
-                      key={index} 
-                      to={`/tag/${tag}`} 
-                      className="bg-gray-100 text-gray-800 px-3 py-2 rounded-md text-sm hover:bg-luko-teal hover:text-white transition-colors"
-                    >
-                      #{tag}
-                    </Link>
-                  ))}
-                  <Link 
-                    to="/tags" 
-                    className="bg-gray-100 text-gray-800 px-3 py-2 rounded-md text-sm hover:bg-luko-teal hover:text-white transition-colors"
-                  >
-                    #فرانت‌اند
-                  </Link>
-                  <Link 
-                    to="/tags" 
-                    className="bg-gray-100 text-gray-800 px-3 py-2 rounded-md text-sm hover:bg-luko-teal hover:text-white transition-colors"
-                  >
-                    #وب
-                  </Link>
-                </div>
-              </div>
+              )}
             </div>
           </div>
+
+          <aside className="col-span-12 lg:col-span-4 space-y-6">
+            <div className="bg-white p-5 rounded-lg shadow-lg">
+              <h3 className="font-semibold text-lg mb-4 text-gray-800 border-b pb-2">
+                دسته بندی
+              </h3>
+              <div className="space-y-3">
+                <Link
+                  to={`/category/${article.newsCatregoryId}`}
+                  className="flex items-center p-2 rounded-md hover:bg-gray-100 transition-colors group"
+                >
+                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center shadow">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                    </svg>
+                  </div>
+                  <span className="mr-3 text-sm text-gray-700 group-hover:text-luko-teal transition-colors">
+                    {article.newsCatregoryName}
+                  </span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 text-gray-400 group-hover:text-luko-teal mr-auto transition-colors"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 19l-7-7 7-7"
+                    />
+                  </svg>
+                </Link>
+              </div>
+            </div>
+
+            <div className="bg-white p-5 rounded-lg shadow-lg">
+              <h3 className="font-semibold text-lg mb-4 text-gray-800 border-b pb-2">
+                اطلاعات مقاله
+              </h3>
+              <div className="space-y-3">
+                <div className="flex justify-between py-2 border-b border-gray-100 last:border-0">
+                  <span className="text-gray-600 text-sm">تاریخ انتشار:</span>
+                  <span className="text-gray-800 text-sm font-medium">{formatDate(article.insertDate)}</span>
+                </div>
+                <div className="flex justify-between py-2 border-b border-gray-100 last:border-0">
+                  <span className="text-gray-600 text-sm">نویسنده:</span>
+                  <span className="text-gray-800 text-sm font-medium">{article.addUserFullName}</span>
+                </div>
+                <div className="flex justify-between py-2 border-b border-gray-100 last:border-0">
+                  <span className="text-gray-600 text-sm">تعداد بازدید:</span>
+                  <span className="text-gray-800 text-sm font-medium">{article.currentView}</span>
+                </div>
+                <div className="flex justify-between py-2 border-b border-gray-100 last:border-0">
+                  <span className="text-gray-600 text-sm">تعداد پسند:</span>
+                  <span className="text-gray-800 text-sm font-medium">{article.currentLikeCount}</span>
+                </div>
+                <div className="flex justify-between py-2 border-b border-gray-100 last:border-0">
+                  <span className="text-gray-600 text-sm">تعداد نظرات:</span>
+                  <span className="text-gray-800 text-sm font-medium">{article.commentsCount}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white p-5 rounded-lg shadow-lg">
+              <h3 className="font-semibold text-lg mb-4 text-gray-800 border-b pb-2">
+                کلمات کلیدی
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {keywords.map((tag, index) => (
+                  <Link
+                    key={index}
+                    to={`/tag/${tag}`}
+                    className="bg-gray-100 text-gray-700 px-3 py-2 rounded-md text-sm hover:bg-luko-teal hover:text-white transition-colors"
+                  >
+                    {tag}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </aside>
         </div>
       </main>
-      
+
       <Footer />
     </div>
   );
