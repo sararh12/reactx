@@ -64,7 +64,7 @@ const Navbar: React.FC = () => {
             </Button>
           </Link>
 
-          <Link to="/cart">
+          {/* <Link to="/cart">
             <Button variant="ghost" size="icon" aria-label="Shopping Cart" className="relative">
               <ShoppingCart className="h-5 w-5" />
               {cartCount > 0 && (
@@ -73,7 +73,7 @@ const Navbar: React.FC = () => {
                 </Badge>
               )}
             </Button>
-          </Link>
+          </Link> */}
 
           <Link to="/auth/login">
             <Button className="bg-luko-teal hover:bg-luko-teal/90 text-white">
