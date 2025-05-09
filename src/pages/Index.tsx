@@ -1,32 +1,37 @@
-import React, { useEffect, useState } from 'react';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-import HeroSection from '@/components/HeroSection';
-import CategorySection from '@/components/CategorySection';
-import CourseSection from '@/components/CourseSection';
-import TeacherSection from '@/components/TeacherSection';
-import ServicesSection from '@/components/ServicesSection';
-import BlogSection from '@/components/BlogSection';
-import CtaSection from '@/components/CtaSection';
+import React, { useEffect, useState } from "react";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import HeroSection from "@/components/HeroSection";
+import CategorySection from "@/components/CategorySection";
+import CourseSection from "@/components/CourseSection";
+import TeacherSection from "@/components/TeacherSection";
+import ServicesSection from "@/components/ServicesSection";
+import BlogSection from "@/components/BlogSection";
+import CtaSection from "@/components/CtaSection";
+import { getTopCourse } from "@/services/api/course/courseService";
+import { getBlogs } from "@/services/api/blog/blogServices";
 
 const Index = () => {
   const [fetchedData, setFetchedData] = useState<any>(null);
   const [blogData, setBlogData] = useState<any>(null);
 
+  async function GetTopCourse() {
+    const res = await getTopCourse("4");
+
+    setFetchedData(res?.data);
+  }
+
+  async function GetBlogs() {
+    const res = await getBlogs(3, 1);
+
+    setBlogData(res?.data?.news);
+  }
+
   useEffect(() => {
-    const fetchCourses = fetch("https://classapi.sepehracademy.ir/api/Home/GetCoursesTop?Count=5")
-      .then(res => res.json())
-      .then(data => setFetchedData(data));
+    GetTopCourse();
 
-    const fetchBlogs = fetch("https://classapi.sepehracademy.ir/api/News")
-      .then(res => res.json())
-      .then(data => {
-        const fiveBlogData = data.news.slice(0, 5);
-        setBlogData(fiveBlogData);
-      });
-
-    Promise.all([fetchCourses, fetchBlogs]);
-  }, []); 
+    GetBlogs();
+  }, []);
 
   if (!fetchedData || !blogData) {
     return <div className="text-center py-10">در حال بارگذاری...</div>;
@@ -37,7 +42,7 @@ const Index = () => {
       <Navbar />
 
       <main className="flex-grow">
-        <HeroSection 
+        <HeroSection
           title="عنوان آموزشگاه"
           subtitle="بزرگترین مرکز آموزش برنامه نویسی و توسعه مهارت های دیجیتال با بیش از ۱۰۰ دوره آموزشی به روز و کاربردی"
           imageUrl="/lovable-uploads/landing.png"
@@ -47,7 +52,7 @@ const Index = () => {
 
         <CourseSection fetchedData={fetchedData} />
 
-        <TeacherSection 
+        <TeacherSection
           name="برترین اساتید"
           title="با استادها همراه شوید"
           description="اساتید مجرب و کارآزموده در زمینه‌های مختلف برنامه‌نویسی و طراحی وب در لوکو گرد هم آمده‌اند تا تجربیات و دانش خود را با شما به اشتراک بگذارند. همه اساتید ما دارای سابقه کاری قابل توجه در صنعت و پروژه‌های واقعی هستند."
@@ -67,4 +72,3 @@ const Index = () => {
 };
 
 export default Index;
-
