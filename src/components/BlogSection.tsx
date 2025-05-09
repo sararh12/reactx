@@ -23,7 +23,7 @@ const BlogSection: React.FC<{blogData:BlogPost[] | null }>=({blogData})=> {
     <div key={post.id} className='bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow direction-300 flex flex-col'>
       <Link to={`/blog/${post.id}`} className='black h-48 overflow-hidden'>
       <img
-      src={post.currentImageAddressTumb || "/placeholder-image.jpg"}
+      src={post.currentImageAddressTumb || "./lovable-uploads/news.png"}
       alt={post.title}
       className='w-full h-full object-cover'
       onError={(e)=>(e.currentTarget.src='/placeholder-image.jpg')}

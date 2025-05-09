@@ -115,7 +115,7 @@ const BlogPage: React.FC =  () => {
                     <div key={article.id} className="bg-white rounded-lg shadow-md overflow-hidden">
                       <Link to={`/blog/${article.id}`}>
                         <img 
-                          src={article.image || '/default.jpg'} 
+                          src={article.image || './lovable-uploads/news.png'} 
                           alt={article.title}
                           className="w-full h-48 object-cover"
                         />
