@@ -1,13 +1,14 @@
-import React from 'react';
-import { useParams } from 'react-router-dom';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-import { Button } from '@/components/ui/button';
-import { Check } from 'lucide-react';
-import CourseAccordion from '@/components/CourseAccordion';
-import CommentSection from './commentSection';
-import { useToast } from '@/components/ui/use-toast';
-import axios from 'axios';
+import React, { useState } from "react";
+import { useParams } from "react-router-dom";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import { Button } from "@/components/ui/button";
+import { Check } from "lucide-react";
+import CourseAccordion from "@/components/CourseAccordion";
+import CommentSection from "./commentSection";
+import { useToast } from "@/components/ui/use-toast";
+import axios from "axios";
+import { getTeacherDetail } from "@/services/api/teacher/teacherSevice";
 
 interface Comment {
   id: string;
@@ -27,18 +28,23 @@ interface Comment {
 }
 
 interface Teacher {
-  imageUrl?: string;
-  teacherName: string;
-  title?: string;
-  bio?: string;
+  pictureAddress?: string;
+  fullName?: string;
+  linkdinProfileLink: string;
+  courseCounts: number;
+  newsCount: number;
+  histories: [];
+  skills: [];
+  teacherId: number;
 }
 
 interface CourseDetailData {
   courseId: string;
   title: string;
   subTitle?: string;
-  description: string;
+  describe: string;
   teacherName: string;
+  teacherId: number;
   cost: number;
   capacity: number;
   imageAddress: string | null;
@@ -57,10 +63,18 @@ interface CourseDetailData {
 const CourseDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { toast } = useToast();
-  const [courseData, setCourseData] = React.useState<CourseDetailData | null>(null);
+  const [courseData, setCourseData] = React.useState<CourseDetailData | null>(
+    null
+  );
   const [courseComments, setCourseComments] = React.useState<Comment[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [loadingComments, setLoadingComments] = React.useState(true);
+  const [teacherState, setTeacher] = useState<Teacher>();
+
+  const teacherDetail = async (teacherId: number) => {
+    const callApi = await getTeacherDetail(teacherId);
+    setTeacher(callApi);
+  };
 
   const fetchCourseComments = async () => {
     if (!id) return;
@@ -83,35 +97,40 @@ const CourseDetail: React.FC = () => {
     }
   };
 
+  const fetchCourseDetails = async () => {
+    if (!id) {
+      console.error("Course ID is missing");
+      setLoading(false);
+      setCourseData(null);
+      setCourseComments([]);
+      return;
+    }
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `https://classapi.sepehracademy.ir/api/Home/GetCourseDetails?CourseId=${id}`
+      );
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      setCourseData(data as CourseDetailData);
+      fetchCourseComments();
+      console.log(data?.teacherId);
+      teacherDetail(data?.teacherId);
+    } catch (error) {
+      console.error("Error fetching course details:", error);
+      setCourseData(null);
+      toast({
+        title: "خطا در دریافت اطلاعات دوره",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   React.useEffect(() => {
-    const fetchCourseDetails = async () => {
-      if (!id) {
-        console.error("Course ID is missing");
-        setLoading(false);
-        setCourseData(null);
-        setCourseComments([]);
-        return;
-      }
-      setLoading(true);
-      try {
-        const response = await fetch(`https://classapi.sepehracademy.ir/api/Home/GetCourseDetails?CourseId=${id}`);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        setCourseData(data as CourseDetailData);
-        fetchCourseComments();
-      } catch (error) {
-        console.error("Error fetching course details:", error);
-        setCourseData(null);
-        toast({
-          title: "خطا در دریافت اطلاعات دوره",
-          variant: "destructive",
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchCourseDetails();
   }, [id]);
 
@@ -120,9 +139,13 @@ const CourseDetail: React.FC = () => {
     setLoading(true);
     setLoadingComments(true);
     try {
-      const detailsResponse = await fetch(`https://classapi.sepehracademy.ir/api/Home/GetCourseDetails?CourseId=${id}`);
+      const detailsResponse = await fetch(
+        `https://classapi.sepehracademy.ir/api/Home/GetCourseDetails?CourseId=${id}`
+      );
       if (!detailsResponse.ok) {
-        throw new Error(`HTTP error fetching details: ${detailsResponse.status}`);
+        throw new Error(
+          `HTTP error fetching details: ${detailsResponse.status}`
+        );
       }
       const detailsData = await detailsResponse.json();
       setCourseData(detailsData as CourseDetailData);
@@ -155,11 +178,15 @@ const CourseDetail: React.FC = () => {
     deleteCommentLike: `https://classapi.sepehracademy.ir/api/Course/DeleteCourseCommentLike`,
     getReplies: (commentId: string) =>
       `https://classapi.sepehracademy.ir/api/Course/GetRepliesCourseComments?Id=${commentId}`,
-    createReplyComment: `https://classapi.sepehracademy.ir/api/Course/AddReplyCourseComment`
+    createReplyComment: `https://classapi.sepehracademy.ir/api/Course/AddReplyCourseComment`,
   };
 
-  if (loading) return <div className="text-center py-10">در حال بارگذاری اطلاعات دوره...</div>;
-  if (!courseData) return <div className="text-center py-10">اطلاعات دوره یافت نشد.</div>;
+  if (loading)
+    return (
+      <div className="text-center py-10">در حال بارگذاری اطلاعات دوره...</div>
+    );
+  if (!courseData)
+    return <div className="text-center py-10">اطلاعات دوره یافت نشد.</div>;
 
   const teacher = courseData.teacherName;
 
@@ -173,12 +200,15 @@ const CourseDetail: React.FC = () => {
           <div className="bg-black rounded-lg overflow-hidden mb-8">
             <div className="flex flex-col md:flex-row">
               <div className="md:w-1/2 p-8">
-                <h1 className="text-3xl font-bold text-white mb-2"> {courseData.title} </h1>
-                <div className="text-white text-lg mb-6"> {courseData.subTitle}  </div>
-                <p className="text-gray-300 mb-4">
-                  {courseData.description}
-                </p>
-
+                <h1 className="text-3xl font-bold text-white mb-2">
+                  {" "}
+                  {courseData.title}{" "}
+                </h1>
+                <div className="text-white text-lg mb-6">
+                  {" "}
+                  {courseData.subTitle}{" "}
+                </div>
+                <p className="text-gray-300 mb-4">{courseData.describe}</p>
 
                 {courseData.teacherName && (
                   <div className="flex items-center text-white mb-6">
@@ -189,13 +219,17 @@ const CourseDetail: React.FC = () => {
                     />
                     <div className="mr-3">
                       <div className="font-bold">{courseData.teacherName}</div>
-                      <div className="text-sm text-gray-300">{courseData.title}</div>
+                      <div className="text-sm text-gray-300">
+                        {courseData.title}
+                      </div>
                     </div>
                   </div>
                 )}
 
                 <div className="bg-gradient-to-r from-luko-teal to-blue-500 p-6 rounded-lg">
-                  <div className="text-white text-2xl font-bold mb-2">{courseData.cost.toLocaleString()} تومان </div>
+                  <div className="text-white text-2xl font-bold mb-2">
+                    {courseData.cost.toLocaleString()} تومان{" "}
+                  </div>
                   <Button className="w-full bg-orange-500 hover:bg-orange-600 text-lg h-12">
                     شرکت در دوره
                   </Button>
@@ -217,24 +251,24 @@ const CourseDetail: React.FC = () => {
             <div className="bg-white p-6 rounded-lg shadow-md">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-amber-500 text-2xl font-bold">{courseData.courseRate || 'N/A'}</div>
+                  <div className="text-amber-500 text-2xl font-bold">
+                    {courseData.courseRate || "N/A"}
+                  </div>
                   <div className="text-sm text-gray-500">امتیاز دوره</div>
                 </div>
-                <div className="text-amber-500">
-                  ★★★★★
-                </div>
+                <div className="text-amber-500">★★★★★</div>
               </div>
               <div className="mt-4 h-2 bg-gray-200 rounded-full">
                 <div className="h-2 bg-luko-teal rounded-full w-4/5"></div>
               </div>
-              <div className="mt-4 text-sm text-gray-500">
-                از مجموع ۲۵۰ رای
-              </div>
+              <div className="mt-4 text-sm text-gray-500">از مجموع ۲۵۰ رای</div>
             </div>
 
             <div className="bg-white p-6 rounded-lg shadow-md">
               <div className="flex flex-col">
-                <div className="text-luko-teal text-2xl font-bold">{courseData.currentRegistrants || 0}</div>
+                <div className="text-luko-teal text-2xl font-bold">
+                  {courseData.currentRegistrants || 0}
+                </div>
                 <div className="text-sm text-gray-500">تعداد دانشجویان</div>
                 <div className="flex items-center mt-2">
                   <div className="flex -space-x-2">
@@ -242,7 +276,9 @@ const CourseDetail: React.FC = () => {
                     <div className="w-8 h-8 rounded-full bg-gray-400"></div>
                     <div className="w-8 h-8 rounded-full bg-gray-500"></div>
                   </div>
-                  <div className="mr-4 text-xs text-gray-500">و {courseData.capacity || 0} نفر دیگر</div>
+                  <div className="mr-4 text-xs text-gray-500">
+                    و {courseData.capacity || 0} نفر دیگر
+                  </div>
                 </div>
               </div>
             </div>
@@ -254,8 +290,19 @@ const CourseDetail: React.FC = () => {
                   <div className="text-sm text-gray-500">بروزرسانی رایگان</div>
                 </div>
                 <div className="text-xl text-luko-teal">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-10 w-10"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
                   </svg>
                 </div>
               </div>
@@ -265,19 +312,24 @@ const CourseDetail: React.FC = () => {
           {/* Course Tabs */}
           <div className="bg-white rounded-lg shadow-md overflow-hidden mb-8">
             <div className="flex border-b">
-              <div className="px-6 py-4 border-b-2 border-luko-teal font-bold text-luko-teal">توضیحات</div>
+              <div className="px-6 py-4 border-b-2 border-luko-teal font-bold text-luko-teal">
+                توضیحات{" "}
+              </div>
               <div className="px-6 py-4 text-gray-500">سرفصل‌ها</div>
-              <div className="px-6 py-4 text-gray-500">نظرات ({courseComments.length || 0})</div>
+              <div className="px-6 py-4 text-gray-500">
+                نظرات ({courseComments.length || 0})
+              </div>
             </div>
 
             <div className="p-6">
               <div className="text-gray-700 leading-relaxed">
-                <p className="mb-4">
-                  {courseData.description}
-                </p>
+                <p className="mb-4">{courseData.describe}</p>
 
                 <div className="mt-6">
-                  <Button variant="outline" className="text-luko-teal border-luko-teal hover:bg-luko-teal/10">
+                  <Button
+                    variant="outline"
+                    className="text-luko-teal border-luko-teal hover:bg-luko-teal/10"
+                  >
                     مطالعه بیشتر
                   </Button>
                 </div>
@@ -307,18 +359,27 @@ const CourseDetail: React.FC = () => {
               <div className="flex flex-col md:flex-row">
                 <div className="md:w-1/4 mb-4 md:mb-0">
                   <img
-                    src={courseData.imageAddress || "/placeholder-avatar.png"}
-                    alt={courseData.teacherName || "مدرس دوره"}
+                    src={
+                      teacherState?.pictureAddress || "/placeholder-avatar.png"
+                    }
+                    alt={teacherState?.teacherName || "مدرس دوره"}
                     className="w-32 h-32 rounded-full object-cover mx-auto border-4 border-luko-teal"
                   />
                 </div>
                 <div className="md:w-3/4 md:pr-6">
-                  <h3 className="text-lg font-bold mb-2"> {courseData.teacherName}</h3>
-                  <div className="text-gray-500 mb-4">   مدرس دوره </div>
+                  <h3 className="text-lg font-bold mb-2">
+                    {" "}
+                    {courseData.teacherName}
+                  </h3>
+                  <div className="text-gray-500 mb-4"> مدرس دوره </div>
                   <p className="text-gray-700 mb-4">
-                    استاد برجسته در زمینه برنامه‌نویسی و توسعه وب با بیش از ۱۰ سال سابقه تدریس.
+                    استاد برجسته در زمینه برنامه‌نویسی و توسعه وب با بیش از ۱۰
+                    سال سابقه تدریس.
                   </p>
-                  <Button variant="outline" className="text-luko-teal border-luko-teal hover:bg-luko-teal/10">
+                  <Button
+                    variant="outline"
+                    className="text-luko-teal border-luko-teal hover:bg-luko-teal/10"
+                  >
                     مشاهده پروفایل مدرس
                   </Button>
                 </div>
@@ -336,7 +397,11 @@ const CourseDetail: React.FC = () => {
               endpoints={commentEndpoints}
               contentId={courseData.courseId}
               contentType="course"
-              totalCommentsCount={courseData.commentsCount !== undefined ? courseData.commentsCount : courseComments.length}
+              totalCommentsCount={
+                courseData.commentsCount !== undefined
+                  ? courseData.commentsCount
+                  : courseComments.length
+              }
             />
           )}
 
@@ -345,7 +410,10 @@ const CourseDetail: React.FC = () => {
             <h2 className="text-xl font-bold mb-6">دوره‌های مرتبط</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {[1, 2, 3, 4].map((item) => (
-                <div key={item} className="bg-white rounded-lg shadow-md overflow-hidden">
+                <div
+                  key={item}
+                  className="bg-white rounded-lg shadow-md overflow-hidden"
+                >
                   <div className="h-40 bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
                     <img
                       src={`/lovable-uploads/04f05962-568c-44ad-a091-a60a681fa24c.png`}
@@ -356,13 +424,26 @@ const CourseDetail: React.FC = () => {
                   <div className="p-4">
                     <h3 className="font-bold mb-2">دوره پیشرفته جاوااسکریپت</h3>
                     <div className="flex items-center text-sm text-gray-600 mb-2">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4 ml-1"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                        />
                       </svg>
                       <span>مهدی محمدی</span>
                     </div>
                     <div className="text-amber-500 mb-2">★★★★★</div>
-                    <div className="text-luko-teal font-bold mt-2 text-left">۱,۴۵۰,۰۰۰ تومان</div>
+                    <div className="text-luko-teal font-bold mt-2 text-left">
+                      ۱,۴۵۰,۰۰۰ تومان
+                    </div>
                   </div>
                 </div>
               ))}
