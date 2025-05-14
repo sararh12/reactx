@@ -1,14 +1,16 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
+import { MdOutlineBookmarkBorder } from "react-icons/md";
 import CourseAccordion from "@/components/CourseAccordion";
 import CommentSection from "./commentSection";
 import { useToast } from "@/components/ui/use-toast";
 import axios from "axios";
 import { getTeacherDetail } from "@/services/api/teacher/teacherSevice";
+import { AddFavoriteCourses } from "@/services/api/course/courseService";
 
 interface Comment {
   id: string;
@@ -70,6 +72,27 @@ const CourseDetail: React.FC = () => {
   const [loading, setLoading] = React.useState(true);
   const [loadingComments, setLoadingComments] = React.useState(true);
   const [teacherState, setTeacher] = useState<Teacher>();
+  const [AddFavorite, setAddFavorite] = useState(false);
+
+  async function AddFavCourse() {
+    const callApi = await AddFavoriteCourses(courseData?.courseId);
+
+    console.log(callApi?.data);
+
+    setAddFavorite(callApi?.data)
+  }
+
+  useEffect(() => {
+    if (courseData?.courseId) {
+      AddFavCourse();
+    }
+  }, [courseData]);
+
+
+  async function handleAddFavorite(courseId:string){
+
+    await AddFavoriteCourses(courseId);
+  }
 
   const teacherDetail = async (teacherId: number) => {
     const callApi = await getTeacherDetail(teacherId);
@@ -227,6 +250,11 @@ const CourseDetail: React.FC = () => {
                 )}
 
                 <div className="bg-gradient-to-r from-luko-teal to-blue-500 p-6 rounded-lg">
+                <button
+                onClick={() => handleAddFavorite(courseData.courseId)}>
+                <MdOutlineBookmarkBorder  className="size-6 "
+                />
+                </button>
                   <div className="text-white text-2xl font-bold mb-2">
                     {courseData.cost.toLocaleString()} تومان{" "}
                   </div>
@@ -360,9 +388,9 @@ const CourseDetail: React.FC = () => {
                 <div className="md:w-1/4 mb-4 md:mb-0">
                   <img
                     src={
-                      teacherState?.pictureAddress || "/placeholder-avatar.png"
+                      teacherState?.pictureAddress || "/ostad.png"
                     }
-                    alt={teacherState?.teacherName || "مدرس دوره"}
+                    alt={courseData.teacherName || "مدرس دوره"}
                     className="w-32 h-32 rounded-full object-cover mx-auto border-4 border-luko-teal"
                   />
                 </div>
