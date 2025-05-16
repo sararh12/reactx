@@ -1,4 +1,5 @@
-import React from "react";
+import { Outlet } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Home,
@@ -9,22 +10,23 @@ import {
   Heart,
 } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import Logo from "./Logo";
-import Footer from "./Footer";
+import Logo from "../../Logo";
+import { GetMyProfile } from "@/services/api/profileInfoService/profileInfoService";
 
-interface DashboardLayoutProps {
-  children: React.ReactNode;
-  activeTab?: string;
-}
+const PanelLayout = ({ activeTab = "/panel/dashboard" }) => {
+  const [profileInfo, setProfileInfo] = useState();
+  async function GetProfileInfo() {
+    try {
+      const callApi = await GetMyProfile();
+      setProfileInfo(callApi?.data);
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
-const DashboardLayout: React.FC<DashboardLayoutProps> = ({
-  children,
-  activeTab,
-}) => {
-  const user = {
-    name: "فلان فلانی",
-    avatar: "public/lovable-uploads/dab28740-378c-4bde-a459-8122ce2f6957.png",
-  };
+  useEffect(() => {
+    GetProfileInfo();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 flex rtl">
@@ -32,10 +34,10 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
       <div className="w-72 bg-[#00D0B9] text-white flex flex-col fixed h-full">
         <div className="p-4 flex flex-col items-center">
           <Avatar className="w-24 h-24 border-4 border-white">
-            <AvatarImage src={user.avatar} alt={user.name} />
-            <AvatarFallback>{user.name[0]}</AvatarFallback>
+            {/* <AvatarImage src={user.avatar} alt={user.name} />
+            <AvatarFallback>{user.name[0]}</AvatarFallback> */}
           </Avatar>
-          <h2 className="text-xl font-bold mt-4">{user.name} خوش آمدید</h2>
+          {/* <h2 className="text-xl font-bold mt-4">{user.name} خوش آمدید</h2> */}
         </div>
 
         <nav className="flex-1 px-4 mt-6">
@@ -141,14 +143,21 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           <Link to="/">
             <Logo />
           </Link>
+          <div>
+            <span>
+              {profileInfo?.fName} {profileInfo?.lName}
+            </span>
+          </div>
         </header>
 
         <main className="p-6">
-          <div className="bg-white rounded-lg shadow-sm">{children}</div>
+          <div className="bg-white rounded-lg shadow-sm">
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>
   );
 };
 
-export default DashboardLayout;
+export default PanelLayout;

@@ -18,6 +18,7 @@ import DashboardReserved from "./pages/dashboard/DashboardReserved";
 import DashboardComments from "./pages/dashboard/DashboardComments";
 import DashboardSecurity from "./pages/dashboard/DashboardSecurity";
 import DashboardFavorites from "./pages/dashboard/DashboardFavorites";
+import PanelLayout from "./components/layout/dashboard";
 // import CartPage from "./pages/CartPage";
 
 const queryClient = new QueryClient();
@@ -34,13 +35,19 @@ const App = () => (
           <Route path="/courses/:id" element={<CourseDetail />} />
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/blog/:id" element={<ArticleDetail />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/dashboard/courses" element={<DashboardCourses />} />
-          <Route path="/dashboard/reserved" element={<DashboardReserved />} />
-          <Route path="/dashboard/comments" element={<DashboardComments />} />
-          <Route path="/dashboard/security" element={<DashboardSecurity />} />
-          <Route path="/dashboard/favorites" element={<DashboardFavorites />} />
-          <Route path="/profile" element={<UserProfile />} />
+          <Route path="/panel" element={<PanelLayout />}>
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="dashboard/courses" element={<DashboardCourses />} />
+            <Route path="dashboard/reserved" element={<DashboardReserved />} />
+            <Route path="dashboard/comments" element={<DashboardComments />} />
+            <Route path="dashboard/security" element={<DashboardSecurity />} />
+            <Route
+              path="dashboard/favorites"
+              element={<DashboardFavorites />}
+            />
+            <Route path="profile" element={<UserProfile />} />
+          </Route>
+
           <Route path="/auth/login" element={<Login />} />
           <Route path="/auth/register" element={<Register />} />
           {/* <Route path="/cart" element={<CartPage />} /> */}

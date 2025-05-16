@@ -1,9 +1,7 @@
-import axios from "axios";
+import http from "@/services/interceptor/interceptor";
 
 export async function getTopCourse(Count: string) {
-  const result = await axios.get(
-    `https://classapi.sepehracademy.ir/api/Home/GetCoursesTop?Count=${Count}`
-  );
+  const result = await http.get(`Home/GetCoursesTop?Count=${Count}`);
 
   return result;
 }
@@ -11,9 +9,69 @@ export async function getTopCourse(Count: string) {
 // get course with id
 
 export async function GetCourseWithId(courseId: string) {
-  const res = await axios.get(
-    `https://classapi.sepehracademy.ir/api/Home/GetCourseDetails?CourseId=${courseId}`
+  const res = await http.get(`Home/GetCourseDetails?CourseId=${courseId}`);
+
+  return res;
+}
+
+// dashboard course table
+
+export async function GetAllMyCourses() {
+  const res = await http.get(
+    `SharePanel/GetMyCourses?PageNumber=1&RowsOfPage=10&SortingCol=DESC&SortType=LastUpdate&Query=`
   );
+
+  return res;
+}
+
+// dashboard reserved courses
+
+export async function GetMyCoursesReserve() {
+  const res = await http.get(`SharePanel/GetMyCoursesReserve`);
+
+  return res;
+}
+
+// dashboard favorite course
+
+export async function GetMyFavoriteCourses() {
+  const res = await http.get(`SharePanel/GetMyFavoriteCourses`);
+
+  return res;
+}
+
+// add favorite course
+
+export async function AddFavoriteCourses(courseId: string) {
+  const res = await http.post(`Course/AddCourseFavorite`, {
+    courseid: courseId,
+  });
+
+  return res;
+}
+
+// add course like
+
+export async function AddCourseLike(courseId: string) {
+  const res = await http.post(`Course/AddCourseLike?CourseId=${courseId}`);
+
+  return res;
+}
+// add to reserve
+
+export async function AddCourseReserve(courseId: string) {
+  const res = await http.post(`CourseReserve/ReserveAdd`, {
+    courseid: courseId,
+  });
+
+  return res;
+}
+
+// delete course favorite
+
+export async function DeleteCourseFavorite(value) {
+  console.log(value);
+  const res = await http.delete(`Course/DeleteCourseFavorite`, value);
 
   return res;
 }

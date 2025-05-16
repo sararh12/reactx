@@ -1,4 +1,5 @@
 import axios from "axios";
+import http from "../../interceptor/interceptor";
 
 const API_BASE_URL = "https://classapi.sepehracademy.ir/api";
 
@@ -25,7 +26,6 @@ export async function getUserProfile() {
     console.error("Error fetching user profile:", error);
     if (axios.isAxiosError(error)) {
       if (error.response?.status === 401) {
-
         throw new Error(
           "Unauthorized: Session may have expired. Please log in again."
         );
@@ -53,7 +53,6 @@ interface UpdateUserProfileData {
   BirthDay?: string;
   Latitude?: string;
   Longitude?: string;
-
 }
 
 export async function updateUserProfile(profileData: UpdateUserProfileData) {
@@ -66,7 +65,6 @@ export async function updateUserProfile(profileData: UpdateUserProfileData) {
     const formData = new FormData();
     Object.entries(profileData).forEach(([key, value]) => {
       if (value !== undefined && value !== null) {
-
         formData.append(key, String(value));
       }
     });
@@ -97,4 +95,12 @@ export async function updateUserProfile(profileData: UpdateUserProfileData) {
       "An unexpected error occurred while updating user profile."
     );
   }
+}
+
+// get current profile info
+
+export async function GetMyProfile() {
+  const res = await http.get(`/SharePanel/GetProfileInfo`);
+
+  return res;
 }

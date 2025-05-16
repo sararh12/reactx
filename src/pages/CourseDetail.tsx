@@ -1,16 +1,20 @@
-import React, { useState,useEffect } from "react";
-import { useParams } from "react-router-dom";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import { Button } from "@/components/ui/button";
-import { Check } from "lucide-react";
-import { MdOutlineBookmarkBorder } from "react-icons/md";
 import CourseAccordion from "@/components/CourseAccordion";
-import CommentSection from "./commentSection";
+import Footer from "@/components/Footer";
+import Navbar from "@/components/Navbar";
+import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import axios from "axios";
+import {
+  AddCourseLike,
+  AddCourseReserve,
+  AddFavoriteCourses,
+} from "@/services/api/course/courseService";
 import { getTeacherDetail } from "@/services/api/teacher/teacherSevice";
-import { AddFavoriteCourses } from "@/services/api/course/courseService";
+import axios from "axios";
+import React, { useState } from "react";
+import { IoIosHeartEmpty } from "react-icons/io";
+import { MdOutlineBookmarkBorder } from "react-icons/md";
+import { useParams } from "react-router-dom";
+import CommentSection from "./commentSection";
 
 interface Comment {
   id: string;
@@ -73,25 +77,46 @@ const CourseDetail: React.FC = () => {
   const [loadingComments, setLoadingComments] = React.useState(true);
   const [teacherState, setTeacher] = useState<Teacher>();
   const [AddFavorite, setAddFavorite] = useState(false);
+  const [AddLike, setAddLike] = useState(false);
 
   async function AddFavCourse() {
     const callApi = await AddFavoriteCourses(courseData?.courseId);
 
     console.log(callApi?.data);
 
-    setAddFavorite(callApi?.data)
+    setAddFavorite(callApi?.data);
   }
 
-  useEffect(() => {
-    if (courseData?.courseId) {
-      AddFavCourse();
+  // useEffect(() => {
+  //   if (courseData?.courseId) {
+  //     AddFavCourse();
+  //   }
+  // }, [courseData]);
+
+  async function handleReserve(courseId: string) {
+    try {
+      const callApi = await AddCourseReserve(courseId);
+      toast({ title: callApi?.data.message });
+      console.log(callApi);
+    } catch (error) {
+      console.log(error);
     }
-  }, [courseData]);
+  }
 
+  async function handleAddFavorite(courseId: string) {
+    try {
+      const callApi = await AddFavoriteCourses(courseId);
+      toast({ title: callApi?.data.message });
+      console.log(callApi);
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
-  async function handleAddFavorite(courseId:string){
+  async function CourseLike() {
+    const callApi = await AddCourseLike(courseData?.courseId);
 
-    await AddFavoriteCourses(courseId);
+    setAddLike(callApi?.data);
   }
 
   const teacherDetail = async (teacherId: number) => {
@@ -249,16 +274,24 @@ const CourseDetail: React.FC = () => {
                   </div>
                 )}
 
-                <div className="bg-gradient-to-r from-luko-teal to-blue-500 p-6 rounded-lg">
-                <button
-                onClick={() => handleAddFavorite(courseData.courseId)}>
-                <MdOutlineBookmarkBorder  className="size-6 "
-                />
-                </button>
-                  <div className="text-white text-2xl font-bold mb-2">
-                    {courseData.cost.toLocaleString()} تومان{" "}
+                <div className="bg-gradient-to-r from-luko-teal to-blue-500 p-6 rounded-lg ">
+                  <div className="flex items-center justify-between">
+                    <div className="text-white text-2xl font-bold mb-2 ">
+                      {courseData.cost.toLocaleString()} تومان{" "}
+                    </div>
+                    <div className="flex gap-2">
+                      <IoIosHeartEmpty className="size-6 " />
+                      <button
+                        onClick={() => handleAddFavorite(courseData?.courseId)}
+                      >
+                        <MdOutlineBookmarkBorder className="size-6 " />
+                      </button>
+                    </div>
                   </div>
-                  <Button className="w-full bg-orange-500 hover:bg-orange-600 text-lg h-12">
+                  <Button
+                    className="w-full bg-orange-500 hover:bg-orange-600 text-lg h-12"
+                    onClick={() => handleReserve(courseData?.courseId)}
+                  >
                     شرکت در دوره
                   </Button>
                 </div>
@@ -387,9 +420,7 @@ const CourseDetail: React.FC = () => {
               <div className="flex flex-col md:flex-row">
                 <div className="md:w-1/4 mb-4 md:mb-0">
                   <img
-                    src={
-                      teacherState?.pictureAddress || "/ostad.png"
-                    }
+                    src={teacherState?.pictureAddress || "/ostad.png"}
                     alt={courseData.teacherName || "مدرس دوره"}
                     className="w-32 h-32 rounded-full object-cover mx-auto border-4 border-luko-teal"
                   />

@@ -26,7 +26,7 @@ const Index = () => {
 
     setBlogData(res?.data?.news);
   }
-
+ 
   useEffect(() => {
     GetTopCourse();
 

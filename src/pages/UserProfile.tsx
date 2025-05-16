@@ -30,7 +30,7 @@ interface UserProfileData {
   ReceiveMessageEvent?: boolean;
   HomeAdderess: string;
   NationalCode: string;
-  Gender?: boolean; 
+  Gender?: boolean;
   BirthDay: string;
   Latitude: string;
   Longitude: string;
@@ -39,7 +39,6 @@ interface UserProfileData {
   phoneNumber: string;
   name?: string;
   avatar?: string;
-
 }
 
 const UserProfile: React.FC = () => {
@@ -80,7 +79,7 @@ const UserProfile: React.FC = () => {
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => {
-      if (!prev) return null; 
+      if (!prev) return null;
       let processedValue: string | boolean = value;
       if (name === "Gender") {
         const lowerValue = value.toLowerCase();
@@ -172,11 +171,9 @@ const UserProfile: React.FC = () => {
         variant: "destructive",
       });
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
   };
-
-
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target?.files?.[0];
@@ -203,247 +200,7 @@ const UserProfile: React.FC = () => {
   }
   return (
     <div className="min-h-screen bg-gray-50 flex rtl">
-      <div className="bg-luko-teal text-white w-80 py-6 hidden lg:block">
-        <div className="p-6 flex flex-col items-center">
-          <img
-            src={
-              user?.userImage ||
-              "lovable-uploads/ad3a9984-7970-4325-a9f0-a4a2a8f9033a.png"
-            }
-            alt={user?.FName || user?.name}
-            className="w-32 h-32 rounded-full object-cover border-4 border-white"
-          />
-          <h2 className="text-xl font-bold mt-4">{user?.FName} خوش آمدید</h2>
-        </div>
-
-        <nav className="p-6 space-y-2">
-          <div className="flex items-center py-3 px-4 bg-white text-luko-teal rounded-md">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 ml-3"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <span>اطلاعات کاربری</span>
-          </div>
-          <Link
-            to="/my-courses"
-            className="flex items-center py-3 px-4 hover:bg-luko-teal/20 rounded-md"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 ml-3"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-              />
-            </svg>
-            <span>دوره های من</span>
-          </Link>
-          <Link
-            to="/purchased-courses"
-            className="flex items-center py-3 px-4 hover:bg-luko-teal/20 rounded-md"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 ml-3"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-              />
-            </svg>
-            <span>دوره های رزرو شده</span>
-          </Link>
-          <Link
-            to="/comments"
-            className="flex items-center py-3 px-4 hover:bg-luko-teal/20 rounded-md"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 ml-3"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
-              />
-            </svg>
-            <span>دیدگاه های من</span>
-          </Link>
-          <Link
-            to="/favorites"
-            className="flex items-center py-3 px-4 hover:bg-luko-teal/20 rounded-md"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 ml-3"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-              />
-            </svg>
-            <span>علاقه مندی ها</span>
-          </Link>
-          <Link
-            to="/security"
-            className="flex items-center py-3 px-4 hover:bg-luko-teal/20 rounded-md"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 ml-3"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 15v2m-6 4h10M12 15l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 11-6 0v-1m6 0H9"
-              />
-            </svg>
-            <span>تنظیمات امنیتی</span>
-          </Link>
-          <div className="border-t border-luko-teal/20 pt-2 mt-2">
-            <Link
-              to="/logout"
-              className="flex items-center py-3 px-4 hover:bg-luko-teal/20 rounded-md"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 ml-3"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                />
-              </svg>
-              <span>خروج از حساب</span>
-            </Link>
-          </div>
-        </nav>
-      </div>
-
       <div className="flex-1 flex flex-col">
-        <header className="bg-white p-4 shadow-sm flex justify-between items-center">
-          <div className="flex items-center">
-            <Link to="/" className="block">
-              <Logo />
-            </Link>
-          </div>
-
-          <div className="flex items-center space-x-4 space-x-reverse">
-            <Link to="/notifications" className="relative">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6 text-gray-600"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                />
-              </svg>
-              <span className="absolute top-0 right-0 h-4 w-4 bg-red-500 rounded-full text-xs text-white flex items-center justify-center">
-                3
-              </span>
-            </Link>
-
-            <Link to="/cart" className="relative">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6 text-gray-600"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-                />
-              </svg>
-              <span className="absolute top-0 right-0 h-4 w-4 bg-orange-500 rounded-full text-xs text-white flex items-center justify-center">
-                1
-              </span>
-            </Link>
-
-            <Link to="/dashboard" className="relative">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6 text-gray-600"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
-                />
-              </svg>
-            </Link>
-
-            <Link to="/" className="text-luko-teal">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-                />
-              </svg>
-            </Link>
-          </div>
-        </header>
-
         <main className="flex-1 p-6">
           <div className="bg-white rounded-lg shadow-sm">
             <div className="p-6 border-b">
@@ -454,9 +211,7 @@ const UserProfile: React.FC = () => {
               <div className="flex flex-col md:flex-row">
                 <div className="md:w-1/3 lg:w-1/4 mb-6 md:mb-0">
                   <div className="flex flex-col items-center">
-                    <div
-                      className="relative group cursor-pointer"
-                    >
+                    <div className="relative group cursor-pointer">
                       <img
                         src={
                           formData?.avatar ||
@@ -705,7 +460,7 @@ const UserProfile: React.FC = () => {
                   }
                   onChange={handleInputChange}
                   className="w-full"
-                  placeholder="true یا false" 
+                  placeholder="true یا false"
                 />
               </div>
 
