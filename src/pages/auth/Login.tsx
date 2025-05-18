@@ -47,7 +47,7 @@ const Login = () => {
         description: "در حال انتقال به داشبورد...",
       });
 
-      navigate("/dashboard");
+      navigate("/panel/dashboard");
     } catch (error: any) {
       toast({
         title: "خطا در ورود",

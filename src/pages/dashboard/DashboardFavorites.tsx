@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import DashboardLayout from "@/components/DashboardLayout";
 import {
   Table,
   TableHeader,
@@ -17,10 +16,22 @@ import {
 } from "@/services/api/course/courseService";
 import OnSetFormData from "@/utils/form-data";
 import { title } from "process";
+import { GetMyFavoriteNews } from "@/services/api/blog/blogServices";
+import { makeDatePersian } from "@/utils/persianDates";
 
 const DashboardFavorites: React.FC = () => {
   const { toast } = useToast();
   const [favoriteCourses, setFavoriteCourses] = useState([]);
+  const [favoriteNews, setFavoriteNews] = useState([]);
+
+  async function FavNews(){
+
+    const callApi = await GetMyFavoriteNews();
+
+    console.log(callApi?.data)
+
+    setFavoriteNews(callApi?.data)
+  }
 
   async function FavCourse() {
     const callApi = await GetMyFavoriteCourses();
@@ -30,9 +41,9 @@ const DashboardFavorites: React.FC = () => {
     setFavoriteCourses(callApi?.data?.favoriteCourseDto);
   }
 
-  async function handleDeleteFav(courseId: string) {
+  async function handleDeleteFav(courseFavId: string) {
     const data = {
-      CourseFavoriteId: courseId,
+      CourseFavoriteId: courseFavId,
     };
 
     const formData = OnSetFormData(data);
@@ -40,17 +51,22 @@ const DashboardFavorites: React.FC = () => {
     try {
       const callApi = await DeleteCourseFavorite(formData);
       toast({ title: ` حذف دوره ${callApi?.data?.message}` });
-    } catch (error) {
-      console.log(error);
+     if (callApi?.data?.success) {
+      const filteredData = favoriteCourses.filter(
+        (e) => e.favoriteId !== courseFavId
+      );
+      setFavoriteCourses(filteredData);
     }
+  } catch (error) {
+    console.log(error);
   }
+}
 
   useEffect(() => {
     FavCourse();
   }, []);
 
   const handleViewCourse = (courseId: number) => {
-    // In a real application, this would navigate to the course detail page
     console.log(`Viewing course with ID: ${courseId}`);
   };
 
@@ -88,17 +104,17 @@ const DashboardFavorites: React.FC = () => {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">دوره های مورد علاقه</h1>
+      <h1 className="text-2xl font-bold mb-6">  علاقه‌مندی‌ها</h1>
       {favoriteCourses.length > 0 ? (
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="text-right">نام دوره</TableHead>
-                <TableHead className="text-right">مدرس دوره</TableHead>
+                <TableHead className="text-right"> عنوان</TableHead>
+                <TableHead className="text-right">نویسنده </TableHead>
                 <TableHead className="text-right">دسته بندی</TableHead>
-                <TableHead className="text-right">قیمت (تومان)</TableHead>
-                <TableHead className="text-right">تاریخ افزودن</TableHead>
+                {/* <TableHead className="text-right">قیمت (تومان)</TableHead> */}
+                <TableHead className="text-right"> زمان انتشار</TableHead>
                 <TableHead className="text-right">عملیات</TableHead>
               </TableRow>
             </TableHeader>
@@ -108,8 +124,8 @@ const DashboardFavorites: React.FC = () => {
                   <TableCell>{course.courseTitle}</TableCell>
                   <TableCell>{course.teacheName}</TableCell>
                   <TableCell>{course.levelName}</TableCell>
-                  <TableCell>{course.cost}</TableCell>
-                  <TableCell>{course.lastUpdate}</TableCell>
+                  {/* <TableCell>{course.cost}</TableCell> */}
+                  <TableCell>{makeDatePersian(course.lastUpdate)}</TableCell>
                   <TableCell>
                     <div className="flex space-x-2 space-x-reverse">
                       <Link
@@ -120,7 +136,7 @@ const DashboardFavorites: React.FC = () => {
                       </Link>
                       <button
                         className="text-red-500 hover:text-red-700"
-                        onClick={() => handleDeleteFav(course?.courseId)}
+                        onClick={() => handleDeleteFav(course?.favoriteId	)}
                       >
                         {course.isFavorite ? (
                           <Heart className="h-5 w-5 fill-current" />

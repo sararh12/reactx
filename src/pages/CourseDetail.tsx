@@ -15,6 +15,8 @@ import { IoIosHeartEmpty } from "react-icons/io";
 import { MdOutlineBookmarkBorder } from "react-icons/md";
 import { useParams } from "react-router-dom";
 import CommentSection from "./commentSection";
+import http from "@/services/interceptor/interceptor"
+import { IoBookmark } from "react-icons/io5";
 
 interface Comment {
   id: string;
@@ -54,6 +56,7 @@ interface CourseDetailData {
   cost: number;
   capacity: number;
   imageAddress: string | null;
+  isUserFavorite:boolean;
   sections: {
     id: string;
     title: string;
@@ -155,17 +158,16 @@ const CourseDetail: React.FC = () => {
     }
     setLoading(true);
     try {
-      const response = await fetch(
-        `https://classapi.sepehracademy.ir/api/Home/GetCourseDetails?CourseId=${id}`
+      const response = await http.get (
+        `Home/GetCourseDetails?CourseId=${id}`
       );
-      if (!response.ok) {
+      if (!response.data) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      const data = await response.json();
-      setCourseData(data as CourseDetailData);
+      setCourseData(response.data as CourseDetailData);
       fetchCourseComments();
-      console.log(data?.teacherId);
-      teacherDetail(data?.teacherId);
+      console.log(response?.data?.teacherId);
+      teacherDetail(response?.data?.teacherId);
     } catch (error) {
       console.error("Error fetching course details:", error);
       setCourseData(null);
@@ -284,7 +286,8 @@ const CourseDetail: React.FC = () => {
                       <button
                         onClick={() => handleAddFavorite(courseData?.courseId)}
                       >
-                        <MdOutlineBookmarkBorder className="size-6 " />
+                        {courseData.isUserFavorite?<IoBookmark className="size-6 "/>:<MdOutlineBookmarkBorder className="size-6 " />}
+                        
                       </button>
                     </div>
                   </div>

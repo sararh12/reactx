@@ -8,6 +8,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
 import axios from "axios";
 import CommentSection from "./commentSection";
+import { AddFavoriteBlogs, GetBlogsById } from "@/services/api/blog/blogServices";
 
 interface Comment {
   id: string;
@@ -78,24 +79,44 @@ const ArticleDetail: React.FC = () => {
     null
   );
   const [error, setError] = useState<string | null>(null);
+  const [AddFavorite, setAddFavorite] = useState(false);
+  
 
-  useEffect(() => {
-    const fetchArticle = async () => {
-      try {
-        const response = await axios.get<NewsDetailData>(
-          `https://classapi.sepehracademy.ir/api/News/${articleId}`
-        );
-        setArticleData(response.data);
-        if (response.data.detailsNewsDto.currentUserIsLike) {
+  async function GetDetails(articleId:string) {
+    try{
+    const res=await GetBlogsById(articleId);
+
+    console.log(res?.data);
+    setArticleData(res.data);
+        if (res.data.detailsNewsDto.currentUserIsLike) {
           setArticleLiked(true);
         }
       } catch (err) {
         setError("خطا در دریافت اطلاعات مقاله.");
         console.error("Error fetching article:", err);
       }
-    };
+  }
 
-    fetchArticle();
+  async function AddFavNews() {
+    const callApi = await AddFavoriteBlogs(articleId);
+
+    console.log(callApi?.data);
+
+    setAddFavorite(callApi?.data);
+  }
+  async function handleAddFavorite(articleId: string) {
+    try {
+      const callApi = await AddFavoriteBlogs(articleId);
+      toast({ title: callApi?.data.message });
+      console.log(callApi);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  useEffect(() => {
+    GetDetails(articleId);
+
   }, [articleId]);
 
   const refetchArticleData = async () => {
@@ -140,73 +161,72 @@ const ArticleDetail: React.FC = () => {
     });
   };
 
-  const handleArticleLike = () => {
-    setArticleLiked(!articleLiked);
-    toast({
-      title: articleLiked
-        ? "از لیست علاقه‌مندی‌ها حذف شد"
-        : "به لیست علاقه‌مندی‌ها اضافه شد",
-    });
-  };
+  // const handleArticleLike = () => {
+  //   setArticleLiked(!articleLiked);
+  //   toast({
+  //     title: articleLiked
+  //       ? "از لیست علاقه‌مندی‌ها حذف شد"
+  //       : "به لیست علاقه‌مندی‌ها اضافه شد",
+  //   });
+  // };
 
-  const handleSaveArticle = async () => {
-    const token = localStorage.getItem("token");
-    if (!token || !articleData || !articleId) {
-      toast({
-        title: "خطا",
-        description: "اطلاعات مورد نیاز برای ذخیره مقاله در دسترس نیست.",
-        variant: "destructive",
-      });
-      return;
-    }
+  // const handleSaveArticle = async () => {
+  //   const token = localStorage.getItem("token");
+  //   if (!token || !articleData || !articleId) {
+  //     toast({
+  //       title: "خطا",
+  //       description: "اطلاعات مورد نیاز برای ذخیره مقاله در دسترس نیست.",
+  //       variant: "destructive",
+  //     });
+  //     return;
+  //   }
 
-    const isCurrentlyFavorite =
-      articleData.detailsNewsDto.isCurrentUserFavorite;
-    const favoriteId = articleData.detailsNewsDto.currentUserFavoriteId;
+    // const isCurrentlyFavorite =
+    //   articleData.detailsNewsDto.isCurrentUserFavorite;
+    // const favoriteId = articleData.detailsNewsDto.currentUserFavoriteId;
 
-    try {
-      if (isCurrentlyFavorite) {
-        // Article is currently a favorite, so we need to remove it.
-        if (
-          favoriteId &&
-          favoriteId !== "00000000-0000-0000-0000-000000000000"
-        ) {
-          await axios.delete(
-            `https://classapi.sepehracademy.ir/api/News/DeleteFavoriteNews`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-              data: { deleteEntityId: favoriteId },
-            }
-          );
-          toast({ title: "مقاله از علاقه‌مندی‌ها حذف شد" });
-        } else {
-          // This case should ideally not happen if isCurrentUserFavorite is true
-          toast({
-            title: "خطا",
-            description: "شناسه علاقه‌مندی یافت نشد.",
-            variant: "destructive",
-          });
-          return;
-        }
-      } else {
-        // Article is not a favorite, so add it.
-        await axios.post(
-          `https://classapi.sepehracademy.ir/api/News/AddFavoriteNews?NewsId=${articleId}`,
-          {},
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        toast({ title: "مقاله به علاقه‌مندی‌ها اضافه شد" });
-      }
-      refetchArticleData(); // Refetch to update UI and favorite status
-    } catch (err) {
-      console.error("Error saving/unsaving article:", err);
-      toast({
-        title: "خطا در ذخیره‌سازی مقاله",
-        description: "لطفا دوباره تلاش کنید.",
-        variant: "destructive",
-      });
-    }
-  };
+  //   try {
+  //     if (isCurrentlyFavorite) {
+  //       if (
+  //         favoriteId &&
+  //         favoriteId !== "00000000-0000-0000-0000-000000000000"
+  //       ) {
+  //         await axios.delete(
+  //           `https://classapi.sepehracademy.ir/api/News/DeleteFavoriteNews`,
+  //           {
+  //             headers: { Authorization: `Bearer ${token}` },
+  //             data: { deleteEntityId: favoriteId },
+  //           }
+  //         );
+  //         toast({ title: "مقاله از علاقه‌مندی‌ها حذف شد" });
+  //       } else {
+  //         // This case should ideally not happen if isCurrentUserFavorite is true
+  //         toast({
+  //           title: "خطا",
+  //           description: "شناسه علاقه‌مندی یافت نشد.",
+  //           variant: "destructive",
+  //         });
+  //         return;
+  //       }
+  //     } else {
+  //       // Article is not a favorite, so add it.
+  //       await axios.post(
+  //         `https://classapi.sepehracademy.ir/api/News/AddFavoriteNews?NewsId=${articleId}`,
+  //         {},
+  //         { headers: { Authorization: `Bearer ${token}` } }
+  //       );
+  //       toast({ title: "مقاله به علاقه‌مندی‌ها اضافه شد" });
+  //     }
+  //     refetchArticleData(); // Refetch to update UI and favorite status
+  //   } catch (err) {
+  //     console.error("Error saving/unsaving article:", err);
+  //     toast({
+  //       title: "خطا در ذخیره‌سازی مقاله",
+  //       description: "لطفا دوباره تلاش کنید.",
+  //       variant: "destructive",
+  //     });
+  //   }
+  // };
 
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
@@ -303,7 +323,8 @@ const ArticleDetail: React.FC = () => {
                       ? "text-luko-teal font-semibold"
                       : ""
                       }`}
-                    onClick={handleSaveArticle}
+                      onClick={() => handleAddFavorite(articleId)}
+
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -331,9 +352,10 @@ const ArticleDetail: React.FC = () => {
                         />
                       )}
                     </svg>
-                    {articleData?.detailsNewsDto.isCurrentUserFavorite
+                    {/* {articleData?.detailsNewsDto.isCurrentUserFavorite
                       ? "ذخیره شده"
-                      : "ذخیره"}
+                      : "ذخیره"} */}
+                        
                   </Button>
                 </div>
               </div>
@@ -378,7 +400,7 @@ const ArticleDetail: React.FC = () => {
                       variant="ghost"
                       className={`text-gray-600 hover:text-luko-teal ${articleLiked ? "text-luko-teal font-semibold" : ""
                         }`}
-                      onClick={handleArticleLike}
+
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"

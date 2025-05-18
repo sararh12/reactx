@@ -1,6 +1,5 @@
 
 import React from 'react';
-import DashboardLayout from '@/components/DashboardLayout';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 
 const DashboardComments: React.FC = () => {
@@ -22,7 +21,6 @@ const DashboardComments: React.FC = () => {
   ];
 
   return (
-    <DashboardLayout activeTab="comments">
       <div className="p-6">
         <h1 className="text-2xl font-bold mb-6">دیدگاه های من</h1>
         <div className="overflow-x-auto">
@@ -58,7 +56,7 @@ const DashboardComments: React.FC = () => {
           </Table>
         </div>
       </div>
-    </DashboardLayout>
+
   );
 };
 

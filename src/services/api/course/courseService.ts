@@ -71,7 +71,7 @@ export async function AddCourseReserve(courseId: string) {
 
 export async function DeleteCourseFavorite(value) {
   console.log(value);
-  const res = await http.delete(`Course/DeleteCourseFavorite`, value);
+  const res = await http.delete(`Course/DeleteCourseFavorite`, { data: value });
 
   return res;
 }

@@ -21,7 +21,7 @@ const Navbar: React.FC = () => {
 
   const menuItems = [
     { to: "/courses", label: "دوره ها" },
-    { to: "/dashboard", label: "صفحه داشبورد" },
+    { to: "/panel/dashboard", label: "صفحه داشبورد" },
     { to: "/blog", label: "اخبار و مقالات" },
     { to: "/instructors", label: "اساتید" },
     { to: "/contact", label: "تماس با ما" },

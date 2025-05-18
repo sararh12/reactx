@@ -104,3 +104,16 @@ export async function GetMyProfile() {
 
   return res;
 }
+
+
+// change password
+
+export async function Changepassword(oldPassword:string,newPassword:string) {
+
+  const res=await http.post(`/SharePanel/ChangePassword`,
+  {oldPassword:oldPassword,newPassword:newPassword}
+  );
+
+  return res;
+  
+}
