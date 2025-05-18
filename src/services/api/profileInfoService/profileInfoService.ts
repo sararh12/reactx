@@ -55,47 +55,6 @@ interface UpdateUserProfileData {
   Longitude?: string;
 }
 
-export async function updateUserProfile(profileData: UpdateUserProfileData) {
-  try {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      throw new Error("Authentication token not found. Please log in.");
-    }
-
-    const formData = new FormData();
-    Object.entries(profileData).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        formData.append(key, String(value));
-      }
-    });
-
-    const response = await axios.put(
-      `${API_BASE_URL}/SharePanel/UpdateProfileInfo`,
-      formData,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error updating user profile:", error);
-    if (axios.isAxiosError(error)) {
-      if (error.response?.status === 401) {
-        throw new Error(
-          "Unauthorized: Session may have expired. Please log in again."
-        );
-      }
-      throw new Error(
-        error.response?.data?.message || "Failed to update user profile."
-      );
-    }
-    throw new Error(
-      "An unexpected error occurred while updating user profile."
-    );
-  }
-}
 
 // get current profile info
 
@@ -116,4 +75,14 @@ export async function Changepassword(oldPassword:string,newPassword:string) {
 
   return res;
   
+}
+
+export async function UpdateProfileInfo(value) {
+
+  const res=await http.put(`/SharePanel/UpdateProfileInfo`,
+  value
+  )
+
+  return res;
+
 }

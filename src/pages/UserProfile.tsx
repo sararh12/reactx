@@ -17,9 +17,13 @@ import { UserPen } from "lucide-react";
 import DashboardLayout from "@/components/DashboardLayout";
 import Logo from "@/components/Logo";
 import {
+  GetMyProfile,
   getUserProfile,
-  updateUserProfile,
+  UpdateProfileInfo,
 } from "@/services/api/profileInfoService/profileInfoService";
+import { makeDatePersian } from "@/utils/persianDates";
+import { Formik, Form, Field } from 'formik';
+import OnSetFormData from "@/utils/form-data";
 
 interface UserProfileData {
   LName: string;
@@ -52,13 +56,13 @@ const UserProfile: React.FC = () => {
     const fetchUserProfile = async () => {
       setLoading(true);
       try {
-        const userProfile = await getUserProfile();
-        if (!userProfile) {
+        const {data} = await GetMyProfile();
+        if (!data) {
           setLoading(false);
           throw new Error("User profile not found");
         }
-        setUser(userProfile);
-        setFormData(userProfile);
+        setUser(data);
+        setFormData(data);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching user profile:", error);
@@ -112,68 +116,23 @@ const UserProfile: React.FC = () => {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formData) {
-      toast({
-        title: "خطا",
-        description: "اطلاعات فرم موجود نیست",
-        variant: "destructive",
-      });
-      return;
+
+    const formData= OnSetFormData(e)
+    try{
+      const result=await UpdateProfileInfo(formData)
+      if(result.data.success){
+        toast({title:result.data.message})
+      }
+      console.log(result.data);
     }
-
-    console.log("Form submitted:", formData);
-    setLoading(true);
-
-    try {
-      const profileUpdateData = {
-        LName: formData.LName,
-        FName: formData.FName,
-        UserAbout: formData.UserAbout,
-        LinkdinProfile: formData.LinkdinProfile,
-        TelegramLink: formData.TelegramLink,
-        ...(formData.ReceiveMessageEvent !== undefined && {
-          ReceiveMessageEvent: formData.ReceiveMessageEvent,
-        }),
-        HomeAdderess: formData.HomeAdderess,
-        NationalCode: formData.NationalCode,
-        Gender: formData.Gender,
-        BirthDay: formData.BirthDay,
-        Latitude: formData.Latitude,
-        Longitude: formData.Longitude,
-      };
-
-      const response = await updateUserProfile(profileUpdateData);
-      console.log("Response:", response);
-
-      const updatedUser = {
-        ...user,
-        ...formData,
-        ...profileUpdateData,
-      } as UserProfileData;
-      setUser(updatedUser);
-      setFormData(updatedUser);
-
-      setIsDialogOpen(false);
-      toast({
-        title: "پروفایل با موفقیت بروزرسانی شد",
-        description: "تغییرات شما با موفقیت ذخیره شد",
-      });
-    } catch (error) {
-      console.error("Error updating user profile:", error);
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "مشکلی در بروزرسانی پروفایل پیش آمد";
-      toast({
-        title: "خطا",
-        description: errorMessage,
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
+    catch(error){
+      console.log(error);
     }
-  };
+    
+
+   
+
+  }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target?.files?.[0];
@@ -272,7 +231,7 @@ const UserProfile: React.FC = () => {
                           نام و نام خانوادگی :
                         </div>
                         <div className="font-bold text-orange-500">
-                          {user?.FName} {user?.LName}
+                          {user?.fName	} {user?.lName	}
                         </div>
                       </div>
 
@@ -288,7 +247,7 @@ const UserProfile: React.FC = () => {
 
                       <div className="mb-4">
                         <div className="text-gray-500 mb-1">کد ملی :</div>
-                        <div className="font-bold">{user?.NationalCode}</div>
+                        <div className="font-bold">{user?.nationalCode	}</div>
                       </div>
 
                       <div className="mb-4">
@@ -296,20 +255,20 @@ const UserProfile: React.FC = () => {
                         <div className="font-bold">
                           {user?.Gender === undefined
                             ? ""
-                            : String(user.Gender)}
+                            : String(user.gender)}
                         </div>
                       </div>
 
                       <div className="mb-4">
                         <div className="text-gray-500 mb-1">تاریخ تولد :</div>
-                        <div className="font-bold">{user?.BirthDay}</div>
+                        <div className="font-bold">{makeDatePersian(user?.birthDay)	}</div>
                       </div>
                     </div>
 
                     <div>
                       <div className="mb-4">
                         <div className="text-gray-500 mb-1">آدرس :</div>
-                        <div className="font-bold">{user?.HomeAdderess}</div>
+                        <div className="font-bold">{user?.homeAdderess}</div>
                       </div>
 
                       <div className="border rounded-lg p-2 mb-4">
@@ -327,7 +286,7 @@ const UserProfile: React.FC = () => {
                   <div className="mt-6">
                     <div className="text-gray-500 mb-1">درباره من :</div>
                     <div className="text-gray-700 border p-4 rounded-lg">
-                      {user?.UserAbout}
+                      {user?.userAbout	}
                     </div>
                   </div>
                 </div>
@@ -354,17 +313,36 @@ const UserProfile: React.FC = () => {
               ویرایش اطلاعات شخصی
             </DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleSubmit}>
+          <Formik
+          initialValues={
+            {
+              FName:user?.fName,
+              LName:user?.lName,
+              phoneNumber:user?.phoneNumber,
+              email:user?.email,
+              LinkdinProfile:user?.linkdinProfile,
+              TelegramLink:user?.telegramLink,
+              NationalCode:user?.nationalCode,
+              Gender:user?.gender,
+              BirthDay:user?.birthDay,
+              Latitude:user?.latitude,
+              Longitude:user?.longitude,
+              HomeAdderess:user?.homeAdderess,
+              UserAbout:user?.userAbout,
+
+            }
+          }
+          onSubmit={(value)=>{handleSubmit(value)}}
+          >
+          <Form >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
               <div className="col-span-1">
                 <Label htmlFor="FName" className="mb-2 block">
                   نام
                 </Label>
-                <Input
+                <Field
                   id="FName"
                   name="FName"
-                  value={formData?.FName || ""}
-                  onChange={handleInputChange}
                   className="w-full"
                 />
               </div>
@@ -372,11 +350,9 @@ const UserProfile: React.FC = () => {
                 <Label htmlFor="LName" className="mb-2 block">
                   نام خانوادگی
                 </Label>
-                <Input
+                <Field
                   id="LName"
                   name="LName"
-                  value={formData?.LName || ""}
-                  onChange={handleInputChange}
                   className="w-full"
                 />
               </div>
@@ -385,11 +361,9 @@ const UserProfile: React.FC = () => {
                 <Label htmlFor="phoneNumber" className="mb-2 block">
                   شماره همراه
                 </Label>
-                <Input
+                <Field
                   id="phoneNumber"
                   name="phoneNumber"
-                  value={formData?.phoneNumber || ""}
-                  onChange={handleInputChange}
                   className="w-full"
                 />
               </div>
@@ -398,11 +372,9 @@ const UserProfile: React.FC = () => {
                 <Label htmlFor="email" className="mb-2 block">
                   ایمیل
                 </Label>
-                <Input
+                <Field
                   id="email"
                   name="email"
-                  value={formData?.email || ""}
-                  onChange={handleInputChange}
                   className="w-full"
                 />
               </div>
@@ -410,11 +382,9 @@ const UserProfile: React.FC = () => {
                 <Label htmlFor="LinkdinProfile" className="mb-2 block">
                   پروفایل لینکدین
                 </Label>
-                <Input
+                <Field
                   id="LinkdinProfile"
                   name="LinkdinProfile"
-                  value={formData?.LinkdinProfile || ""}
-                  onChange={handleInputChange}
                   className="w-full"
                 />
               </div>
@@ -422,11 +392,9 @@ const UserProfile: React.FC = () => {
                 <Label htmlFor="TelegramLink" className="mb-2 block">
                   پروفایل تلگرام
                 </Label>
-                <Input
+                <Field
                   id="TelegramLink"
                   name="TelegramLink"
-                  value={formData?.TelegramLink || ""}
-                  onChange={handleInputChange}
                   className="w-full"
                 />
               </div>
@@ -435,11 +403,9 @@ const UserProfile: React.FC = () => {
                 <Label htmlFor="NationalCode" className="mb-2 block">
                   کد ملی
                 </Label>
-                <Input
+                <Field
                   id="NationalCode"
                   name="NationalCode"
-                  value={formData?.NationalCode || ""}
-                  onChange={handleInputChange}
                   className="w-full"
                 />
               </div>
@@ -448,17 +414,10 @@ const UserProfile: React.FC = () => {
                 <Label htmlFor="Gender" className="mb-2 block">
                   جنسیت
                 </Label>
-                <Input
+                <Field
                   id="Gender"
                   name="Gender"
-                  value={
-                    formData?.Gender === undefined
-                      ? ""
-                      : formData.Gender === true
-                      ? "true"
-                      : "false"
-                  }
-                  onChange={handleInputChange}
+                 
                   className="w-full"
                   placeholder="true یا false"
                 />
@@ -468,11 +427,9 @@ const UserProfile: React.FC = () => {
                 <Label htmlFor="BirthDay" className="mb-2 block">
                   تاریخ تولد
                 </Label>
-                <Input
+                <Field
                   id="BirthDay"
                   name="BirthDay"
-                  value={formData?.BirthDay || ""}
-                  onChange={handleInputChange}
                   className="w-full"
                   placeholder="YYYY-MM-DD"
                 />
@@ -481,11 +438,9 @@ const UserProfile: React.FC = () => {
                 <Label htmlFor="Latitude" className="mb-2 block">
                   عرض جغرافیایی
                 </Label>
-                <Input
+                <Field
                   id="Latitude"
                   name="Latitude"
-                  value={formData?.Latitude || ""}
-                  onChange={handleInputChange}
                   className="w-full"
                 />
               </div>
@@ -493,11 +448,9 @@ const UserProfile: React.FC = () => {
                 <Label htmlFor="Longitude" className="mb-2 block">
                   طول جغرافیایی
                 </Label>
-                <Input
+                <Field
                   id="Longitude"
                   name="Longitude"
-                  value={formData?.Longitude || ""}
-                  onChange={handleInputChange}
                   className="w-full"
                 />
               </div>
@@ -506,11 +459,9 @@ const UserProfile: React.FC = () => {
                 <Label htmlFor="HomeAdderess" className="mb-2 block">
                   آدرس
                 </Label>
-                <Input
+                <Field
                   id="HomeAdderess"
                   name="HomeAdderess"
-                  value={formData?.HomeAdderess || ""}
-                  onChange={handleInputChange}
                   className="w-full"
                 />
               </div>
@@ -519,28 +470,13 @@ const UserProfile: React.FC = () => {
                 <Label htmlFor="userAbout" className="mb-2 block">
                   درباره من
                 </Label>
-                <Textarea
+                <Field
                   id="UserAbout"
                   name="UserAbout"
-                  value={formData?.UserAbout || ""}
-                  onChange={handleInputChange}
                   className="w-full"
                   rows={4}
+                  as="textarea"
                 />
-              </div>
-
-              <div className="col-span-2 flex items-center space-x-2 rtl:space-x-reverse">
-                <Switch
-                  id="ReceiveMessageEvent"
-                  name="ReceiveMessageEvent"
-                  checked={formData?.ReceiveMessageEvent || false}
-                  onCheckedChange={(checked) =>
-                    handleSwitchChange("ReceiveMessageEvent", checked)
-                  }
-                />
-                <Label htmlFor="ReceiveMessageEvent" className="mb-0">
-                  دریافت پیام رویدادها
-                </Label>
               </div>
             </div>
             <DialogFooter>
@@ -559,7 +495,8 @@ const UserProfile: React.FC = () => {
                 ذخیره تغییرات
               </Button>
             </DialogFooter>
-          </form>
+          </Form>
+          </Formik>
         </DialogContent>
       </Dialog>
     </div>
