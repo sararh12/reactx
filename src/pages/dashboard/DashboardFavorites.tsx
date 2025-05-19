@@ -22,16 +22,6 @@ import { makeDatePersian } from "@/utils/persianDates";
 const DashboardFavorites: React.FC = () => {
   const { toast } = useToast();
   const [favoriteCourses, setFavoriteCourses] = useState([]);
-  const [favoriteNews, setFavoriteNews] = useState([]);
-
-  async function FavNews(){
-
-    const callApi = await GetMyFavoriteNews();
-
-    console.log(callApi?.data)
-
-    setFavoriteNews(callApi?.data)
-  }
 
   async function FavCourse() {
     const callApi = await GetMyFavoriteCourses();
