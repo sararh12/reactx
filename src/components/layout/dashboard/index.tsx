@@ -102,6 +102,18 @@ const PanelLayout = ({ activeTab = "/panel/dashboard" }) => {
           </Link>
 
           <Link
+          to="/panel/dashboard/favoriteNews"
+          className={`flex items-center py-3 px-4 rounded-md mb-2 ${
+            activeTab === "favoriteNews"
+              ? "bg-white text-[#00D0B9]"
+              : "text-white hover:bg-white/10"
+          }`}
+          >
+          <Heart className="ml-3 h-5 w-5" />
+          <span> اخبار مورد علاقه</span>
+          </Link>
+
+          <Link
             to="/panel/dashboard/comments"
             className={`flex items-center py-3 px-4 rounded-md mb-2 ${
               activeTab === "comments"
