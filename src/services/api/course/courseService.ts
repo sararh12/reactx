@@ -75,3 +75,14 @@ export async function DeleteCourseFavorite(value) {
 
   return res;
 }
+
+// delete reserved course
+
+export async function DeleteCourseReserve(value) {
+
+  console.log(value);
+  const res=await http.delete(`/CourseReserve`,{data:value});
+
+  return res;
+}
+

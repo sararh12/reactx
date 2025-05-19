@@ -9,12 +9,38 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { Eye } from "lucide-react";
-import { GetMyCoursesReserve } from "@/services/api/course/courseService";
+import { GetMyCoursesReserve,DeleteCourseReserve } from "@/services/api/course/courseService";
 import { useNavigate } from "react-router-dom";
+import { toast } from "@/hooks/use-toast";
+import { makeDatePersian } from "@/utils/persianDates";
+import { IoTrash } from "react-icons/io5";
+
 
 const DashboardReserved: React.FC = () => {
-  const navigate = useNavigate();
+
   const [ReservedCourses, setReservedCourses] = useState([]);
+
+  async function handleDeleteReserve(reserveId	: string) {
+    const data = {
+      id: reserveId,
+    };
+
+
+    try {
+      const callApi = await DeleteCourseReserve(data);
+      toast({ title: ` حذف دوره ${callApi?.data?.message}` });
+     if (callApi?.data?.success) {
+      const filteredData = ReservedCourses.filter(
+        (e) => e.reserveId !== reserveId
+      );
+      setReservedCourses(filteredData);
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+  const navigate = useNavigate();
 
   async function ReservedCourse() {
     const callApi = await GetMyCoursesReserve();
@@ -48,7 +74,7 @@ const DashboardReserved: React.FC = () => {
               <TableRow key={course?.courseId}>
                 <TableCell>{course?.courseName}</TableCell>
                 <TableCell>{course.teacherName}</TableCell>
-                <TableCell>{course?.reserverDate}</TableCell>
+                <TableCell>{makeDatePersian(course?.reserverDate)}</TableCell>
                 <TableCell>{course.cost}</TableCell>
                 <TableCell>
                   <span className="px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800">
@@ -60,7 +86,10 @@ const DashboardReserved: React.FC = () => {
                     className="text-gray-600 hover:text-gray-900"
                     onClick={() => navigate(`/courses/${course?.courseId}`)}
                   >
-                    <Eye className="h-5 w-5" />
+                    <Eye className="h-5 w-5 " />
+                  </button>
+                  <button  onClick={() => handleDeleteReserve(course?.reserveId	)}>
+                  <IoTrash className="h-5 w-5 "/>
                   </button>
                 </TableCell>
               </TableRow>

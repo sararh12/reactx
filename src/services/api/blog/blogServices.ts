@@ -28,6 +28,7 @@ export async function GetMyFavoriteNews() {
     
 }
 
+// get news by id
 
 export async function GetBlogsById(articleId:string) {
 
@@ -37,3 +38,13 @@ export async function GetBlogsById(articleId:string) {
     return res;
     
 }
+
+// delete favorite news
+
+export async function DeleteFavoriteNews(value) {
+  
+    console.log(value);
+    const res=await http.delete(`/News/DeleteFavoriteNews`,{data:value});
+  
+    return res;
+  }
