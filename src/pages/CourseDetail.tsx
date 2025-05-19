@@ -17,6 +17,7 @@ import { useParams } from "react-router-dom";
 import CommentSection from "./commentSection";
 import http from "@/services/interceptor/interceptor"
 import { IoBookmark } from "react-icons/io5";
+import { AiOutlineLike } from "react-icons/ai";
 
 interface Comment {
   id: string;
@@ -57,6 +58,7 @@ interface CourseDetailData {
   capacity: number;
   imageAddress: string | null;
   isUserFavorite:boolean;
+  isCourseReseve:number;
   sections: {
     id: string;
     title: string;
@@ -282,7 +284,6 @@ const CourseDetail: React.FC = () => {
                       {courseData.cost.toLocaleString()} تومان{" "}
                     </div>
                     <div className="flex gap-2">
-                      <IoIosHeartEmpty className="size-6 " />
                       <button
                         onClick={() => handleAddFavorite(courseData?.courseId)}
                       >
@@ -295,7 +296,7 @@ const CourseDetail: React.FC = () => {
                     className="w-full bg-orange-500 hover:bg-orange-600 text-lg h-12"
                     onClick={() => handleReserve(courseData?.courseId)}
                   >
-                    شرکت در دوره
+                    {courseData.isCourseReseve===1?"شرکت در دوره":"شرکت شده"	}
                   </Button>
                 </div>
               </div>
