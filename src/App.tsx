@@ -18,6 +18,7 @@ import DashboardReserved from "./pages/dashboard/DashboardReserved";
 import DashboardComments from "./pages/dashboard/DashboardComments";
 import DashboardSecurity from "./pages/dashboard/DashboardSecurity";
 import DashboardFavorites from "./pages/dashboard/DashboardFavorites";
+import DashboardFavoriteNews from "./pages/dashboard/DashboardFavoriteNews";
 import PanelLayout from "./components/layout/dashboard";
 // import CartPage from "./pages/CartPage";
 
@@ -44,6 +45,10 @@ const App = () => (
             <Route
               path="dashboard/favorites"
               element={<DashboardFavorites />}
+            />
+             <Route
+              path="dashboard/favoriteNews"
+              element={<DashboardFavoriteNews />}
             />
             <Route path="profile" element={<UserProfile />} />
           </Route>
