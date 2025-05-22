@@ -10,51 +10,63 @@ import {
 } from "@/components/ui/table";
 
 import { useToast } from "@/hooks/use-toast";
-import { DeleteFavoriteNews, GetMyFavoriteNews } from "@/services/api/blog/blogServices";
+import {
+  DeleteFavoriteNews,
+  GetBlogsById,
+  GetMyFavoriteNews,
+} from "@/services/api/blog/blogServices";
 import { makeDatePersian } from "@/utils/persianDates";
 import { Eye, Heart, HeartOff } from "lucide-react";
 
 const DashboardFavoriteNews: React.FC = () => {
+  const { toast } = useToast();
+  const [favoriteNews, setFavoriteNews] = useState([]);
 
-    const { toast } = useToast();
-    const [favoriteNews, setFavoriteNews] = useState([]);
+  async function FavNews() {
+    const callApi = await GetMyFavoriteNews();
 
-    async function FavNews() {
-        const callApi = await GetMyFavoriteNews();
-    
-        console.log(callApi?.data?.myFavoriteNews	);
-    
-        setFavoriteNews(callApi?.data?.myFavoriteNews	);
+    setFavoriteNews(callApi?.data?.myFavoriteNews);
+
+    const fetchDetail = callApi?.data?.myFavoriteNews.map(
+      async (item) =>
+        await GetBlogsById(item?.newsId).then(
+          (res) => res?.data?.detailsNewsDto
+        )
+    );
+
+    const list = await Promise.all(fetchDetail);
+
+    console.log(list);
+
+    setFavoriteNews(list);
+  }
+
+  async function handleDeleteNews(newsFavId: string) {
+    const data = {
+      deleteEntityId: newsFavId,
+    };
+
+    try {
+      const callApi = await DeleteFavoriteNews(data);
+      toast({ title: ` حذف دوره ${callApi?.data?.message}` });
+      if (callApi?.data?.success) {
+        const filteredData = favoriteNews.filter(
+          (e) => e.favoriteId !== newsFavId
+        );
+        setFavoriteNews(filteredData);
       }
-
-      async function handleDeleteNews(newsFavId: string) {
-        const data = {
-          deleteEntityId: newsFavId,
-        };
-    
-    
-        try {
-          const callApi = await DeleteFavoriteNews(data);
-          toast({ title: ` حذف دوره ${callApi?.data?.message}` });
-         if (callApi?.data?.success) {
-          const filteredData = favoriteNews.filter(
-            (e) => e.favoriteId !== newsFavId
-          );
-          setFavoriteNews(filteredData);
-        }
-      } catch (error) {
-        console.log(error);
-      }
+    } catch (error) {
+      console.log(error);
     }
+  }
 
-      useEffect(() => {
-        FavNews();
-      }, []);
+  useEffect(() => {
+    FavNews();
+  }, []);
 
-      return(
-
-        <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">  اخبار مورد علاقه</h1>
+  return (
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-6"> اخبار مورد علاقه</h1>
       {favoriteNews.length > 0 ? (
         <div className="overflow-x-auto">
           <Table>
@@ -70,23 +82,23 @@ const DashboardFavoriteNews: React.FC = () => {
             </TableHeader>
             <TableBody>
               {favoriteNews.map((news) => (
-                <TableRow key={news.newsId	}>
-                  <TableCell>{news.title	}</TableCell>
-                  <TableCell>{news.teacheName}</TableCell>
-                  <TableCell>{news.levelName}</TableCell>
+                <TableRow key={news.id}>
+                  <TableCell>{news.title}</TableCell>
+                  <TableCell>{news.addUserFullName}</TableCell>
+                  <TableCell>{news.newsCatregoryName}</TableCell>
                   {/* <TableCell>{course.cost}</TableCell> */}
-                  <TableCell>{makeDatePersian(news.updateDate)}</TableCell>
+                  <TableCell>{makeDatePersian(news.insertDate)}</TableCell>
                   <TableCell>
                     <div className="flex space-x-2 space-x-reverse">
                       <Link
-                        to={`/blog/${news.newsId}`}
+                        to={`/blog/${news.id}`}
                         className="text-gray-600 hover:text-gray-900"
                       >
                         <Eye className="h-5 w-5" />
                       </Link>
                       <button
                         className="text-red-500 hover:text-red-700"
-                        onClick={() =>handleDeleteNews(news?.favoriteId	)}
+                        onClick={() => handleDeleteNews(news?.favoriteId)}
                       >
                         {news.isFavorite ? (
                           <Heart className="h-5 w-5 fill-current" />
@@ -116,9 +128,7 @@ const DashboardFavoriteNews: React.FC = () => {
         </div>
       )}
     </div>
-
-      )
-    
+  );
 };
 
 export default DashboardFavoriteNews;

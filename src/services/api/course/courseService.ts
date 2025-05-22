@@ -52,8 +52,8 @@ export async function AddFavoriteCourses(courseId: string) {
 
 // add course like
 
-export async function AddCourseLike(courseId: string) {
-  const res = await http.post(`Course/AddCourseLike?CourseId=${courseId}`);
+export async function AddCourseLike(CourseId: string) {
+  const res = await http.post(`Course/AddCourseLike?CourseId=${CourseId}`);
 
   return res;
 }
@@ -86,3 +86,11 @@ export async function DeleteCourseReserve(value) {
   return res;
 }
 
+
+// add course dislike
+
+export async function AddCourseDislike(CourseId: string) {
+  const res = await http.post(`/Course/AddCourseDissLike?CourseId=${CourseId}`);
+
+  return res;
+}

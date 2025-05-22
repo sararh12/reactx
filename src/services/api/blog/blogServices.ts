@@ -48,3 +48,23 @@ export async function DeleteFavoriteNews(value) {
   
     return res;
   }
+
+  // like news
+
+  export async function AddNewsLike(newsId:string) {
+
+    const res=await http.post(`/News/NewsLike/${newsId}`)
+
+    return res;
+    
+  }
+
+  // dislike news
+
+  export async function AddNewsDislike(newsId:string) {
+
+    const res=await http.post(`/News/NewsDissLike/${newsId}`)
+
+    return res;
+    
+  }

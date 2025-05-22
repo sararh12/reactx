@@ -77,6 +77,8 @@ export async function Changepassword(oldPassword:string,newPassword:string) {
   
 }
 
+// update profile info
+
 export async function UpdateProfileInfo(value) {
 
   const res=await http.put(`/SharePanel/UpdateProfileInfo`,
@@ -85,4 +87,13 @@ export async function UpdateProfileInfo(value) {
 
   return res;
 
+}
+
+// add profile pic
+
+export async function AddProfileImage(value) {
+  console.log(value);
+  const res = await http.post(`/SharePanel/AddProfileImage`, { data: value });
+
+  return res;
 }

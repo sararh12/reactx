@@ -8,46 +8,54 @@ import {
   TableHead,
   TableCell,
 } from "@/components/ui/table";
-import { Eye } from "lucide-react";
-import { GetMyCoursesReserve,DeleteCourseReserve } from "@/services/api/course/courseService";
+import { Eye, List } from "lucide-react";
+import {
+  GetMyCoursesReserve,
+  DeleteCourseReserve,
+  GetCourseWithId,
+} from "@/services/api/course/courseService";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import { makeDatePersian } from "@/utils/persianDates";
 import { IoTrash } from "react-icons/io5";
 
-
 const DashboardReserved: React.FC = () => {
-
   const [ReservedCourses, setReservedCourses] = useState([]);
 
-  async function handleDeleteReserve(reserveId	: string) {
+  async function handleDeleteReserve(reserveId: string) {
     const data = {
       id: reserveId,
     };
 
-
     try {
       const callApi = await DeleteCourseReserve(data);
       toast({ title: ` حذف دوره ${callApi?.data?.message}` });
-     if (callApi?.data?.success) {
-      const filteredData = ReservedCourses.filter(
-        (e) => e.reserveId !== reserveId
-      );
-      setReservedCourses(filteredData);
+      if (callApi?.data?.success) {
+        const filteredData = ReservedCourses.filter(
+          (e) => e.reserveId !== reserveId
+        );
+        setReservedCourses(filteredData);
+      }
+    } catch (error) {
+      console.log(error);
     }
-  } catch (error) {
-    console.log(error);
   }
-}
 
   const navigate = useNavigate();
 
   async function ReservedCourse() {
     const callApi = await GetMyCoursesReserve();
 
-    console.log(callApi?.data);
+    const fetchDetail = callApi?.data?.map(
+      async (item) =>
+        await GetCourseWithId(item?.courseId).then((res) => res?.data)
+    );
 
-    setReservedCourses(callApi?.data);
+    const list = await Promise.all(fetchDetail);
+
+    console.log(list);
+
+    setReservedCourses(list);
   }
 
   useEffect(() => {
@@ -72,13 +80,15 @@ const DashboardReserved: React.FC = () => {
           <TableBody>
             {ReservedCourses.map((course) => (
               <TableRow key={course?.courseId}>
-                <TableCell>{course?.courseName}</TableCell>
+                <TableCell>{course?.title}</TableCell>
                 <TableCell>{course.teacherName}</TableCell>
-                <TableCell>{makeDatePersian(course?.reserverDate)}</TableCell>
+                <TableCell>{makeDatePersian(course?.insertDate)}</TableCell>
                 <TableCell>{course.cost}</TableCell>
                 <TableCell>
                   <span className="px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800">
-                    {course?.accept ? "تایید شده" : "در انتظار تایید"}
+                    {course?.isCourseUser == 1
+                      ? "تایید شده"
+                      : "در انتظار تایید"}
                   </span>
                 </TableCell>
                 <TableCell>
@@ -88,8 +98,10 @@ const DashboardReserved: React.FC = () => {
                   >
                     <Eye className="h-5 w-5 " />
                   </button>
-                  <button  onClick={() => handleDeleteReserve(course?.reserveId	)}>
-                  <IoTrash className="h-5 w-5 "/>
+                  <button
+                    onClick={() => handleDeleteReserve(course?.reserveId)}
+                  >
+                    <IoTrash className="h-5 w-5 " />
                   </button>
                 </TableCell>
               </TableRow>

@@ -17,6 +17,7 @@ import { UserPen } from "lucide-react";
 import DashboardLayout from "@/components/DashboardLayout";
 import Logo from "@/components/Logo";
 import {
+  AddProfileImage,
   GetMyProfile,
   getUserProfile,
   UpdateProfileInfo,
@@ -51,6 +52,31 @@ const UserProfile: React.FC = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [formData, setFormData] = useState<UserProfileData | null>(null);
   const { toast } = useToast();
+  const [AddPic, setAddPic] = useState([]);
+
+  async function AddProfilePic(id: string) {
+    const data = {
+      currentPictureAddress: id,
+    };
+
+    const formData = OnSetFormData(data);
+
+    try {
+      const callApi = await AddProfileImage(formData);
+      toast({ title: ` حذف دوره ${callApi?.data?.message}` });
+     if (callApi?.data?.success) {
+      const filteredData = AddPic.filter(
+        (e) => e.id !== id
+      );
+      setAddPic(filteredData);
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+
+  
 
   useEffect(() => {
     const fetchUserProfile = async () => {
