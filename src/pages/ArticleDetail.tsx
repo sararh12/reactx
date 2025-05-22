@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -8,7 +7,16 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
 import axios from "axios";
 import CommentSection from "./commentSection";
-import { AddFavoriteBlogs, GetBlogsById } from "@/services/api/blog/blogServices";
+import {
+  AddFavoriteBlogs,
+  GetBlogsById,
+  AddNewsDislike,
+  AddNewsLike,
+} from "@/services/api/blog/blogServices";
+import { AiOutlineLike } from "react-icons/ai";
+import { AiFillLike } from "react-icons/ai";
+import { AiOutlineDislike } from "react-icons/ai";
+import { AiFillDislike } from "react-icons/ai";
 
 interface Comment {
   id: string;
@@ -80,21 +88,50 @@ const ArticleDetail: React.FC = () => {
   );
   const [error, setError] = useState<string | null>(null);
   const [AddFavorite, setAddFavorite] = useState(false);
-  
+  const [AddLike, setAddLike] = useState(false);
+  const [AddDisike, setAddDislike] = useState(false);
 
-  async function GetDetails(articleId:string) {
-    try{
-    const res=await GetBlogsById(articleId);
+  async function AddDislikeForNews(newsId) {
+    const callApi = await AddNewsDislike(articleId);
 
-    console.log(res?.data);
-    setArticleData(res.data);
-        if (res.data.detailsNewsDto.currentUserIsLike) {
-          setArticleLiked(true);
-        }
-      } catch (err) {
-        setError("خطا در دریافت اطلاعات مقاله.");
-        console.error("Error fetching article:", err);
+    console.log(callApi?.data);
+
+    setAddDislike(callApi?.data);
+  }
+
+  async function handleDislike(articleId: string) {
+    try {
+      const callApi = await AddNewsDislike(articleId);
+      toast({ title: callApi?.data.message });
+      console.log(callApi);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function handleLike(articleId: string) {
+    try {
+      const callApi = await AddNewsLike(articleId);
+      toast({ title: callApi?.data.message });
+      console.log(callApi);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function GetDetails(articleId: string) {
+    try {
+      const res = await GetBlogsById(articleId);
+
+      console.log(res?.data);
+      setArticleData(res.data);
+      if (res.data.detailsNewsDto.currentUserIsLike) {
+        setArticleLiked(true);
       }
+    } catch (err) {
+      setError("خطا در دریافت اطلاعات مقاله.");
+      console.error("Error fetching article:", err);
+    }
   }
 
   async function AddFavNews() {
@@ -116,7 +153,6 @@ const ArticleDetail: React.FC = () => {
 
   useEffect(() => {
     GetDetails(articleId);
-
   }, [articleId]);
 
   const refetchArticleData = async () => {
@@ -161,73 +197,6 @@ const ArticleDetail: React.FC = () => {
     });
   };
 
-  // const handleArticleLike = () => {
-  //   setArticleLiked(!articleLiked);
-  //   toast({
-  //     title: articleLiked
-  //       ? "از لیست علاقه‌مندی‌ها حذف شد"
-  //       : "به لیست علاقه‌مندی‌ها اضافه شد",
-  //   });
-  // };
-
-  // const handleSaveArticle = async () => {
-  //   const token = localStorage.getItem("token");
-  //   if (!token || !articleData || !articleId) {
-  //     toast({
-  //       title: "خطا",
-  //       description: "اطلاعات مورد نیاز برای ذخیره مقاله در دسترس نیست.",
-  //       variant: "destructive",
-  //     });
-  //     return;
-  //   }
-
-    // const isCurrentlyFavorite =
-    //   articleData.detailsNewsDto.isCurrentUserFavorite;
-    // const favoriteId = articleData.detailsNewsDto.currentUserFavoriteId;
-
-  //   try {
-  //     if (isCurrentlyFavorite) {
-  //       if (
-  //         favoriteId &&
-  //         favoriteId !== "00000000-0000-0000-0000-000000000000"
-  //       ) {
-  //         await axios.delete(
-  //           `https://classapi.sepehracademy.ir/api/News/DeleteFavoriteNews`,
-  //           {
-  //             headers: { Authorization: `Bearer ${token}` },
-  //             data: { deleteEntityId: favoriteId },
-  //           }
-  //         );
-  //         toast({ title: "مقاله از علاقه‌مندی‌ها حذف شد" });
-  //       } else {
-  //         // This case should ideally not happen if isCurrentUserFavorite is true
-  //         toast({
-  //           title: "خطا",
-  //           description: "شناسه علاقه‌مندی یافت نشد.",
-  //           variant: "destructive",
-  //         });
-  //         return;
-  //       }
-  //     } else {
-  //       // Article is not a favorite, so add it.
-  //       await axios.post(
-  //         `https://classapi.sepehracademy.ir/api/News/AddFavoriteNews?NewsId=${articleId}`,
-  //         {},
-  //         { headers: { Authorization: `Bearer ${token}` } }
-  //       );
-  //       toast({ title: "مقاله به علاقه‌مندی‌ها اضافه شد" });
-  //     }
-  //     refetchArticleData(); // Refetch to update UI and favorite status
-  //   } catch (err) {
-  //     console.error("Error saving/unsaving article:", err);
-  //     toast({
-  //       title: "خطا در ذخیره‌سازی مقاله",
-  //       description: "لطفا دوباره تلاش کنید.",
-  //       variant: "destructive",
-  //     });
-  //   }
-  // };
-
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
     toast({
@@ -247,7 +216,7 @@ const ArticleDetail: React.FC = () => {
     deleteCommentLike: `https://classapi.sepehracademy.ir/api/News/DeleteCommentLikeNews`,
     getReplies: (commentId: string) =>
       `https://classapi.sepehracademy.ir/api/News/GetRepliesComments?Id=${commentId}`,
-    createReplyComment: `https://classapi.sepehracademy.ir/api/News/CreateNewsReplyComment`
+    createReplyComment: `https://classapi.sepehracademy.ir/api/News/CreateNewsReplyComment`,
   };
 
   return (
@@ -319,12 +288,12 @@ const ArticleDetail: React.FC = () => {
                   </div>
                   <Button
                     variant="ghost"
-                    className={`flex items-center text-gray-500 hover:text-luko-teal ${articleData?.detailsNewsDto.isCurrentUserFavorite
-                      ? "text-luko-teal font-semibold"
-                      : ""
-                      }`}
-                      onClick={() => handleAddFavorite(articleId)}
-
+                    className={`flex items-center text-gray-500 hover:text-luko-teal ${
+                      articleData?.detailsNewsDto.isCurrentUserFavorite
+                        ? "text-luko-teal font-semibold"
+                        : ""
+                    }`}
+                    onClick={() => handleAddFavorite(articleId)}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -355,7 +324,6 @@ const ArticleDetail: React.FC = () => {
                     {/* {articleData?.detailsNewsDto.isCurrentUserFavorite
                       ? "ذخیره شده"
                       : "ذخیره"} */}
-                        
                   </Button>
                 </div>
               </div>
@@ -396,40 +364,21 @@ const ArticleDetail: React.FC = () => {
 
                 <div className="mt-8 pt-6 border-t border-gray-200 flex items-center justify-between">
                   <div className="flex space-x-3 space-x-reverse">
-                    <Button
-                      variant="ghost"
-                      className={`text-gray-600 hover:text-luko-teal ${articleLiked ? "text-luko-teal font-semibold" : ""
-                        }`}
+                    <button onClick={() => handleLike(articleId)}>
+                      {articleData?.detailsNewsDto.currentUserIsLike ? (
+                        <AiFillLike className="size-6" />
+                      ) : (
+                        <AiOutlineLike className="size-6" />
+                      )}
+                    </button>
 
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5 ml-2"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.865.8L2 10.5z" />
-                      </svg>
-                      {articleLiked ? "پسندیدم" : "میپسندم"}
-                      <span className="mr-1 text-xs">
-                        ({article.currentLikeCount})
-                      </span>
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      className="text-gray-600 hover:text-luko-teal"
-                      onClick={handleShare}
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5 ml-2"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z" />
-                      </svg>
-                      اشتراک گذاری
-                    </Button>
+                    <button onClick={() => handleDislike(articleId)}>
+                      {articleData?.detailsNewsDto.currentUserIsDissLike ? (
+                        <AiFillDislike className="size-6" />
+                      ) : (
+                        <AiOutlineDislike className="size-6" />
+                      )}
+                    </button>
                   </div>
                 </div>
               </div>
@@ -437,7 +386,7 @@ const ArticleDetail: React.FC = () => {
                 comments={comments}
                 refetchData={refetchArticleData}
                 endpoints={commentEndpoints}
-                contentId={articleId || ''}
+                contentId={articleId || ""}
                 contentType="article"
                 totalCommentsCount={article.commentsCount}
               />

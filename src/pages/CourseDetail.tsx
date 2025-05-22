@@ -7,6 +7,7 @@ import {
   AddCourseLike,
   AddCourseReserve,
   AddFavoriteCourses,
+  AddCourseDislike,
 } from "@/services/api/course/courseService";
 import { getTeacherDetail } from "@/services/api/teacher/teacherSevice";
 import axios from "axios";
@@ -18,6 +19,9 @@ import CommentSection from "./commentSection";
 import http from "@/services/interceptor/interceptor"
 import { IoBookmark } from "react-icons/io5";
 import { AiOutlineLike } from "react-icons/ai";
+import { AiFillLike } from "react-icons/ai";
+import { AiOutlineDislike } from "react-icons/ai";
+import { AiFillDislike } from "react-icons/ai";
 
 interface Comment {
   id: string;
@@ -59,6 +63,8 @@ interface CourseDetailData {
   imageAddress: string | null;
   isUserFavorite:boolean;
   isCourseReseve:number;
+  currentUserLike:string;
+  currentUserDissLike:string;
   sections: {
     id: string;
     title: string;
@@ -83,6 +89,46 @@ const CourseDetail: React.FC = () => {
   const [teacherState, setTeacher] = useState<Teacher>();
   const [AddFavorite, setAddFavorite] = useState(false);
   const [AddLike, setAddLike] = useState(false);
+  const [AddDisike, setAddDislike] = useState(false);
+
+    async function AddDislikeForCourse(CourseId) {
+      
+      const callApi=await AddCourseDislike(courseData?.courseId)
+
+      console.log(callApi?.data);
+
+      setAddDislike(callApi?.data)
+    }
+
+    async function handleDislike(courseId: string) {
+      try {
+        const callApi = await AddCourseDislike(courseId);
+        toast({ title: callApi?.data.message });
+        console.log(callApi);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+  async function AddLikeForCourse(CourseId) {
+
+    const callApi=await AddCourseLike(courseData?.courseId)
+
+    console.log(callApi?.data);
+
+    setAddLike(callApi?.data)
+    
+  }
+
+  async function handleLike(courseId: string) {
+    try {
+      const callApi = await AddCourseLike(courseId);
+      toast({ title: callApi?.data.message });
+      console.log(callApi);
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   async function AddFavCourse() {
     const callApi = await AddFavoriteCourses(courseData?.courseId);
@@ -118,11 +164,6 @@ const CourseDetail: React.FC = () => {
     }
   }
 
-  async function CourseLike() {
-    const callApi = await AddCourseLike(courseData?.courseId);
-
-    setAddLike(callApi?.data);
-  }
 
   const teacherDetail = async (teacherId: number) => {
     const callApi = await getTeacherDetail(teacherId);
@@ -284,6 +325,17 @@ const CourseDetail: React.FC = () => {
                       {courseData.cost.toLocaleString()} تومان{" "}
                     </div>
                     <div className="flex gap-2">
+                    <button
+                    onClick={() => handleDislike(courseData?.courseId)}
+                    >
+                      {courseData.currentUserDissLike==="0"?<AiOutlineDislike className="size-6"/>:<AiFillDislike  className="size-6"/>	}
+                      </button>
+                      <button
+                        onClick={() => handleLike(courseData?.courseId)}
+                      >
+                      {courseData.currentUserLike==="0"?<AiOutlineLike  className="size-6 " />:<AiFillLike  className="size-6 "/>	}
+                      </button>
+                      
                       <button
                         onClick={() => handleAddFavorite(courseData?.courseId)}
                       >
