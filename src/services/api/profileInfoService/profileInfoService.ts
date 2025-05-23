@@ -1,5 +1,6 @@
 import axios from "axios";
 import http from "../../interceptor/interceptor";
+import OnSetFormData from "@/utils/form-data";
 
 const API_BASE_URL = "https://classapi.sepehracademy.ir/api";
 
@@ -91,9 +92,16 @@ export async function UpdateProfileInfo(value) {
 
 // add profile pic
 
-export async function AddProfileImage(value) {
-  console.log(value);
-  const res = await http.post(`/SharePanel/AddProfileImage`, { data: value });
+export async function AddProfileImage(value: File) {
+  const formData = OnSetFormData({
+    formFile: value,
+  });
+
+  const res = await http.post(`/SharePanel/AddProfileImage`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 
   return res;
 }

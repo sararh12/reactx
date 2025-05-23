@@ -23,8 +23,10 @@ import {
   UpdateProfileInfo,
 } from "@/services/api/profileInfoService/profileInfoService";
 import { makeDatePersian } from "@/utils/persianDates";
-import { Formik, Form, Field } from 'formik';
+import { Formik, Form, Field } from "formik";
 import OnSetFormData from "@/utils/form-data";
+import { on } from "events";
+
 
 interface UserProfileData {
   LName: string;
@@ -39,7 +41,33 @@ interface UserProfileData {
   BirthDay: string;
   Latitude: string;
   Longitude: string;
-  userImage?: string;
+  userImage: Array<{
+    id: string;
+    puctureAddress: string;
+  }>;
+
+  email: string;
+  phoneNumber: string;
+  name?: string;
+  avatar?: string;
+}interface UserProfileData {
+  LName: string;
+  FName: string;
+  UserAbout: string;
+  LinkdinProfile: string;
+  TelegramLink: string;
+  ReceiveMessageEvent?: boolean;
+  HomeAdderess: string;
+  NationalCode: string;
+  Gender?: boolean;
+  BirthDay: string;
+  Latitude: string;
+  Longitude: string;
+  userImage: Array<{
+    id: string;
+    puctureAddress: string;
+  }>;
+
   email: string;
   phoneNumber: string;
   name?: string;
@@ -160,7 +188,7 @@ const UserProfile: React.FC = () => {
 
   }
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async(e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target?.files?.[0];
     if (file) {
       const imageUrl = URL.createObjectURL(file);
@@ -169,12 +197,55 @@ const UserProfile: React.FC = () => {
         avatar: imageUrl,
       }));
 
-      toast({
-        title: "عکس پروفایل آپلود شد",
-        description: "عکس جدید با موفقیت آپلود شد",
-      });
-    }
-  };
+      setLoading(true); 
+
+      try {
+        const response = await AddProfileImage(file);
+  
+        if (response.status === 200 && response.data?.success) {
+          toast({
+            title: "عکس پروفایل آپلود شد",
+            description: "عکس جدید با موفقیت آپلود شد",
+          });
+  
+          const { data: updatedProfile } = await GetMyProfile();
+  
+          if (updatedProfile?.userImage?.length > 0) {
+            const latestImage =
+              updatedProfile.userImage[updatedProfile.userImage.length - 1];
+            setUser(updatedProfile);
+            setFormData((prev) => ({
+              ...prev,
+              ...updatedProfile,
+              avatar: latestImage.puctureAddress,
+            }));
+          } else {
+            throw new Error("عکس پروفایل یافت نشد");
+          }
+        } else {
+          throw new Error(response.data?.message || "خطا در آپلود عکس");
+        }
+      } catch (error) {
+        console.error("Error uploading profile image:", error);
+        toast({
+          title: "خطا در آپلود عکس",
+          description:
+            error instanceof Error ? error.message : "لطفا دوباره تلاش کنید",
+          variant: "destructive",
+        });
+
+        setFormData((prev) => ({
+          ...prev,
+          
+          avatar: updatedProfile.userImage?.[0]?.puctureAddress || ''
+        }));
+      } finally {
+        setLoading(false);
+        URL.revokeObjectURL(imageUrl); 
+      }
+      }
+    };
+  
 
   if (loading) {
     return (
@@ -197,10 +268,11 @@ const UserProfile: React.FC = () => {
                 <div className="md:w-1/3 lg:w-1/4 mb-6 md:mb-0">
                   <div className="flex flex-col items-center">
                     <div className="relative group cursor-pointer">
-                      <img
+                    <img
                         src={
-                          formData?.avatar ||
-                          formData?.userImage ||
+                          user?.avatar ||
+                          formData?.userImage[formData.userImage.length - 1]
+                            .puctureAddress ||
                           "lovable-uploads/ad3a9984-7970-4325-a9f0-a4a2a8f9033a.png"
                         }
                         alt={user?.FName || user?.name}
@@ -231,13 +303,11 @@ const UserProfile: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                    {/* <input
+                    <input
                       type="file"
-                      ref={fileInputRef}
-                      className="hidden"
                       accept="image/*"
                       onChange={handleFileChange}
-                    /> */}
+                    />
                     <Button
                       variant="outline"
                       className="mt-4 text-luko-teal border-luko-teal hover:bg-luko-teal/10"
