@@ -16,16 +16,22 @@ import { useToast } from "@/hooks/use-toast";
 import { UserPen } from "lucide-react";
 import DashboardLayout from "@/components/DashboardLayout";
 import Logo from "@/components/Logo";
+import { MdAddCircleOutline } from "react-icons/md";
+import { TiDeleteOutline } from "react-icons/ti";
+
 import {
   AddProfileImage,
+  DeleteProfileImage,
   GetMyProfile,
   getUserProfile,
+  SelectProfileImage,
   UpdateProfileInfo,
 } from "@/services/api/profileInfoService/profileInfoService";
 import { makeDatePersian } from "@/utils/persianDates";
 import { Formik, Form, Field } from "formik";
 import OnSetFormData from "@/utils/form-data";
 import { on } from "events";
+import { IoIosClose } from "react-icons/io";
 
 
 interface UserProfileData {
@@ -81,6 +87,11 @@ const UserProfile: React.FC = () => {
   const [formData, setFormData] = useState<UserProfileData | null>(null);
   const { toast } = useToast();
   const [AddPic, setAddPic] = useState([]);
+  const [SelectPic, setSelectPic] = useState([]);
+  const [DeletePic, setDeletePic] = useState([]);
+    const [isModalShow, setisModalShow] = useState(false);
+
+    console.log(user);
 
   async function AddProfilePic(id: string) {
     const data = {
@@ -93,14 +104,46 @@ const UserProfile: React.FC = () => {
       const callApi = await AddProfileImage(formData);
       toast({ title: ` حذف دوره ${callApi?.data?.message}` });
      if (callApi?.data?.success) {
-      const filteredData = AddPic.filter(
+      const filteredData = DeletePic.filter(
         (e) => e.id !== id
       );
-      setAddPic(filteredData);
+      setDeletePic(filteredData);
     }
   } catch (error) {
     console.log(error);
   }
+}
+
+async function SelectImage(id:string) {
+
+
+   const formData = OnSetFormData({ ImageId: id });
+
+     try {
+       const callApi = await SelectProfileImage(formData);
+       toast({ title: ` انتخاب عکس  ${callApi?.data?.message}` });
+       if (callApi?.data?.success) {
+         const filteredData = SelectPic.filter((e) => e.id !== id);
+         setSelectPic(filteredData);
+       }
+     } catch (error) {
+       console.log(error);
+     }
+  
+}
+
+async function DeleteImage(imageId: string) {
+
+   try {
+     const callApi = await DeleteProfileImage(imageId);
+     toast({ title: ` حذف عکس  ${callApi?.data?.message}` });
+     if (callApi?.data?.success) {
+       const filteredData = SelectPic.filter((e) => e.id !== id);
+       setSelectPic(filteredData);
+     }
+   } catch (error) {
+     console.log(error);
+   }
 }
 
 
@@ -259,6 +302,7 @@ const UserProfile: React.FC = () => {
       <div className="flex-1 flex flex-col">
         <main className="flex-1 p-6">
           <div className="bg-white rounded-lg shadow-sm">
+            
             <div className="p-6 border-b">
               <h1 className="text-2xl font-bold">اطلاعات کاربری</h1>
             </div>
@@ -267,10 +311,15 @@ const UserProfile: React.FC = () => {
               <div className="flex flex-col md:flex-row">
                 <div className="md:w-1/3 lg:w-1/4 mb-6 md:mb-0">
                   <div className="flex flex-col items-center">
-                    <div className="relative group cursor-pointer">
-                    <img
+                    <div
+                      className="relative group cursor-pointer"
+                      onClick={() => {
+                        setisModalShow(true);
+                      }}
+                    >
+                      <img
                         src={
-                          user?.avatar ||
+                          user?.currentPictureAddress ||
                           formData?.userImage[formData.userImage.length - 1]
                             .puctureAddress ||
                           "lovable-uploads/ad3a9984-7970-4325-a9f0-a4a2a8f9033a.png"
@@ -303,11 +352,59 @@ const UserProfile: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleFileChange}
-                    />
+
+                    {isModalShow && (
+                      <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+                        <div className="bg-white rounded-2xl p-6 w-[90%] max-w-2xl shadow-xl relative">
+                          <button
+                            onClick={() => setisModalShow(false)}
+                            className="absolute left-4 top-4 text-luko-teal hover:text-luko-teal-dark transition-colors"
+                          >
+                            <IoIosClose className="size-8" />
+                          </button>
+
+                          <h3 className="text-xl font-bold text-luko-teal mb-4 text-center">
+                            انتخاب عکس پروفایل
+                          </h3>
+
+                          <div className="grid grid-cols-4 md:grid-cols-5 gap-3 max-h-[60vh] overflow-y-auto p-2">
+                            {user?.userImage?.map((image) => (
+                              <div
+                                key={image.id}
+                                className="relative group cursor-pointer transition-transform hover:scale-105"
+                              >
+                                <img
+                                  onClick={() => SelectImage(image.id)}
+                                  src={image.puctureAddress}
+                                  alt="User image"
+                                  className="w-full aspect-square object-cover rounded-lg border-2 border-gray-200 group-hover:border-luko-teal"
+                                />
+                                <div
+                                  className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    DeleteImage(image.id);
+                                  }}
+                                >
+                                  <TiDeleteOutline className="text-red-500 size-6 hover:text-red-700 cursor-pointer bg-white rounded-full" />
+                                </div>
+                              </div>
+                            ))}
+
+                            <label className="flex items-center justify-center border-2 border-dashed border-gray-300 rounded-lg hover:border-luko-teal transition-colors">
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleFileChange}
+                                className="hidden"
+                              />
+                              <MdAddCircleOutline className="size-8 text-luko-teal" />
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
                     <Button
                       variant="outline"
                       className="mt-4 text-luko-teal border-luko-teal hover:bg-luko-teal/10"
@@ -327,7 +424,7 @@ const UserProfile: React.FC = () => {
                           نام و نام خانوادگی :
                         </div>
                         <div className="font-bold text-orange-500">
-                          {user?.fName	} {user?.lName	}
+                          {user?.fName} {user?.lName}
                         </div>
                       </div>
 
@@ -343,7 +440,7 @@ const UserProfile: React.FC = () => {
 
                       <div className="mb-4">
                         <div className="text-gray-500 mb-1">کد ملی :</div>
-                        <div className="font-bold">{user?.nationalCode	}</div>
+                        <div className="font-bold">{user?.nationalCode}</div>
                       </div>
 
                       <div className="mb-4">
@@ -357,7 +454,9 @@ const UserProfile: React.FC = () => {
 
                       <div className="mb-4">
                         <div className="text-gray-500 mb-1">تاریخ تولد :</div>
-                        <div className="font-bold">{makeDatePersian(user?.birthDay)	}</div>
+                        <div className="font-bold">
+                          {makeDatePersian(user?.birthDay)}
+                        </div>
                       </div>
                     </div>
 
@@ -382,7 +481,7 @@ const UserProfile: React.FC = () => {
                   <div className="mt-6">
                     <div className="text-gray-500 mb-1">درباره من :</div>
                     <div className="text-gray-700 border p-4 rounded-lg">
-                      {user?.userAbout	}
+                      {user?.userAbout}
                     </div>
                   </div>
                 </div>
@@ -410,188 +509,166 @@ const UserProfile: React.FC = () => {
             </DialogTitle>
           </DialogHeader>
           <Formik
-          initialValues={
-            {
-              FName:user?.fName,
-              LName:user?.lName,
-              phoneNumber:user?.phoneNumber,
-              email:user?.email,
-              LinkdinProfile:user?.linkdinProfile,
-              TelegramLink:user?.telegramLink,
-              NationalCode:user?.nationalCode,
-              Gender:user?.gender,
-              BirthDay:user?.birthDay,
-              Latitude:user?.latitude,
-              Longitude:user?.longitude,
-              HomeAdderess:user?.homeAdderess,
-              UserAbout:user?.userAbout,
-
-            }
-          }
-          onSubmit={(value)=>{handleSubmit(value)}}
+            initialValues={{
+              FName: user?.fName,
+              LName: user?.lName,
+              phoneNumber: user?.phoneNumber,
+              email: user?.email,
+              LinkdinProfile: user?.linkdinProfile,
+              TelegramLink: user?.telegramLink,
+              NationalCode: user?.nationalCode,
+              Gender: user?.gender,
+              BirthDay: user?.birthDay,
+              Latitude: user?.latitude,
+              Longitude: user?.longitude,
+              HomeAdderess: user?.homeAdderess,
+              UserAbout: user?.userAbout,
+            }}
+            onSubmit={(value) => {
+              handleSubmit(value);
+            }}
           >
-          <Form >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
-              <div className="col-span-1">
-                <Label htmlFor="FName" className="mb-2 block">
-                  نام
-                </Label>
-                <Field
-                  id="FName"
-                  name="FName"
-                  className="w-full"
-                />
-              </div>
-              <div>
-                <Label htmlFor="LName" className="mb-2 block">
-                  نام خانوادگی
-                </Label>
-                <Field
-                  id="LName"
-                  name="LName"
-                  className="w-full"
-                />
-              </div>
+            <Form>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
+                <div className="col-span-1">
+                  <Label htmlFor="FName" className="mb-2 block">
+                    نام
+                  </Label>
+                  <Field id="FName" name="FName" className="w-full" />
+                </div>
+                <div>
+                  <Label htmlFor="LName" className="mb-2 block">
+                    نام خانوادگی
+                  </Label>
+                  <Field id="LName" name="LName" className="w-full" />
+                </div>
 
-              <div className="col-span-1">
-                <Label htmlFor="phoneNumber" className="mb-2 block">
-                  شماره همراه
-                </Label>
-                <Field
-                  id="phoneNumber"
-                  name="phoneNumber"
-                  className="w-full"
-                />
-              </div>
+                <div className="col-span-1">
+                  <Label htmlFor="phoneNumber" className="mb-2 block">
+                    شماره همراه
+                  </Label>
+                  <Field
+                    id="phoneNumber"
+                    name="phoneNumber"
+                    className="w-full"
+                  />
+                </div>
 
-              <div className="col-span-1">
-                <Label htmlFor="email" className="mb-2 block">
-                  ایمیل
-                </Label>
-                <Field
-                  id="email"
-                  name="email"
-                  className="w-full"
-                />
-              </div>
-              <div className="col-span-1">
-                <Label htmlFor="LinkdinProfile" className="mb-2 block">
-                  پروفایل لینکدین
-                </Label>
-                <Field
-                  id="LinkdinProfile"
-                  name="LinkdinProfile"
-                  className="w-full"
-                />
-              </div>
-              <div className="col-span-1">
-                <Label htmlFor="TelegramLink" className="mb-2 block">
-                  پروفایل تلگرام
-                </Label>
-                <Field
-                  id="TelegramLink"
-                  name="TelegramLink"
-                  className="w-full"
-                />
-              </div>
+                <div className="col-span-1">
+                  <Label htmlFor="email" className="mb-2 block">
+                    ایمیل
+                  </Label>
+                  <Field id="email" name="email" className="w-full" />
+                </div>
+                <div className="col-span-1">
+                  <Label htmlFor="LinkdinProfile" className="mb-2 block">
+                    پروفایل لینکدین
+                  </Label>
+                  <Field
+                    id="LinkdinProfile"
+                    name="LinkdinProfile"
+                    className="w-full"
+                  />
+                </div>
+                <div className="col-span-1">
+                  <Label htmlFor="TelegramLink" className="mb-2 block">
+                    پروفایل تلگرام
+                  </Label>
+                  <Field
+                    id="TelegramLink"
+                    name="TelegramLink"
+                    className="w-full"
+                  />
+                </div>
 
-              <div className="col-span-1">
-                <Label htmlFor="NationalCode" className="mb-2 block">
-                  کد ملی
-                </Label>
-                <Field
-                  id="NationalCode"
-                  name="NationalCode"
-                  className="w-full"
-                />
-              </div>
+                <div className="col-span-1">
+                  <Label htmlFor="NationalCode" className="mb-2 block">
+                    کد ملی
+                  </Label>
+                  <Field
+                    id="NationalCode"
+                    name="NationalCode"
+                    className="w-full"
+                  />
+                </div>
 
-              <div className="col-span-1">
-                <Label htmlFor="Gender" className="mb-2 block">
-                  جنسیت
-                </Label>
-                <Field
-                  id="Gender"
-                  name="Gender"
-                 
-                  className="w-full"
-                  placeholder="true یا false"
-                />
-              </div>
+                <div className="col-span-1">
+                  <Label htmlFor="Gender" className="mb-2 block">
+                    جنسیت
+                  </Label>
+                  <Field
+                    id="Gender"
+                    name="Gender"
+                    className="w-full"
+                    placeholder="true یا false"
+                  />
+                </div>
 
-              <div className="col-span-1">
-                <Label htmlFor="BirthDay" className="mb-2 block">
-                  تاریخ تولد
-                </Label>
-                <Field
-                  id="BirthDay"
-                  name="BirthDay"
-                  className="w-full"
-                  placeholder="YYYY-MM-DD"
-                />
-              </div>
-              <div className="col-span-1">
-                <Label htmlFor="Latitude" className="mb-2 block">
-                  عرض جغرافیایی
-                </Label>
-                <Field
-                  id="Latitude"
-                  name="Latitude"
-                  className="w-full"
-                />
-              </div>
-              <div className="col-span-1">
-                <Label htmlFor="Longitude" className="mb-2 block">
-                  طول جغرافیایی
-                </Label>
-                <Field
-                  id="Longitude"
-                  name="Longitude"
-                  className="w-full"
-                />
-              </div>
+                <div className="col-span-1">
+                  <Label htmlFor="BirthDay" className="mb-2 block">
+                    تاریخ تولد
+                  </Label>
+                  <Field
+                    id="BirthDay"
+                    name="BirthDay"
+                    className="w-full"
+                    placeholder="YYYY-MM-DD"
+                  />
+                </div>
+                <div className="col-span-1">
+                  <Label htmlFor="Latitude" className="mb-2 block">
+                    عرض جغرافیایی
+                  </Label>
+                  <Field id="Latitude" name="Latitude" className="w-full" />
+                </div>
+                <div className="col-span-1">
+                  <Label htmlFor="Longitude" className="mb-2 block">
+                    طول جغرافیایی
+                  </Label>
+                  <Field id="Longitude" name="Longitude" className="w-full" />
+                </div>
 
-              <div className="col-span-2">
-                <Label htmlFor="HomeAdderess" className="mb-2 block">
-                  آدرس
-                </Label>
-                <Field
-                  id="HomeAdderess"
-                  name="HomeAdderess"
-                  className="w-full"
-                />
-              </div>
+                <div className="col-span-2">
+                  <Label htmlFor="HomeAdderess" className="mb-2 block">
+                    آدرس
+                  </Label>
+                  <Field
+                    id="HomeAdderess"
+                    name="HomeAdderess"
+                    className="w-full"
+                  />
+                </div>
 
-              <div className="col-span-2">
-                <Label htmlFor="userAbout" className="mb-2 block">
-                  درباره من
-                </Label>
-                <Field
-                  id="UserAbout"
-                  name="UserAbout"
-                  className="w-full"
-                  rows={4}
-                  as="textarea"
-                />
+                <div className="col-span-2">
+                  <Label htmlFor="userAbout" className="mb-2 block">
+                    درباره من
+                  </Label>
+                  <Field
+                    id="UserAbout"
+                    name="UserAbout"
+                    className="w-full"
+                    rows={4}
+                    as="textarea"
+                  />
+                </div>
               </div>
-            </div>
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setIsDialogOpen(false)}
-                className="ml-2"
-              >
-                انصراف
-              </Button>
-              <Button
-                type="submit"
-                className="bg-luko-teal hover:bg-luko-teal/90"
-              >
-                ذخیره تغییرات
-              </Button>
-            </DialogFooter>
-          </Form>
+              <DialogFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsDialogOpen(false)}
+                  className="ml-2"
+                >
+                  انصراف
+                </Button>
+                <Button
+                  type="submit"
+                  className="bg-luko-teal hover:bg-luko-teal/90"
+                >
+                  ذخیره تغییرات
+                </Button>
+              </DialogFooter>
+            </Form>
           </Formik>
         </DialogContent>
       </Dialog>

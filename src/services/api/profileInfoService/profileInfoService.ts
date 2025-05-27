@@ -105,3 +105,31 @@ export async function AddProfileImage(value: File) {
 
   return res;
 }
+
+
+// delete profile pic
+
+export async function DeleteProfileImage(imageId: string) {
+  const formData = OnSetFormData({
+    DeleteEntityId: imageId,
+  });
+
+  const res = await http.delete(`SharePanel/DeleteProfileImage`, {
+    data: formData, 
+    headers: {
+      "Content-Type": "multipart/form-data", 
+    },
+  });
+
+  return res;
+}
+
+// select profile pic
+
+export async function SelectProfileImage(formData: FormData) {
+
+
+  const res = await http.post(`/SharePanel/SelectProfileImage`, formData);
+
+  return res;
+}
