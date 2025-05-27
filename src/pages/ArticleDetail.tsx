@@ -17,6 +17,11 @@ import { AiOutlineLike } from "react-icons/ai";
 import { AiFillLike } from "react-icons/ai";
 import { AiOutlineDislike } from "react-icons/ai";
 import { AiFillDislike } from "react-icons/ai";
+import { RateCourse } from "@/services/api/course/courseService";
+import http from "@/services/interceptor/interceptor";
+import Rating from "react-rating";
+import { FaRegStar, FaStar } from "react-icons/fa";
+
 
 interface Comment {
   id: string;
@@ -90,6 +95,18 @@ const ArticleDetail: React.FC = () => {
   const [AddFavorite, setAddFavorite] = useState(false);
   const [AddLike, setAddLike] = useState(false);
   const [AddDisike, setAddDislike] = useState(false);
+    const [rate, setRate] = useState(0);
+    console.log(rate);
+
+    async function handleRating(value) {
+      try {
+        const callApi = await RateCourse(id, value);
+        if (callApi?.data?.success)
+          toast({ title: `${callApi?.data?.message}` });
+      } catch (error) {
+        console.log(error);
+      }
+    }
 
   async function AddDislikeForNews(newsId) {
     const callApi = await AddNewsDislike(articleId);
@@ -157,7 +174,7 @@ const ArticleDetail: React.FC = () => {
 
   const refetchArticleData = async () => {
     try {
-      const response = await axios.get<NewsDetailData>(
+      const response = await http.get<NewsDetailData>(
         `https://classapi.sepehracademy.ir/api/News/${articleId}`
       );
       setArticleData(response.data);
@@ -379,6 +396,17 @@ const ArticleDetail: React.FC = () => {
                         <AiOutlineDislike className="size-6" />
                       )}
                     </button>
+                  </div>
+                  <div className="text-amber-500">
+                    <Rating
+                      initialRating={rate}
+                      start={0}
+                      step={1}
+                      stop={5}
+                      emptySymbol={<FaRegStar size={30} color="#ccc" />}
+                      fullSymbol={<FaStar size={30} color="#FFD700" />}
+                      onChange={handleRating}
+                    />
                   </div>
                 </div>
               </div>
