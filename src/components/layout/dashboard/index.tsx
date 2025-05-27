@@ -22,7 +22,10 @@ const PanelLayout = ({ activeTab = "/panel/dashboard" }) => {
     } catch (error) {
       console.log(error);
     }
+
   }
+
+  console.log(profileInfo);
 
   useEffect(() => {
     GetProfileInfo();
@@ -34,8 +37,8 @@ const PanelLayout = ({ activeTab = "/panel/dashboard" }) => {
       <div className="w-72 bg-[#00D0B9] text-white flex flex-col fixed h-full">
         <div className="p-4 flex flex-col items-center">
           <Avatar className="w-24 h-24 border-4 border-white">
-            {/* <AvatarImage src={user.avatar} alt={user.name} />
-            <AvatarFallback>{user.name[0]}</AvatarFallback> */}
+           <AvatarImage src={profileInfo?.currentPictureAddress} alt="profile image" /> 
+            {/* // <AvatarFallback>{user.name[0]}</AvatarFallback>  */}
           </Avatar>
           {/* <h2 className="text-xl font-bold mt-4">{user.name} خوش آمدید</h2> */}
         </div>
