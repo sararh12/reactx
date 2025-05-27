@@ -6,6 +6,7 @@ import Logo from "@/components/Logo";
 import { getTopCourse } from "@/services/api/course/courseService";
 import { getBlogs } from "@/services/api/blog/blogServices";
 import { IoPersonOutline } from "react-icons/io5";
+import { makeDatePersian } from "@/utils/persianDates";
 const Dashboard: React.FC = () => {
   const [TopCourseData, setTopCourseData] = useState([]);
   const [TopNewsData, setTopNewsData] = useState([]);
@@ -199,21 +200,27 @@ const Dashboard: React.FC = () => {
               {/* Course Sections */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="bg-white rounded-lg shadow-sm p-6 ">
-                  <h2 className="text-lg font-bold mb-4">دوره های پیشنهادی</h2>
+                  <h2 className="text-lg font-bold mb-4 text-[#777777]">
+                    دوره های پیشنهادی
+                  </h2>
                   <div className="space-y-4">
                     {TopCourseData.map((course: any) => (
                       <div
                         key={course?.courseId}
-                        className="max-w-[336px] rounded-[10px] bg-[#F9F9F9] p-5 flex"
+                        className="max-w-[343px]  rounded-[10px] bg-[#F9F9F9] p-5 flex shadow-[0_1px_2px_0_#00000040]"
                       >
                         <div className="flex flex-col gap-6 p-2">
-                          <h3>{course?.title}</h3>
+                          <h3 className="text-[#005250] text-[13px] font-[700]">
+                            {course?.title}
+                          </h3>
                           <div className="flex justify-between">
-                            <div className="text-[#26B4AF] flex gap-2 items-center">
-                              <IoPersonOutline className="size-4" />
+                            <div className="text-[#26B4AF] flex gap-1 items-center text-[10px] font-[550]">
+                              <IoPersonOutline className="size-3" />
                               <span>{course?.teacherName}</span>
                             </div>
-                            <span>tarikh</span>
+                            <div className="text-[10px] text-[#D47300] font-[700]">
+                              {makeDatePersian(course?.lastUpdate)}
+                            </div>
                           </div>
                         </div>
                         <div className="p-2">
