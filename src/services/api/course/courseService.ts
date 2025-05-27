@@ -79,18 +79,26 @@ export async function DeleteCourseFavorite(value) {
 // delete reserved course
 
 export async function DeleteCourseReserve(value) {
-
   console.log(value);
-  const res=await http.delete(`/CourseReserve`,{data:value});
+  const res = await http.delete(`/CourseReserve`, { data: value });
 
   return res;
 }
-
 
 // add course dislike
 
 export async function AddCourseDislike(CourseId: string) {
   const res = await http.post(`/Course/AddCourseDissLike?CourseId=${CourseId}`);
+
+  return res;
+}
+
+// rate
+
+export async function RateCourse(cId, rate) {
+  const res = await http.post(
+    `/Course/SetCourseRating?CourseId=${cId}&RateNumber=${rate}`
+  );
 
   return res;
 }
