@@ -12,12 +12,12 @@ import {
   GetBlogsById,
   AddNewsDislike,
   AddNewsLike,
+  RateNews,
 } from "@/services/api/blog/blogServices";
 import { AiOutlineLike } from "react-icons/ai";
 import { AiFillLike } from "react-icons/ai";
 import { AiOutlineDislike } from "react-icons/ai";
 import { AiFillDislike } from "react-icons/ai";
-import { RateCourse } from "@/services/api/course/courseService";
 import http from "@/services/interceptor/interceptor";
 import Rating from "react-rating";
 import { FaRegStar, FaStar } from "react-icons/fa";
@@ -100,7 +100,7 @@ const ArticleDetail: React.FC = () => {
 
     async function handleRating(value) {
       try {
-        const callApi = await RateCourse(id, value);
+        const callApi = await RateNews(articleId, value);
         if (callApi?.data?.success)
           toast({ title: `${callApi?.data?.message}` });
       } catch (error) {
@@ -141,6 +141,7 @@ const ArticleDetail: React.FC = () => {
       const res = await GetBlogsById(articleId);
 
       console.log(res?.data);
+      setRate(res?.data?.detailsNewsDto.currentUserRateNumber);
       setArticleData(res.data);
       if (res.data.detailsNewsDto.currentUserIsLike) {
         setArticleLiked(true);

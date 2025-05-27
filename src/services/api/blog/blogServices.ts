@@ -68,3 +68,13 @@ export async function DeleteFavoriteNews(value) {
     return res;
     
   }
+
+  // rate news
+
+  export async function RateNews(nId, rate) {
+    const res = await http.post(
+      `/News/NewsRate?NewsId=${nId}&RateNumber=${rate}`
+    );
+
+    return res;
+  }
