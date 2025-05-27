@@ -8,6 +8,7 @@ import {
   AddCourseReserve,
   AddFavoriteCourses,
   AddCourseDislike,
+  RateCourse,
 } from "@/services/api/course/courseService";
 import { getTeacherDetail } from "@/services/api/teacher/teacherSevice";
 import axios from "axios";
@@ -16,12 +17,17 @@ import { IoIosHeartEmpty } from "react-icons/io";
 import { MdOutlineBookmarkBorder } from "react-icons/md";
 import { useParams } from "react-router-dom";
 import CommentSection from "./commentSection";
-import http from "@/services/interceptor/interceptor"
+import http from "@/services/interceptor/interceptor";
 import { IoBookmark } from "react-icons/io5";
 import { AiOutlineLike } from "react-icons/ai";
 import { AiFillLike } from "react-icons/ai";
 import { AiOutlineDislike } from "react-icons/ai";
 import { AiFillDislike } from "react-icons/ai";
+import { IoPersonOutline } from "react-icons/io5";
+import { FaMoneyBillWave, FaRegStar, FaStar } from "react-icons/fa";
+import { IoCartOutline } from "react-icons/io5";
+import Rating from "react-rating";
+import { LiaAngleDownSolid } from "react-icons/lia";
 
 interface Comment {
   id: string;
@@ -61,10 +67,10 @@ interface CourseDetailData {
   cost: number;
   capacity: number;
   imageAddress: string | null;
-  isUserFavorite:boolean;
-  isCourseReseve:number;
-  currentUserLike:string;
-  currentUserDissLike:string;
+  isUserFavorite: boolean;
+  isCourseReseve: number;
+  currentUserLike: string;
+  currentUserDissLike: string;
   sections: {
     id: string;
     title: string;
@@ -90,34 +96,42 @@ const CourseDetail: React.FC = () => {
   const [AddFavorite, setAddFavorite] = useState(false);
   const [AddLike, setAddLike] = useState(false);
   const [AddDisike, setAddDislike] = useState(false);
+  const [rate, setRate] = useState(0);
+  console.log(rate);
 
-    async function AddDislikeForCourse(CourseId) {
-      
-      const callApi=await AddCourseDislike(courseData?.courseId)
-
-      console.log(callApi?.data);
-
-      setAddDislike(callApi?.data)
+  async function handleRating(value) {
+    try {
+      const callApi = await RateCourse(id, value);
+      if (callApi?.data?.success) toast({ title: `${callApi?.data?.message}` });
+    } catch (error) {
+      console.log(error);
     }
+  }
 
-    async function handleDislike(courseId: string) {
-      try {
-        const callApi = await AddCourseDislike(courseId);
-        toast({ title: callApi?.data.message });
-        console.log(callApi);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-
-  async function AddLikeForCourse(CourseId) {
-
-    const callApi=await AddCourseLike(courseData?.courseId)
+  async function AddDislikeForCourse(CourseId) {
+    const callApi = await AddCourseDislike(courseData?.courseId);
 
     console.log(callApi?.data);
 
-    setAddLike(callApi?.data)
-    
+    setAddDislike(callApi?.data);
+  }
+
+  async function handleDislike(courseId: string) {
+    try {
+      const callApi = await AddCourseDislike(courseId);
+      toast({ title: callApi?.data.message });
+      console.log(callApi);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function AddLikeForCourse(CourseId) {
+    const callApi = await AddCourseLike(courseData?.courseId);
+
+    console.log(callApi?.data);
+
+    setAddLike(callApi?.data);
   }
 
   async function handleLike(courseId: string) {
@@ -164,7 +178,6 @@ const CourseDetail: React.FC = () => {
     }
   }
 
-
   const teacherDetail = async (teacherId: number) => {
     const callApi = await getTeacherDetail(teacherId);
     setTeacher(callApi);
@@ -201,12 +214,11 @@ const CourseDetail: React.FC = () => {
     }
     setLoading(true);
     try {
-      const response = await http.get (
-        `Home/GetCourseDetails?CourseId=${id}`
-      );
+      const response = await http.get(`Home/GetCourseDetails?CourseId=${id}`);
       if (!response.data) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
+      setRate(response?.data?.currentUserRateNumber);
       setCourseData(response.data as CourseDetailData);
       fetchCourseComments();
       console.log(response?.data?.teacherId);
@@ -290,74 +302,73 @@ const CourseDetail: React.FC = () => {
       <main className="flex-grow rtl">
         <div className="container mx-auto px-4 py-8">
           {/* Course Header */}
-          <div className="bg-black rounded-lg overflow-hidden mb-8">
-            <div className="flex flex-col md:flex-row">
-              <div className="md:w-1/2 p-8">
-                <h1 className="text-3xl font-bold text-white mb-2">
-                  {" "}
-                  {courseData.title}{" "}
-                </h1>
-                <div className="text-white text-lg mb-6">
-                  {" "}
-                  {courseData.subTitle}{" "}
-                </div>
-                <p className="text-gray-300 mb-4">{courseData.describe}</p>
-
-                {courseData.teacherName && (
-                  <div className="flex items-center text-white mb-6">
-                    <img
-                      src={courseData.imageAddress || undefined}
-                      alt={courseData.teacherName || "مدرس"}
-                      className="w-12 h-12 rounded-full object-cover border-2 border-luko-teal"
-                    />
-                    <div className="mr-3">
-                      <div className="font-bold">{courseData.teacherName}</div>
-                      <div className="text-sm text-gray-300">
-                        {courseData.title}
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                <div className="bg-gradient-to-r from-luko-teal to-blue-500 p-6 rounded-lg ">
-                  <div className="flex items-center justify-between">
-                    <div className="text-white text-2xl font-bold mb-2 ">
-                      {courseData.cost.toLocaleString()} تومان{" "}
-                    </div>
-                    <div className="flex gap-2">
+          <div className=" rounded-lg overflow-hidden mb-8">
+            <div className="p-4 bg-white flex justify-between max-w-[1220px] mx-auto flex-col md:flex-row">
+              <div className="p-4 max-w-[598px] rounded-2xl shadow-[0_8px_2px_0_#00000040] flex flex-col gap-4 min-w-[400px]">
+                <div className="flex justify-between items-center ">
+                  <h1 className="text-[29px]">{courseData?.title}</h1>
+                  <div className="flex items-center gap-2">
                     <button
-                    onClick={() => handleDislike(courseData?.courseId)}
+                      className="text-[#00B4AF]"
+                      onClick={() => handleAddFavorite(courseData?.courseId)}
                     >
-                      {courseData.currentUserDissLike==="0"?<AiOutlineDislike className="size-6"/>:<AiFillDislike  className="size-6"/>	}
-                      </button>
+                      {courseData.isUserFavorite ? (
+                        <IoBookmark className="size-6 " />
+                      ) : (
+                        <MdOutlineBookmarkBorder className="size-6 " />
+                      )}
+                    </button>
+                    <div className="flex gap-2 text-[#00B4AF]">
                       <button
-                        onClick={() => handleLike(courseData?.courseId)}
+                        onClick={() => handleDislike(courseData?.courseId)}
                       >
-                      {courseData.currentUserLike==="0"?<AiOutlineLike  className="size-6 " />:<AiFillLike  className="size-6 "/>	}
+                        {courseData.currentUserDissLike === "0" ? (
+                          <AiOutlineDislike className="size-6" />
+                        ) : (
+                          <AiFillDislike className="size-6" />
+                        )}
                       </button>
-                      
-                      <button
-                        onClick={() => handleAddFavorite(courseData?.courseId)}
-                      >
-                        {courseData.isUserFavorite?<IoBookmark className="size-6 "/>:<MdOutlineBookmarkBorder className="size-6 " />}
-                        
+                      <button onClick={() => handleLike(courseData?.courseId)}>
+                        {courseData.currentUserLike === "0" ? (
+                          <AiOutlineLike className="size-6 " />
+                        ) : (
+                          <AiFillLike className="size-6 " />
+                        )}
                       </button>
                     </div>
                   </div>
-                  <Button
-                    className="w-full bg-orange-500 hover:bg-orange-600 text-lg h-12"
+                </div>
+                <p className="text-[#777777] text-[20px] py-4">
+                  {courseData?.miniDescribe}
+                </p>
+                <div className="flex justify-between items-center text-[#005B58]">
+                  <div className="flex gap-2 items-center">
+                    <IoPersonOutline />
+                    <h3>{courseData?.teacherName}</h3>
+                  </div>
+
+                  <div className="flex gap-2 items-center">
+                    <span>{courseData?.cost}</span>
+                    <FaMoneyBillWave />
+                  </div>
+                </div>
+                <button className="mt-5 mx-auto block w-[347px] bg-orange-500 hover:bg-orange-600 text-lg text-white h-12 rounded-[9px]">
+                  <div
+                    className="flex items-center text-center justify-center gap-2"
                     onClick={() => handleReserve(courseData?.courseId)}
                   >
-                    {courseData.isCourseReseve===1?"شرکت در دوره":"شرکت شده"	}
-                  </Button>
-                </div>
+                    <IoCartOutline />
+                    {courseData.isCourseReseve === 1
+                      ? "شرکت در دوره"
+                      : "شرکت شده"}
+                  </div>
+                </button>
               </div>
-
-              <div className="md:w-1/2 bg-gradient-to-r from-blue-900 to-black p-8 flex items-center justify-center">
+              <div>
                 <img
-                  src={courseData.imageAddress || undefined}
-                  alt={courseData.title}
-                  className="max-w-full h-auto"
+                  src={courseData?.imageAddress}
+                  alt=""
+                  className="w-[624px] h-[395px] rounded-[15px]"
                 />
               </div>
             </div>
@@ -373,7 +384,17 @@ const CourseDetail: React.FC = () => {
                   </div>
                   <div className="text-sm text-gray-500">امتیاز دوره</div>
                 </div>
-                <div className="text-amber-500">★★★★★</div>
+                <div className="text-amber-500">
+                  <Rating
+                    initialRating={rate}
+                    start={0}
+                    step={1}
+                    stop={5}
+                    emptySymbol={<FaRegStar size={30} color="#ccc" />}
+                    fullSymbol={<FaStar size={30} color="#FFD700" />}
+                    onChange={handleRating}
+                  />
+                </div>
               </div>
               <div className="mt-4 h-2 bg-gray-200 rounded-full">
                 <div className="h-2 bg-luko-teal rounded-full w-4/5"></div>
@@ -428,26 +449,19 @@ const CourseDetail: React.FC = () => {
 
           {/* Course Tabs */}
           <div className="bg-white rounded-lg shadow-md overflow-hidden mb-8">
-            <div className="flex border-b">
-              <div className="px-6 py-4 border-b-2 border-luko-teal font-bold text-luko-teal">
-                توضیحات{" "}
-              </div>
-              <div className="px-6 py-4 text-gray-500">سرفصل‌ها</div>
-              <div className="px-6 py-4 text-gray-500">
-                نظرات ({courseComments.length || 0})
-              </div>
-            </div>
+            <div className="block text-[#005351] mr-5">توضیحات</div>
 
-            <div className="p-6">
+            <div className="p-6 shadow-[0_1px_2px_0_#00000040]">
               <div className="text-gray-700 leading-relaxed">
                 <p className="mb-4">{courseData.describe}</p>
 
-                <div className="mt-6">
+                <div className="mt-6 flex justify-center">
                   <Button
                     variant="outline"
-                    className="text-luko-teal border-luko-teal hover:bg-luko-teal/10"
+                    className="text-[#006865] border-[#01CEC9] hover:bg-luko-teal/10  rounded-[45px] content-center flex"
                   >
                     مطالعه بیشتر
+                    <LiaAngleDownSolid />
                   </Button>
                 </div>
               </div>
