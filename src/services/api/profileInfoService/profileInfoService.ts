@@ -1,6 +1,7 @@
 import axios from "axios";
 import http from "../../interceptor/interceptor";
 import OnSetFormData from "@/utils/form-data";
+import { Value } from "@radix-ui/react-select";
 
 const API_BASE_URL = "https://classapi.sepehracademy.ir/api";
 
@@ -76,6 +77,16 @@ export async function Changepassword(oldPassword:string,newPassword:string) {
 
   return res;
   
+}
+
+//EditSecurity
+
+export async function EditSecurity(
+  value
+) {
+  const res = await http.put(`/SharePanel/EditSecurity`, value);
+
+  return res;
 }
 
 // update profile info

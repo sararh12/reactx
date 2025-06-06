@@ -32,6 +32,8 @@ export async function GetMyCoursesReserve() {
   return res;
 }
 
+
+
 // dashboard favorite course
 
 export async function GetMyFavoriteCourses() {
@@ -101,4 +103,26 @@ export async function RateCourse(cId, rate) {
   );
 
   return res;
+}
+
+// course payment
+
+export async function CoursePayment(paymentData) {
+  console.log(paymentData);
+
+  const res = await http.post(`/CoursePayment/StudentAddPeyment`, paymentData);
+
+  return res;
+}
+
+// course payment picture
+
+export async function PaymentImage(paymentImageData) {
+
+  console.log(paymentImageData);
+
+  const res = await http.post(`/CoursePayment/StudentAddPeymentImage`,paymentImageData);
+
+  return res;
+  
 }

@@ -4,6 +4,10 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Search } from 'lucide-react';
 import axios from 'axios';
+import { makeDatePersian } from '@/utils/persianDates';
+import { IoCalendarClearOutline } from "react-icons/io5";
+import { RiEyeLine } from "react-icons/ri";
+import { FaAngleLeft } from "react-icons/fa6";
 
 const BlogPage: React.FC =  () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -119,7 +123,7 @@ const BlogPage: React.FC =  () => {
                       <Link to={`/blog/${article.id}`}>
                         <img
                           src={
-                            article?.pictureAddress ||
+                            article?.currentImageAddressTumb ||
                             "./lovable-uploads/news.png"
                           }
                           alt={article.title}
@@ -132,42 +136,27 @@ const BlogPage: React.FC =  () => {
                             {article.title}
                           </h3>
                         </Link>
+
                         <p className="text-gray-600 text-sm mb-4">
-                          {article.excerpt}
+                          {article?.miniDescribe}
                         </p>
+
                         <div className="flex justify-between items-center text-xs text-gray-500">
-                          <div className="flex items-center">
-                            <span>{article.inserDate}</span>
+                          <div className="flex items-center gap-1">
+                            <RiEyeLine className="text-[#01CEC9] size-4" />
+                            <span>{article?.currentView} بازدید</span>
                           </div>
-                          <div className="flex items-center">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-4 w-4 ml-1"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={1.5}
-                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                              />
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={1.5}
-                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                              />
-                            </svg>
-                            <span>{article.views}</span>
+                          <div className="flex items-center gap-1">
+                            <IoCalendarClearOutline className="text-[#01CEC9] size-4" />
+                            <span>{makeDatePersian(article?.insertDate)}</span>
                           </div>
                         </div>
                         <Link
                           to={`/blog/${article.id}`}
-                          className="block text-luko-teal text-sm mt-4 hover:underline"
+                          className="flex justify-center items-center  text-[#D47300] text-sm mt-4 hover:underline"
                         >
                           مطالعه بیشتر
+                          <FaAngleLeft className="text-base mt-[2px]" />
                         </Link>
                       </div>
                     </div>

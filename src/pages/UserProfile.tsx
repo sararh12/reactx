@@ -611,6 +611,7 @@ async function DeleteImage(imageId: string) {
                   <Field
                     id="BirthDay"
                     name="BirthDay"
+                    type="Date"
                     className="w-full"
                     placeholder="YYYY-MM-DD"
                   />
