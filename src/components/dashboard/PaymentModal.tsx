@@ -11,6 +11,7 @@ const PaymentModal = ({ setisModalShow, InitialValue }) => {
   const [step, setStep] = useState(1);
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewURL, setPreviewURL] = useState(null);
+  const [paymentId, setPaymentId] = useState("");
 
   console.log(InitialValue);
 
@@ -20,9 +21,8 @@ const PaymentModal = ({ setisModalShow, InitialValue }) => {
     console.log(values);
 
      const newValue = {
-       
+       ...values
      };
-
     const formData=OnSetFormData(newValue)
 
     const callApi = await PaymentImage(formData)
@@ -164,7 +164,6 @@ const PaymentModal = ({ setisModalShow, InitialValue }) => {
 
       {step === 2 && (
         <div className="flex justify-around items-center mt-8">
-
           <div className="flex flex-col items-center space-y-4 text-white">
             <p>فایل مورد نظر را انتخاب کنید</p>
             <label
@@ -188,9 +187,14 @@ const PaymentModal = ({ setisModalShow, InitialValue }) => {
               }}
             />
 
-            <button className="bg-[#C2C2C2] text-white rounded-[8px] p-2 w-48 hover:bg-gray-400"
-            onClick={(values) => {
-              handlePaymentImage(values);}}
+            <button
+              className="bg-[#C2C2C2] text-white rounded-[8px] p-2 w-48 hover:bg-gray-400"
+              onClick={() => {
+                handlePaymentImage({
+                  PaymentId: paymentId, 
+                  Image: selectedFile, 
+                });
+              }}
             >
               ثبت اطلاعات
             </button>
