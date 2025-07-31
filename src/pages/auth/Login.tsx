@@ -20,7 +20,7 @@ const Login = () => {
 
     try {
       const response = await fetch(
-        "https://classapi.sepehracademy.ir/api/Sign/Login",
+        "https://sepehracademy.liara.run/Sign/Login",
         {
           method: "POST",
           headers: {

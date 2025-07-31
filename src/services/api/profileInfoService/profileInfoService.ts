@@ -3,7 +3,7 @@ import http from "../../interceptor/interceptor";
 import OnSetFormData from "@/utils/form-data";
 import { Value } from "@radix-ui/react-select";
 
-const API_BASE_URL = "https://classapi.sepehracademy.ir/api";
+const API_BASE_URL = "https://sepehracademy.liara.run";
 
 export async function getUserProfile() {
   try {

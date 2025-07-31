@@ -19,7 +19,9 @@ const BlogPage: React.FC =  () => {
   useEffect(() => {
     const fetchArticles = async () => {
       try {
-        const response = await axios.get(`https://classapi.sepehracademy.ir/api/News`);
+        const response = await axios.get(
+          `https://sepehracademy.liara.run/News`
+        );
         console.log(response.data);
         setArticles(response.data.news);  
       

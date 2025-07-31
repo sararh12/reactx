@@ -188,7 +188,7 @@ const CourseDetail: React.FC = () => {
     setLoadingComments(true);
     try {
       const response = await axios.get<Comment[]>(
-        `https://classapi.sepehracademy.ir/api/Course/GetCourseCommnets/${id}`
+        `https://sepehracademy.liara.run/Course/GetCourseCommnets/${id}`
       );
       setCourseComments(response.data || []);
     } catch (error) {
@@ -245,7 +245,7 @@ const CourseDetail: React.FC = () => {
     setLoadingComments(true);
     try {
       const detailsResponse = await fetch(
-        `https://classapi.sepehracademy.ir/api/Home/GetCourseDetails?CourseId=${id}`
+        `https://sepehracademy.liara.run/Home/GetCourseDetails?CourseId=${id}`
       );
       if (!detailsResponse.ok) {
         throw new Error(
@@ -256,7 +256,7 @@ const CourseDetail: React.FC = () => {
       setCourseData(detailsData as CourseDetailData);
 
       const commentsResponse = await axios.get<Comment[]>(
-        `https://classapi.sepehracademy.ir/api/Course/GetCourseCommnets/${id}`
+        `https://sepehracademy.liara.run/Course/GetCourseCommnets/${id}`
       );
       setCourseComments(commentsResponse.data || []);
 
@@ -275,15 +275,15 @@ const CourseDetail: React.FC = () => {
   };
 
   const commentEndpoints = {
-    createComment: `https://classapi.sepehracademy.ir/api/Course/AddCommentCourse`,
+    createComment: `https://sepehracademy.liara.run/Course/AddCommentCourse`,
     likeComment: (commentId: string) =>
-      `https://classapi.sepehracademy.ir/api/Course/AddCourseCommentLike?CourseCommandId=${commentId}`,
+      `https://sepehracademy.liara.run/Course/AddCourseCommentLike?CourseCommandId=${commentId}`,
     dislikeComment: (commentId: string) =>
-      `https://classapi.sepehracademy.ir/api/Course/AddCourseCommentDissLike?CourseCommandId=${commentId}`,
+      `https://sepehracademy.liara.run/Course/AddCourseCommentDissLike?CourseCommandId=${commentId}`,
     deleteCommentLike: `https://classapi.sepehracademy.ir/api/Course/DeleteCourseCommentLike`,
     getReplies: (commentId: string) =>
-      `https://classapi.sepehracademy.ir/api/Course/GetRepliesCourseComments?Id=${commentId}`,
-    createReplyComment: `https://classapi.sepehracademy.ir/api/Course/AddReplyCourseComment`,
+      `https://sepehracademy.liara.run/Course/GetRepliesCourseComments?Id=${commentId}`,
+    createReplyComment: `https://sepehracademy.liara.run/Course/AddReplyCourseComment`,
   };
 
   if (loading)

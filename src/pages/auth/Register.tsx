@@ -22,7 +22,10 @@ const Register = () => {
     setStep(2);
 
     try{
-      const response=await axios.post("https://classapi.sepehracademy.ir/api/Sign/SendVerifyMessage",{phoneNumber})
+      const response = await axios.post(
+        "https://sepehracademy.liara.run/Sign/SendVerifyMessage",
+        { phoneNumber }
+      );
 
       if (response.status !== 200) {
         throw new Error('خطا در ارسال کد تایید');
@@ -49,10 +52,13 @@ const Register = () => {
     e.preventDefault();
   
     try {
-      const response = await axios.post('https://classapi.sepehracademy.ir/api/Sign/VerifyMessage', {
-        phoneNumber,
-        verifyCode,
-      });
+      const response = await axios.post(
+        "https://sepehracademy.liara.run/Sign/VerifyMessage",
+        {
+          phoneNumber,
+          verifyCode,
+        }
+      );
   
       if (response.status !== 200) {
         throw new Error('کد تایید اشتباه است');
@@ -78,11 +84,14 @@ const Register = () => {
     e.preventDefault();
   
     try {
-      const response = await axios.post("https://classapi.sepehracademy.ir/api/Sign/Register", {
-        gmail,
-        password,
-        phoneNumber
-      });
+      const response = await axios.post(
+        "https://sepehracademy.liara.run/Sign/Register",
+        {
+          gmail,
+          password,
+          phoneNumber,
+        }
+      );
   
       if (response.status !== 200) {
         throw new Error('خطا در ثبت‌نام');

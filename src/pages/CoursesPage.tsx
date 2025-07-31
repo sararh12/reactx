@@ -100,33 +100,37 @@ const CoursesPage: React.FC = () => {
     filterParams.append("CostUp", String(priceRange));
 
 
-    axios.get(`https://classapi.sepehracademy.ir/api/Home/GetCoursesWithPagination?${filterParams.toString()}`)
-    .then(response => {
-      if (response.data && Array.isArray(response.data.courseFilterDtos)) {
-        setCourses(response.data.courseFilterDtos);  
-        setTotalCount(response.data.totalCount); 
-      } else {
-        console.error(
-          "Invalid data structure received from API:",
-          response.data
-        );
+    axios
+      .get(
+        `https://sepehracademy.liara.run/Home/GetCoursesWithPagination?${filterParams.toString()}`
+      )
+      .then((response) => {
+        if (response.data && Array.isArray(response.data.courseFilterDtos)) {
+          setCourses(response.data.courseFilterDtos);
+          setTotalCount(response.data.totalCount);
+        } else {
+          console.error(
+            "Invalid data structure received from API:",
+            response.data
+          );
+          setCourses([]);
+          setTotalCount(0);
+        }
+      })
+      .catch((error) => {
+        console.error("خطا در دریافت لیست دوره‌ها:", error);
         setCourses([]);
         setTotalCount(0);
-      }
-    })
-    .catch(error => {
-      console.error("خطا در دریافت لیست دوره‌ها:", error);
-      setCourses([]);
-        setTotalCount(0);
-    });
+      });
 };
 
 useEffect(() => {
-  axios.get('https://classapi.sepehracademy.ir/api/Home/GetTechnologies')
-    .then(response => {
+  axios
+    .get("https://sepehracademy.liara.run/Home/GetTechnologies")
+    .then((response) => {
       if (Array.isArray(response.data)) {
         setTechnologies(response.data);
-      }else {
+      } else {
         console.error(
           "Invalid data structure received for technologies:",
           response.data
@@ -134,14 +138,14 @@ useEffect(() => {
         setTechnologies([]);
       }
     })
-    .catch(err => console.error("خطا در دریافت تکنولوژی‌ها", err));
+    .catch((err) => console.error("خطا در دریافت تکنولوژی‌ها", err));
 }, []);
 
 useEffect(() => {
   const fetchCourseTypes = async () => {
     try {
       const response = await axios.get(
-        `https://classapi.sepehracademy.ir/api/CourseType/GetCourseTypes`
+        `https://sepehracademy.liara.run/CourseType/GetCourseTypes`
       );
       if (Array.isArray(response.data)) {
         setCourseTypes(response.data);

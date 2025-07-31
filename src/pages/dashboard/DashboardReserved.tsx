@@ -51,6 +51,9 @@ const DashboardReserved: React.FC = () => {
         await GetCourseWithId(item?.courseId).then((res) => res?.data)
     );
 
+
+    console.log(callApi);
+
     const list = await Promise.all(fetchDetail);
 
     console.log(list);
@@ -77,7 +80,7 @@ const DashboardReserved: React.FC = () => {
               <TableHead className="text-right">عملیات</TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody>
+          {/* <TableBody>
             {ReservedCourses.map((course) => (
               <TableRow key={course?.courseId}>
                 <TableCell>{course?.title}</TableCell>
@@ -106,7 +109,7 @@ const DashboardReserved: React.FC = () => {
                 </TableCell>
               </TableRow>
             ))}
-          </TableBody>
+          </TableBody> */}
         </Table>
       </div>
     </div>

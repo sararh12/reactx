@@ -176,7 +176,7 @@ const ArticleDetail: React.FC = () => {
   const refetchArticleData = async () => {
     try {
       const response = await http.get<NewsDetailData>(
-        `https://classapi.sepehracademy.ir/api/News/${articleId}`
+        `https://sepehracademy.liara.run/News/${articleId}`
       );
       setArticleData(response.data);
       if (response.data.detailsNewsDto.currentUserIsLike) {
@@ -226,15 +226,15 @@ const ArticleDetail: React.FC = () => {
   const keywords = article.keyword ? article.keyword.split(" ") : [];
 
   const commentEndpoints = {
-    createComment: `https://classapi.sepehracademy.ir/api/News/CreateNewsComment`,
+    createComment: `https://sepehracademy.liara.run/News/CreateNewsComment`,
     likeComment: (commentId: string) =>
-      `https://classapi.sepehracademy.ir/api/News/CommentLike/${commentId}?LikeType=true`,
+      `https://sepehracademy.liara.run/News/CommentLike/${commentId}?LikeType=true`,
     dislikeComment: (commentId: string) =>
-      `https://classapi.sepehracademy.ir/api/News/CommentLike/${commentId}?LikeType=false`,
-    deleteCommentLike: `https://classapi.sepehracademy.ir/api/News/DeleteCommentLikeNews`,
+      `https://sepehracademy.liara.run/News/CommentLike/${commentId}?LikeType=false`,
+    deleteCommentLike: `https://sepehracademy.liara.run/News/DeleteCommentLikeNews`,
     getReplies: (commentId: string) =>
-      `https://classapi.sepehracademy.ir/api/News/GetRepliesComments?Id=${commentId}`,
-    createReplyComment: `https://classapi.sepehracademy.ir/api/News/CreateNewsReplyComment`,
+      `https://sepehracademy.liara.run/News/GetRepliesComments?Id=${commentId}`,
+    createReplyComment: `https://sepehracademy.liara.run/News/CreateNewsReplyComment`,
   };
 
   return (

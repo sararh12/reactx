@@ -1,7 +1,9 @@
 import http from "@/services/interceptor/interceptor"
 
 export async function getBlogs(RowsOfPage:number,PageNumber:number) {
-    const result=await http.get(`https://classapi.sepehracademy.ir/api/News?PageNumber=${PageNumber}&RowsOfPage=${RowsOfPage}`)
+    const result = await http.get(
+      `https://sepehracademy.liara.run/News?PageNumber=${PageNumber}&RowsOfPage=${RowsOfPage}`
+    );
 
 
     return result
