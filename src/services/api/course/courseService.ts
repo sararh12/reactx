@@ -45,8 +45,8 @@ export async function GetMyFavoriteCourses() {
 // add favorite course
 
 export async function AddFavoriteCourses(courseId: string) {
-  const res = await http.post(`Course/AddCourseFavorite`, {
-    courseid: courseId,
+  const res = await http.post(`/Course/AddCourseFavorite`, {
+    courseId: courseId,
   });
 
   return res;
@@ -63,7 +63,7 @@ export async function AddCourseLike(CourseId: string) {
 
 export async function AddCourseReserve(courseId: string) {
   const res = await http.post(`CourseReserve/ReserveAdd`, {
-    courseid: courseId,
+    courseId: courseId,
   });
 
   return res;

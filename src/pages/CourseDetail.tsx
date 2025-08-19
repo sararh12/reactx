@@ -322,10 +322,10 @@ const CourseDetail: React.FC = () => {
                       <button
                         onClick={() => handleDislike(courseData?.courseId)}
                       >
-                        {courseData.currentUserDissLike === "0" ? (
-                          <AiOutlineDislike className="size-6" />
-                        ) : (
+                        {courseData.currentUserDissLike ? (
                           <AiFillDislike className="size-6" />
+                        ) : (
+                          <AiOutlineDislike className="size-6" />
                         )}
                       </button>
                       <button onClick={() => handleLike(courseData?.courseId)}>
@@ -358,9 +358,9 @@ const CourseDetail: React.FC = () => {
                     onClick={() => handleReserve(courseData?.courseId)}
                   >
                     <IoCartOutline />
-                    {courseData.isCourseReseve === 1
-                      ? "شرکت در دوره"
-                      : "شرکت شده"}
+                    {courseData.isCourseReseve 
+                      ? "شرکت شده"
+                      : "شرکت در دوره"}
                   </div>
                 </button>
               </div>
