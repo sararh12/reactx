@@ -65,12 +65,17 @@ const CourseCard: React.FC<CourseCardProps> = ({course}) => {
     <div className="course-card bg-white rounded-lg overflow-hidden shadow-md rtl">
       <div className="relative">
         <Link to={`/courses/${courseId}`}>
-          <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-48 w-full rounded-t-lg overflow-hidden">
-            <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full w-16 h-16 m-auto">
+          <div className="h-48 w-full rounded-t-lg overflow-hidden">
+            <img
+              src={image || "./lovable-uploads/news.png"}
+              alt={title}
+              className="w-full h-48 object-cover"
+            />
+            {/* <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full w-16 h-16 m-auto">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
               </svg>
-            </div>
+            </div> */}
           </div>
         </Link>
       </div>
@@ -79,8 +84,19 @@ const CourseCard: React.FC<CourseCardProps> = ({course}) => {
           <h3 className="font-bold text-lg mb-2 text-gray-800">{title}</h3>
         </Link>
         <div className="flex items-center text-sm text-gray-600 mb-2">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-4 w-4 ml-1"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+            />
           </svg>
           <span>{teacherName}</span>
         </div>
@@ -89,8 +105,19 @@ const CourseCard: React.FC<CourseCardProps> = ({course}) => {
           <span className="text-sm text-gray-500 mr-1">({courseRate})</span>
         </div>
         <div className="flex items-center text-sm text-gray-600 mb-4">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-4 w-4 ml-1"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+            />
           </svg>
           <span>{currentRegistrants} دانشجو</span>
         </div>
@@ -98,16 +125,33 @@ const CourseCard: React.FC<CourseCardProps> = ({course}) => {
           <div className="ltr">
             {discountPrice ? (
               <div className="flex flex-col items-end">
-                <span className="text-gray-500 line-through text-sm">{cost.toLocaleString()} تومان</span>
-                <span className="text-luko-teal font-bold">{discountPrice.toLocaleString()} تومان</span>
+                <span className="text-gray-500 line-through text-sm">
+                  {cost.toLocaleString()} تومان
+                </span>
+                <span className="text-luko-teal font-bold">
+                  {discountPrice.toLocaleString()} تومان
+                </span>
               </div>
             ) : (
-              <span className="text-luko-teal font-bold">{cost.toLocaleString()} تومان</span>
+              <span className="text-luko-teal font-bold">
+                {cost.toLocaleString()} تومان
+              </span>
             )}
           </div>
           <button className="bg-luko-teal text-white p-2 rounded-md">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+              />
             </svg>
           </button>
         </div>
