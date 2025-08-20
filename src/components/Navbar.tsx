@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { NavLink } from "react-router-dom";
 import { Search, User, Menu, X, ShoppingCart, Bell } from 'lucide-react';
 import Logo from './Logo';
 import { Button } from '@/components/ui/button';
@@ -36,25 +36,36 @@ const Navbar: React.FC = () => {
 
         <nav className="hidden md:flex space-x-8 space-x-reverse">
           {menuItems.map((item) => (
-            <Link
+            <NavLink
               key={item.to}
               to={item.to}
-              className="text-gray-700 hover:text-luko-teal px-3 py-2"
+              className={({ isActive }) =>
+                `relative px-3 py-2 transition ${
+                  isActive
+                    ? "text-luko-teal font-bold after:content-[''] after:absolute after:left-0 after:right-0 after:-bottom-1 after:h-[3px] after:bg-gradient-to-r after:from-orange-400 after:to-orange-600 after:rounded-full after:shadow-md"
+                    : "text-gray-700 hover:text-luko-teal"
+                }`
+              }
             >
               {item.label}
-            </Link>
+            </NavLink>
           ))}
         </nav>
 
         <div className="hidden md:flex items-center space-x-4 space-x-reverse">
-          <Link to="/search">
+          <NavLink to="/search">
             <Button variant="ghost" size="icon" aria-label="Search">
               <Search className="h-5 w-5" />
             </Button>
-          </Link>
+          </NavLink>
 
-          <Link to="/notifications">
-            <Button variant="ghost" size="icon" aria-label="Notifications" className="relative">
+          <NavLink to="/notifications">
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Notifications"
+              className="relative"
+            >
               <Bell className="h-5 w-5" />
               {notificationCount > 0 && (
                 <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center bg-red-500">
@@ -62,7 +73,7 @@ const Navbar: React.FC = () => {
                 </Badge>
               )}
             </Button>
-          </Link>
+          </NavLink>
 
           {/* <Link to="/cart">
             <Button variant="ghost" size="icon" aria-label="Shopping Cart" className="relative">
@@ -75,12 +86,12 @@ const Navbar: React.FC = () => {
             </Button>
           </Link> */}
 
-          <Link to="/auth/login">
+          <NavLink to="/auth/login">
             <Button className="bg-luko-teal hover:bg-luko-teal/90 text-white">
               <User className="h-4 w-4 mr-2 ml-2" />
               حساب کاربری
             </Button>
-          </Link>
+          </NavLink>
         </div>
 
         {/* Mobile Menu */}
@@ -101,53 +112,63 @@ const Navbar: React.FC = () => {
                     </Button>
                   </DrawerClose>
                 </div>
-                
+
                 <nav className="flex flex-col space-y-4">
                   {menuItems.map((item) => (
-                    <Link
+                    <NavLink
                       key={item.to}
                       to={item.to}
-                      className="text-gray-700 hover:text-luko-teal px-3 py-2 text-lg font-medium"
+                      className={({ isActive }) =>
+                        `relative px-3 py-2 text-lg font-medium transition ${
+                          isActive
+                            ? "text-luko-teal font-bold after:content-[''] after:absolute after:left-0 after:right-0 after:-bottom-1 after:h-[3px] after:bg-gradient-to-r after:from-orange-400 after:to-orange-600 after:rounded-full after:shadow-md"
+                            : "text-gray-700 hover:text-luko-teal"
+                        }`
+                      }
                     >
                       {item.label}
-                    </Link>
+                    </NavLink>
                   ))}
                 </nav>
 
                 <div className="flex flex-col space-y-4 pt-6">
-                  <Link to="/search" className="w-full">
+                  <NavLink to="/search" className="w-full">
                     <Button variant="outline" className="w-full justify-start">
                       <Search className="h-5 w-5 ml-2" />
                       جستجو
                     </Button>
-                  </Link>
-                  
-                  <Link to="/notifications" className="w-full">
+                  </NavLink>
+
+                  <NavLink to="/notifications" className="w-full">
                     <Button variant="outline" className="w-full justify-start">
                       <Bell className="h-5 w-5 ml-2" />
                       اعلان‌ها
                       {notificationCount > 0 && (
-                        <Badge className="mr-2 bg-red-500">{notificationCount}</Badge>
+                        <Badge className="mr-2 bg-red-500">
+                          {notificationCount}
+                        </Badge>
                       )}
                     </Button>
-                  </Link>
-                  
-                  <Link to="/cart" className="w-full">
+                  </NavLink>
+
+                  <NavLink to="/cart" className="w-full">
                     <Button variant="outline" className="w-full justify-start">
                       <ShoppingCart className="h-5 w-5 ml-2" />
                       سبد خرید
                       {cartCount > 0 && (
-                        <Badge className="mr-2 bg-orange-500">{cartCount}</Badge>
+                        <Badge className="mr-2 bg-orange-500">
+                          {cartCount}
+                        </Badge>
                       )}
                     </Button>
-                  </Link>
-                  
-                  <Link to="/auth/login" className="w-full">
+                  </NavLink>
+
+                  <NavLink to="/auth/login" className="w-full">
                     <Button className="w-full bg-luko-teal hover:bg-luko-teal/90 text-white justify-start">
                       <User className="h-4 w-4 ml-2" />
                       حساب کاربری
                     </Button>
-                  </Link>
+                  </NavLink>
                 </div>
               </div>
             </DrawerContent>
