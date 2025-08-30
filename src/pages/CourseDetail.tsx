@@ -98,6 +98,7 @@ const CourseDetail: React.FC = () => {
   const [AddDisike, setAddDislike] = useState(false);
   const [rate, setRate] = useState(0);
   console.log(rate);
+  console.log(courseData?.imageAddress);
 
   async function handleRating(value) {
     try {
@@ -370,6 +371,7 @@ const CourseDetail: React.FC = () => {
                   alt=""
                   className="w-[624px] h-[395px] rounded-[15px]"
                 />
+                
               </div>
             </div>
           </div>
