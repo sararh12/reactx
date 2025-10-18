@@ -52,7 +52,7 @@ const PanelLayout = ({ activeTab = "/panel/dashboard" }) => {
     menuItems.map((item) => (
       <Link
         key={item.path}
-        to={`/panel/${item.path}`}
+        to={`/panel/dashboard/${item.path}`}
         className={`flex items-center py-3 px-4 rounded-md mb-2 ${
           activeTab.endsWith(item.path)
             ? "bg-white text-[#00D0B9]"

@@ -134,7 +134,8 @@ const BlogPage: React.FC =  () => {
                       </Link>
                       <div className="p-4">
                         <Link to={`/blog/${article.id}`}>
-                          <h3 className="font-bold text-lg mb-2 hover:text-luko-teal transition-colors">
+                          <h3 className="font-
+                          bold text-lg mb-2 hover:text-luko-teal transition-colors">
                             {article.title}
                           </h3>
                         </Link>

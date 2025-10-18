@@ -31,8 +31,6 @@ const PaymentModal = ({ setisModalShow, InitialValue }) => {
     
   }
 
-
-
   async function handleSubmit(values) {
     console.log(values);
 

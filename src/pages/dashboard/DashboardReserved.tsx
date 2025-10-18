@@ -80,7 +80,7 @@ const DashboardReserved: React.FC = () => {
               <TableHead className="text-right">عملیات</TableHead>
             </TableRow>
           </TableHeader>
-          {/* <TableBody>
+           <TableBody>
             {ReservedCourses.map((course) => (
               <TableRow key={course?.courseId}>
                 <TableCell>{course?.title}</TableCell>
@@ -109,7 +109,7 @@ const DashboardReserved: React.FC = () => {
                 </TableCell>
               </TableRow>
             ))}
-          </TableBody> */}
+          </TableBody> 
         </Table>
       </div>
     </div>
