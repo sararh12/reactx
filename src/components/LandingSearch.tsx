@@ -5,14 +5,6 @@ import { Field, Form, Formik } from "formik";
 import pic from "../../public/lovable-uploads/khabar.png";
 import { Link } from "react-router-dom";
 
-/**
- * Improved LandingSearch component
- * - Debounced search
- * - Click-outside to close
- * - Keeps existing colors (luko-teal) and overall layout
- * - Better keyboard & accessibility basics
- * - Cleaner, card-like results with hover + transitions
- */
 
 const LandingSearch: React.FC = () => {
   const [isModalShow, setIsModalShow] = useState(false);
@@ -24,7 +16,6 @@ const LandingSearch: React.FC = () => {
 
   const closeModal = () => setIsModalShow(false);
 
-  // Close when clicking outside
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (!containerRef.current) return;
@@ -65,7 +56,6 @@ const LandingSearch: React.FC = () => {
     }, 350);
   };
 
-  // helper: small card for search result
   const ResultCard = ({ item }: { item: any }) => (
     <Link
       to={`/courses/${item?.courseId}`}
@@ -108,7 +98,7 @@ const LandingSearch: React.FC = () => {
                 type="search"
                 onFocus={() => setIsModalShow(true)}
                 onBlur={() => {
-                  /* keep a short delay so clicking an item doesn't immediately close */
+
                   setTimeout(() => {
                     if (document.activeElement !== inputRef.current)
                       setIsModalShow(false);
