@@ -2,290 +2,37 @@ import CourseAccordion from "@/components/CourseAccordion";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
-import {
-  AddCourseLike,
-  AddCourseReserve,
-  AddFavoriteCourses,
-  AddCourseDislike,
-  RateCourse,
-} from "@/services/api/course/courseService";
-import { getTeacherDetail } from "@/services/api/teacher/teacherSevice";
-import axios from "axios";
 import React, { useState } from "react";
-import { IoIosHeartEmpty } from "react-icons/io";
-import { MdOutlineBookmarkBorder } from "react-icons/md";
-import { useParams } from "react-router-dom";
 import CommentSection from "./commentSection";
-import http from "@/services/interceptor/interceptor";
-import { IoBookmark } from "react-icons/io5";
-import { AiOutlineLike } from "react-icons/ai";
-import { AiFillLike } from "react-icons/ai";
-import { AiOutlineDislike } from "react-icons/ai";
-import { AiFillDislike } from "react-icons/ai";
-import { IoPersonOutline } from "react-icons/io5";
-import { FaMoneyBillWave, FaRegStar, FaStar } from "react-icons/fa";
-import { IoCartOutline } from "react-icons/io5";
+import { FaRegStar, FaStar } from "react-icons/fa";
 import Rating from "react-rating";
 import { LiaAngleDownSolid } from "react-icons/lia";
-
-interface Comment {
-  id: string;
-  courseId: string;
-  parentId?: string | null;
-  currentUserLikeId?: string | null;
-  inserDate: string;
-  title: string;
-  describe: string;
-  likeCount: number;
-  dissLikeCount: number;
-  replyCount: number;
-  currentUserIsLike: boolean;
-  currentUserIsDissLike: boolean;
-  autor: string;
-  pictureAddress?: string | null;
-}
-
-interface Teacher {
-  pictureAddress?: string;
-  fullName?: string;
-  linkdinProfileLink: string;
-  courseCounts: number;
-  newsCount: number;
-  histories: [];
-  skills: [];
-  teacherId: number;
-}
-
-interface CourseDetailData {
-  courseId: string;
-  title: string;
-  subTitle?: string;
-  describe: string;
-  teacherName: string;
-  teacherId: number;
-  cost: number;
-  capacity: number;
-  imageAddress: string | null;
-  isUserFavorite: boolean;
-  isCourseReseve: number;
-  currentUserLike: string;
-  currentUserDissLike: string;
-  sections: {
-    id: string;
-    title: string;
-    lessons: number;
-    duration: string;
-  }[];
-
-  courseRate?: number;
-  currentRegistrants?: number;
-  commentsCount?: number;
-}
+import useCourseDetails from "@/hooks/useCourseDetails";
+import { CourseHeader } from "@/components/pages/courseDetails/courseDetailsHeader";
 
 const CourseDetail: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
-  const { toast } = useToast();
-  const [courseData, setCourseData] = React.useState<CourseDetailData | null>(
-    null
-  );
-  const [courseComments, setCourseComments] = React.useState<Comment[]>([]);
-  const [loading, setLoading] = React.useState(true);
-  const [loadingComments, setLoadingComments] = React.useState(true);
-  const [teacherState, setTeacher] = useState<Teacher>();
-  const [AddFavorite, setAddFavorite] = useState(false);
-  const [AddLike, setAddLike] = useState(false);
-  const [AddDisike, setAddDislike] = useState(false);
-  const [rate, setRate] = useState(0);
-  console.log(rate);
-  console.log(courseData?.imageAddress);
-
-  async function handleRating(value) {
-    try {
-      const callApi = await RateCourse(id, value);
-      if (callApi?.data?.success) toast({ title: `${callApi?.data?.message}` });
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  async function AddDislikeForCourse(CourseId) {
-    const callApi = await AddCourseDislike(courseData?.courseId);
-
-    console.log(callApi?.data);
-
-    setAddDislike(callApi?.data);
-  }
-
-  async function handleDislike(courseId: string) {
-    try {
-      const callApi = await AddCourseDislike(courseId);
-      toast({ title: callApi?.data.message });
-      console.log(callApi);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  async function AddLikeForCourse(CourseId) {
-    const callApi = await AddCourseLike(courseData?.courseId);
-
-    console.log(callApi?.data);
-
-    setAddLike(callApi?.data);
-  }
-
-  async function handleLike(courseId: string) {
-    try {
-      const callApi = await AddCourseLike(courseId);
-      toast({ title: callApi?.data.message });
-      console.log(callApi);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  async function AddFavCourse() {
-    const callApi = await AddFavoriteCourses(courseData?.courseId);
-
-    console.log(callApi?.data);
-
-    setAddFavorite(callApi?.data);
-  }
-
-  // useEffect(() => {
-  //   if (courseData?.courseId) {
-  //     AddFavCourse();
-  //   }
-  // }, [courseData]);
-
-  async function handleReserve(courseId: string) {
-    try {
-      const callApi = await AddCourseReserve(courseId);
-      toast({ title: callApi?.data.message });
-      console.log(callApi);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  async function handleAddFavorite(courseId: string) {
-    try {
-      const callApi = await AddFavoriteCourses(courseId);
-      toast({ title: callApi?.data.message });
-      console.log(callApi);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  const teacherDetail = async (teacherId: number) => {
-    const callApi = await getTeacherDetail(teacherId);
-    setTeacher(callApi);
-  };
-
-  const fetchCourseComments = async () => {
-    if (!id) return;
-    setLoadingComments(true);
-    try {
-      const response = await axios.get<Comment[]>(
-        `https://sepehracademy.liara.run/Course/GetCourseCommnets/${id}`
-      );
-      setCourseComments(response.data || []);
-    } catch (error) {
-      console.error("Error fetching course comments:", error);
-      setCourseComments([]);
-      toast({
-        title: "خطا در دریافت نظرات دوره",
-        description: "لطفا دوباره تلاش کنید.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoadingComments(false);
-    }
-  };
-
-  const fetchCourseDetails = async () => {
-    if (!id) {
-      console.error("Course ID is missing");
-      setLoading(false);
-      setCourseData(null);
-      setCourseComments([]);
-      return;
-    }
-    setLoading(true);
-    try {
-      const response = await http.get(`Home/GetCourseDetails?CourseId=${id}`);
-      if (!response.data) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      setRate(response?.data?.currentUserRateNumber);
-      setCourseData(response.data as CourseDetailData);
-      fetchCourseComments();
-      console.log(response?.data?.teacherId);
-      teacherDetail(response?.data?.teacherId);
-    } catch (error) {
-      console.error("Error fetching course details:", error);
-      setCourseData(null);
-      toast({
-        title: "خطا در دریافت اطلاعات دوره",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  React.useEffect(() => {
-    fetchCourseDetails();
-  }, [id]);
-
-  const refetchDataAndComments = async () => {
-    if (!id) return;
-    setLoading(true);
-    setLoadingComments(true);
-    try {
-      const detailsResponse = await fetch(
-        `https://sepehracademy.liara.run/Home/GetCourseDetails?CourseId=${id}`
-      );
-      if (!detailsResponse.ok) {
-        throw new Error(
-          `HTTP error fetching details: ${detailsResponse.status}`
-        );
-      }
-      const detailsData = await detailsResponse.json();
-      setCourseData(detailsData as CourseDetailData);
-
-      const commentsResponse = await axios.get<Comment[]>(
-        `https://sepehracademy.liara.run/Course/GetCourseCommnets/${id}`
-      );
-      setCourseComments(commentsResponse.data || []);
-
-      toast({ title: "اطلاعات دوره و نظرات به‌روزرسانی شد" });
-    } catch (error) {
-      console.error("Error refetching course data and comments:", error);
-      toast({
-        title: "خطا در به‌روزرسانی اطلاعات",
-        description: "لطفا دوباره تلاش کنید.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-      setLoadingComments(false);
-    }
-  };
-
-  const commentEndpoints = {
-    createComment: `https://sepehracademy.liara.run/Course/AddCommentCourse`,
-    likeComment: (commentId: string) =>
-      `https://sepehracademy.liara.run/Course/AddCourseCommentLike?CourseCommandId=${commentId}`,
-    dislikeComment: (commentId: string) =>
-      `https://sepehracademy.liara.run/Course/AddCourseCommentDissLike?CourseCommandId=${commentId}`,
-    deleteCommentLike: `https://classapi.sepehracademy.ir/api/Course/DeleteCourseCommentLike`,
-    getReplies: (commentId: string) =>
-      `https://sepehracademy.liara.run/Course/GetRepliesCourseComments?Id=${commentId}`,
-    createReplyComment: `https://sepehracademy.liara.run/Course/AddReplyCourseComment`,
-  };
+  const {
+    courseData,
+    handleRating,
+    courseComments,
+    loading,
+    loadingComments,
+    teacherState,
+    AddFavorite,
+    AddLike,
+    AddDisike,
+    rate,
+    AddDislikeForCourse,
+    handleDislike,
+    AddLikeForCourse,
+    handleLike,
+    AddFavCourse,
+    handleReserve,
+    handleAddFavorite,
+    refetchDataAndComments,
+    commentEndpoints,
+    teacher,
+  } = useCourseDetails();
 
   if (loading)
     return (
@@ -293,9 +40,7 @@ const CourseDetail: React.FC = () => {
     );
   if (!courseData)
     return <div className="text-center py-10">اطلاعات دوره یافت نشد.</div>;
-
-  const teacher = courseData.teacherName;
-
+  
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
@@ -303,78 +48,7 @@ const CourseDetail: React.FC = () => {
       <main className="flex-grow rtl">
         <div className="container mx-auto px-4 py-8">
           {/* Course Header */}
-          <div className=" rounded-lg overflow-hidden mb-8">
-            <div className="p-4 bg-white flex justify-between max-w-[1220px] mx-auto flex-col md:flex-row">
-              <div className="p-4 max-w-[598px] rounded-2xl shadow-[0_8px_2px_0_#00000040] flex flex-col gap-4 min-w-[400px]">
-                <div className="flex justify-between items-center ">
-                  <h1 className="text-[29px]">{courseData?.title}</h1>
-                  <div className="flex items-center gap-2">
-                    <button
-                      className="text-[#00B4AF]"
-                      onClick={() => handleAddFavorite(courseData?.courseId)}
-                    >
-                      {courseData.isUserFavorite ? (
-                        <IoBookmark className="size-6 " />
-                      ) : (
-                        <MdOutlineBookmarkBorder className="size-6 " />
-                      )}
-                    </button>
-                    <div className="flex gap-2 text-[#00B4AF]">
-                      <button
-                        onClick={() => handleDislike(courseData?.courseId)}
-                      >
-                        {courseData.currentUserDissLike ? (
-                          <AiFillDislike className="size-6" />
-                        ) : (
-                          <AiOutlineDislike className="size-6" />
-                        )}
-                      </button>
-                      <button onClick={() => handleLike(courseData?.courseId)}>
-                        {courseData.currentUserLike === "0" ? (
-                          <AiOutlineLike className="size-6 " />
-                        ) : (
-                          <AiFillLike className="size-6 " />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                <p className="text-[#777777] text-[20px] py-4">
-                  {courseData?.miniDescribe}
-                </p>
-                <div className="flex justify-between items-center text-[#005B58]">
-                  <div className="flex gap-2 items-center">
-                    <IoPersonOutline />
-                    <h3>{courseData?.teacherName}</h3>
-                  </div>
-
-                  <div className="flex gap-2 items-center">
-                    <span>{courseData?.cost}</span>
-                    <FaMoneyBillWave />
-                  </div>
-                </div>
-                <button className="mt-5 mx-auto block w-[347px] bg-orange-500 hover:bg-orange-600 text-lg text-white h-12 rounded-[9px]">
-                  <div
-                    className="flex items-center text-center justify-center gap-2"
-                    onClick={() => handleReserve(courseData?.courseId)}
-                  >
-                    <IoCartOutline />
-                    {courseData.isCourseReseve 
-                      ? "شرکت شده"
-                      : "شرکت در دوره"}
-                  </div>
-                </button>
-              </div>
-              <div>
-                <img
-                  src={courseData?.imageAddress}
-                  alt=""
-                  className="w-[624px] h-[395px] rounded-[15px]"
-                />
-                
-              </div>
-            </div>
-          </div>
+          <CourseHeader />
 
           {/* Course Statistics */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

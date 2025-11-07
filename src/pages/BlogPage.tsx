@@ -41,35 +41,65 @@ const BlogPage: React.FC =  () => {
   
   const recommendedPosts = [
     {
-      id: '101',
-      title: 'چگونه در مصاحبه React موفق شویم؟',
-      image: '/lovable-uploads/01258e8d-775b-4627-9c29-60c74aff1682.png',
-      link: '/blog/101'
+      id: "101",
+      title: "چگونه در مصاحبه React موفق شویم؟",
+      image: "/lovable-uploads/ff1800fa69286aff4819156512be6e0b2ffd22d9.jpg",
+      link: "/blog/101",
     },
     {
-      id: '102',
-      title: 'مقایسه دوره مدیر پروژه تخصصی',
-      image: '/lovable-uploads/01258e8d-775b-4627-9c29-60c74aff1682.png',
-      link: '/blog/102'
+      id: "102",
+      title: "مقایسه دوره مدیر پروژه تخصصی",
+      image: "/lovable-uploads/5e73b9912271dcd8eb60c42cda58f1642e6503a8.jpg",
+      link: "/blog/102",
     },
     {
-      id: '103',
-      title: 'حرکت خلاقانه در Next.js',
-      image: '/lovable-uploads/01258e8d-775b-4627-9c29-60c74aff1682.png',
-      link: '/blog/103'
+      id: "103",
+      title: "حرکت خلاقانه در Next.js",
+      image: "/lovable-uploads/9c30dd1cf8af56fc7574b0826c5cc94ef1f6daf9.jpg",
+      link: "/blog/103",
     },
   ];
   
   const tags = [
-    { id: '1', name: 'شبکه معنایی وب', count: 24, icon: '/lovable-uploads/6bf14711-f68d-471e-836c-44429cf7e00f.png' },
-    { id: '2', name: 'جاوااسکریپت', count: 18, icon: '/lovable-uploads/6bf14711-f68d-471e-836c-44429cf7e00f.png' },
-    { id: '3', name: 'ری اکت', count: 32, icon: '/lovable-uploads/6bf14711-f68d-471e-836c-44429cf7e00f.png' }
+    {
+      id: "1",
+      name: "شبکه معنایی وب",
+      count: 24,
+      icon: "/lovable-uploads/70e7c3e96999230dd6ccc094e8d803664da58e76.jpg",
+    },
+    {
+      id: "2",
+      name: "جاوااسکریپت",
+      count: 18,
+      icon: "/lovable-uploads/70e7c3e96999230dd6ccc094e8d803664da58e76.jpg",
+    },
+    {
+      id: "3",
+      name: "ری اکت",
+      count: 32,
+      icon: "/lovable-uploads/70e7c3e96999230dd6ccc094e8d803664da58e76.jpg",
+    },
   ];
   
   const popularCourses = [
-    { id: '1', title: 'دوره جامع Angular', link: '/courses/1', image: '/lovable-uploads/04f05962-568c-44ad-a091-a60a681fa24c.png' },
-    { id: '2', title: 'دوره جامع React', link: '/courses/2', image: '/lovable-uploads/04f05962-568c-44ad-a091-a60a681fa24c.png' },
-    { id: '3', title: 'دوره جامع Next.js', link: '/courses/3', image: '/lovable-uploads/04f05962-568c-44ad-a091-a60a681fa24c.png' }
+    {
+      id: "1",
+      title: "دوره جامع Angular",
+      link: "/courses/1",
+      image: "/lovable-uploads/f4e701a9a7f2a7fb0c9fd179bc58e1671a7757b92.png",
+    },
+    {
+      id: "2",
+      title: "دوره جامع React",
+      link: "/courses/2",
+      image: "/lovable-uploads/fbbfaff3f58b4edefff1cdd827e82897ce1e29f8.png",
+    },
+    {
+      id: "3",
+      title: "دوره جامع Next.js",
+      link: "/courses/3",
+      image: "/lovable-uploads/f4e701a9a7f2a7fb0c9fd179bc58e1671a7757b91.png",
+    },
   ];
 
   return (
@@ -134,8 +164,10 @@ const BlogPage: React.FC =  () => {
                       </Link>
                       <div className="p-4">
                         <Link to={`/blog/${article.id}`}>
-                          <h3 className="font-
-                          bold text-lg mb-2 hover:text-luko-teal transition-colors">
+                          <h3
+                            className="font-
+                          bold text-lg mb-2 hover:text-luko-teal transition-colors"
+                          >
                             {article.title}
                           </h3>
                         </Link>
@@ -278,36 +310,27 @@ const BlogPage: React.FC =  () => {
                   <h3 className="font-bold mb-4">محبوب ترین دوره ها</h3>
                   <div className="space-y-4">
                     {popularCourses.map((course) => (
-                      <Link
-                        key={course.id}
-                        to={course.link}
-                        className="flex items-center border-b pb-4"
-                      >
-                        <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-md flex items-center justify-center">
-                          <img
-                            src={course.image}
-                            alt={course.title}
-                            className="w-8 h-8 rounded-full bg-black p-1"
-                          />
+                      <div key={course.id} className="flex border-b pb-4">
+                        <img
+                          src={course.image}
+                          alt={course.title}
+                          className="w-16 h-16 rounded-full object-cover" 
+                        />
+                        <div className="mr-3 flex flex-col justify-center">
+                          <Link
+                            to={course.link}
+                            className="font-bold text-sm hover:text-luko-teal"
+                          >
+                            {course.title}
+                          </Link>
+                          <Link
+                            to={course.link}
+                            className="block text-xs text-luko-teal mt-2"
+                          >
+                            مشاهده دوره
+                          </Link>
                         </div>
-                        <span className="mr-3 text-sm font-medium">
-                          {course.title}
-                        </span>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-4 w-4 text-luko-teal mr-auto"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M9 5l7 7-7 7"
-                          />
-                        </svg>
-                      </Link>
+                      </div>
                     ))}
                     <Link
                       to="/courses"

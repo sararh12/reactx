@@ -49,7 +49,6 @@ const Dashboard: React.FC = () => {
     bio: "لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است. کتابهای زیادی در شصت و سه درصد گذشته، حال و آینده شناخت فراوان جامعه و متخصصان را می طلبد",
   };
 
-  // News and updates
   const news = [
     {
       id: "1",
@@ -247,72 +246,55 @@ const Dashboard: React.FC = () => {
                   <h2 className="text-lg font-bold mb-4">
                     دوره های در حال برگزاری
                   </h2>
-                  <div className="space-y-4">
+
+                  {/* تغییر: استفاده از همان کارت‌ها مانند بخش پیشنهادی */}
+                  <div className="flex flex-wrap gap-4">
                     {TopNewsData.map((course) => (
                       <div
                         key={course?.id}
-                        className="border rounded-lg overflow-hidden"
+                        className="max-w-[343px] w-full rounded-[10px] bg-[#F9F9F9] p-5 flex items-center shadow-[0_1px_2px_0_#00000040]"
                       >
-                        <div className="aspect-w-3 aspect-h-2 bg-gradient-to-br from-blue-500 to-purple-400">
-                          <div className="p-4 flex justify-center items-center">
-                            <img
-                              src={course?.currentImageAddressTumb}
-                              alt={course?.title}
-                              className="w-20 h-20 object-contain bg-black/40 rounded-full p-2"
-                            />
-                          </div>
-                        </div>
-                        <div className="p-4">
-                          <h3 className="font-bold text-gray-800 mb-1">
+                        <div className="flex-1 flex flex-col gap-2 pr-2">
+                          <h3 className="text-[#005250] text-[13px] font-[700]">
                             {course?.title}
                           </h3>
-                          <div className="text-xs text-gray-500 mb-2 flex items-center">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-4 w-4 ml-1"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={1.5}
-                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                              />
-                            </svg>
-                            <span>{course?.addUserFullName}</span>
+
+                          <div className="flex justify-between items-center">
+                            <div className="text-[#26B4AF] flex gap-1 items-center text-[10px] font-[550]">
+                              <IoPersonOutline className="size-3" />
+                              <span>
+                                {course?.addUserFullName || course?.teacherName}
+                              </span>
+                            </div>
+                            <div className="text-[10px] text-[#D47300] font-[700]">
+                              {course?.lastUpdate
+                                ? makeDatePersian(course?.lastUpdate)
+                                : course?.publishDate || ""}
+                            </div>
                           </div>
-                          <div className="text-gray-500 mb-1 text-sm">
+
+                          <div className="text-gray-500 text-sm mt-1 line-clamp-2">
                             {course?.miniDescribe}
                           </div>
-                          <Link
-                            to={`/courses/${course?.id}`}
-                            className="text-xs text-luko-teal hover:underline inline-flex items-center"
-                          >
-                            <span>ادامه استفاده از دوره</span>
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-4 w-4 mr-1"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={1.5}
-                                d="M9 5l7 7-7 7"
-                              />
-                            </svg>
-                          </Link>
+                        </div>
+
+                        <div className="p-2">
+                          <img
+                            src={
+                              course?.currentImageAddressTumb ||
+                              course?.tumbImageAddress
+                            }
+                            alt={course?.title}
+                            className="w-[88px] h-[60px] rounded-[6px] object-cover"
+                          />
                         </div>
                       </div>
                     ))}
                   </div>
+
                   <div className="mt-4 text-center">
                     <Link
-                      to="/dashboard/courses"
+                      to="/blog"
                       className="text-xs text-luko-teal hover:underline"
                     >
                       مشاهده همه

@@ -75,7 +75,6 @@ const DashboardFavoriteNews: React.FC = () => {
                 <TableHead className="text-right"> عنوان</TableHead>
                 <TableHead className="text-right">نویسنده </TableHead>
                 <TableHead className="text-right">دسته بندی</TableHead>
-                {/* <TableHead className="text-right">قیمت (تومان)</TableHead> */}
                 <TableHead className="text-right"> زمان انتشار</TableHead>
                 <TableHead className="text-right">عملیات</TableHead>
               </TableRow>
@@ -86,7 +85,6 @@ const DashboardFavoriteNews: React.FC = () => {
                   <TableCell>{news.title}</TableCell>
                   <TableCell>{news.addUserFullName}</TableCell>
                   <TableCell>{news.newsCatregoryName}</TableCell>
-                  {/* <TableCell>{course.cost}</TableCell> */}
                   <TableCell>{makeDatePersian(news.insertDate)}</TableCell>
                   <TableCell>
                     <div className="flex space-x-2 space-x-reverse">

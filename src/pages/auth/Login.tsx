@@ -42,6 +42,7 @@ const Login = () => {
       }
 
       setItem("token", data?.token);
+      setItem("userId", data?.id || data?.userId);
       toast({
         title: "ورود موفقیت‌آمیز",
         description: "در حال انتقال به داشبورد...",
@@ -59,11 +60,6 @@ const Login = () => {
     }
   };
 
-  // toast({
-  //   title: "ورود موفقیت آمیز",
-  //   description: "خوش آمدید! در حال انتقال به داشبورد...",
-  //   duration: 3000,
-  // });
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-form py-12">

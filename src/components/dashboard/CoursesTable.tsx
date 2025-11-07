@@ -6,11 +6,13 @@ import { IoWalletOutline } from "react-icons/io5";
 import pic from "../../../public/lovable-uploads/pic.png";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import PaymentModal from "./PaymentModal";
+import { useNavigate } from "react-router-dom";
 
 const CoursesTable: React.FC = () => {
   const [MyCourses, setMyCourses] = useState([]);
   const [isModalShow, setisModalShow] = useState(false);
   const [InitialValue, setInitialValue] = useState(null);
+   const navigate = useNavigate();
 
   console.log(InitialValue);
 
@@ -63,19 +65,29 @@ const CoursesTable: React.FC = () => {
               <td className="py-4 px-6">{course.cost}</td>
               <td className="py-4 px-6">{course.paymentStatus}</td>
               <td className="py-4 px-6">
-                <button className="text-gray-600 hover:text-gray-900 flex gap-2 items-center">
-                  <IoWalletOutline
-                    className="size-5 text-[#00726F]"
+                <div className="flex items-center gap-1">
+                  <button
+                    className="text-gray-600 hover:text-gray-900 flex items-center p-1"
                     onClick={() => {
-                      setisModalShow(true),
-                        setInitialValue({
-                          courseId: course.courseId,
-                          payment: course.cost,
-                        });
+                      setisModalShow(true);
+                      setInitialValue({
+                        courseId: course.courseId,
+                        payment: course.cost,
+                      });
                     }}
-                  />
-                  <Eye className="h-5 w-5 text-[#E48900]" />
-                </button>
+                    aria-label="پرداخت از کیف پول"
+                  >
+                    <IoWalletOutline className="size-5 text-[#00726F]" />
+                  </button>
+
+                  <button
+                    className="text-gray-600 hover:text-gray-900 flex items-center p-1"
+                    onClick={() => navigate(`/courses/${course?.courseId}`)}
+                    aria-label="مشاهده جزئیات"
+                  >
+                    <Eye className="h-5 w-5 " />
+                  </button>
+                </div>
               </td>
             </tr>
           ))}

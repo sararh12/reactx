@@ -228,11 +228,7 @@ const Register = () => {
             {step === 3 && (
               <>
               <div className="text-center">
-                {/* <div className="mb-6">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-green-500 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div> */}
+
                 <h2 className="text-2xl font-bold mb-6 text-center">ورود به حساب کاربری</h2>
                 <form onSubmit={handleRegisterFinal}>
                   <div className='space-y-4'>

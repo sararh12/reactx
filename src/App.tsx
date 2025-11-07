@@ -20,7 +20,6 @@ import DashboardSecurity from "./pages/dashboard/DashboardSecurity";
 import DashboardFavorites from "./pages/dashboard/DashboardFavorites";
 import DashboardFavoriteNews from "./pages/dashboard/DashboardFavoriteNews";
 import PanelLayout from "./components/layout/dashboard";
-// import CartPage from "./pages/CartPage";
 
 const queryClient = new QueryClient();
 
@@ -38,16 +37,16 @@ const App = () => (
           <Route path="/blog/:id" element={<ArticleDetail />} />
           <Route path="/panel" element={<PanelLayout />}>
             <Route path="dashboard" element={<Dashboard />} />
-            <Route path="dashboard/courses" element={<DashboardCourses />} />
-            <Route path="dashboard/reserved" element={<DashboardReserved />} />
-            <Route path="dashboard/comments" element={<DashboardComments />} />
-            <Route path="dashboard/security" element={<DashboardSecurity />} />
+            <Route path="courses" element={<DashboardCourses />} />
+            <Route path="reserved" element={<DashboardReserved />} />
+            <Route path="comments" element={<DashboardComments />} />
+            <Route path="security" element={<DashboardSecurity />} />
             <Route
-              path="dashboard/favorites"
+              path="favorites"
               element={<DashboardFavorites />}
             />
              <Route
-              path="dashboard/favoriteNews"
+              path="favoriteNews"
               element={<DashboardFavoriteNews />}
             />
             <Route path="profile" element={<UserProfile />} />
@@ -55,7 +54,6 @@ const App = () => (
 
           <Route path="/auth/login" element={<Login />} />
           <Route path="/auth/register" element={<Register />} />
-          {/* <Route path="/cart" element={<CartPage />} /> */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

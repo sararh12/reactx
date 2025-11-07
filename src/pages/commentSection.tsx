@@ -45,7 +45,6 @@ interface NewCourseCommentSchema {
   Describe: string;
 }
 
-
 interface CourseReplySchema {
   CommentId: string;
   CourseId: string;
@@ -53,11 +52,10 @@ interface CourseReplySchema {
   Describe: string;
 }
 
-
 interface ApiErrorResponse {
   ErrorType?: string;
   ErrorMessage?: string | string[];
-  message?: string; 
+  message?: string;
   errors?: Record<string, string[]>;
 }
 
@@ -146,7 +144,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({
 
           await axios.delete(deleteEndpointUrl, {
             headers: { Authorization: `Bearer ${token}` },
-            data: { deleteEntityId: comment.currentUserLikeId }, 
+            data: { deleteEntityId: comment.currentUserLikeId },
           });
           toast({ title: "بازخورد شما حذف شد" });
         }
@@ -186,11 +184,12 @@ const CommentSection: React.FC<CommentSectionProps> = ({
     parentId?: string
   ) => {
     e.preventDefault();
-    const userIdString = localStorage.getItem('userId');
+    const userIdString = localStorage.getItem("userId");
     const token = localStorage.getItem("token");
     const textToSubmit = parentId ? replyText : commentText;
 
-    if (!userIdString && contentType !== "course") { // UserId required for articles, not for course formdata
+    if (!userIdString && contentType !== "course") {
+
       toast({
         title: "خطا در احراز هویت",
         description: "شناسه کاربر یافت نشد. لطفا مجددا وارد شوید.",
@@ -200,6 +199,8 @@ const CommentSection: React.FC<CommentSectionProps> = ({
     }
 
     const parsedUserId = parseInt(userIdString || "0", 10);
+    console.log("<>>>>>>>>>>>>>>>>>>", parsedUserId, token);
+
     if (isNaN(parsedUserId) && contentType !== "course") {
       toast({
         title: "خطای شناسه کاربری",
@@ -208,7 +209,6 @@ const CommentSection: React.FC<CommentSectionProps> = ({
       });
       return;
     }
-
 
     if (!textToSubmit.trim() || !contentId) {
       toast({
@@ -225,7 +225,6 @@ const CommentSection: React.FC<CommentSectionProps> = ({
     let endpointUrl: string;
     let headers: Record<string, string> = {
       Authorization: `Bearer ${token}`,
-      // Default to JSON, will be overridden for FormData
       "Content-Type": "application/json",
     };
 
@@ -237,30 +236,31 @@ const CommentSection: React.FC<CommentSectionProps> = ({
         newsId: contentId,
         title: titleForArticleComment,
         describe: textToSubmit,
-        userId: parsedUserId, // Use parsed User ID
+        userId: parsedUserId, 
         ...(parentId && { parentId }),
       };
       endpointUrl = parentId
         ? endpoints.createReplyComment
         : endpoints.createComment;
-    } else { // contentType === 'course', both new and reply are FormData
+    } else {
+
       const formData = new FormData();
       formData.append("CourseId", contentId);
       formData.append("Describe", textToSubmit);
 
-      if (parentId) { // Replying to a course comment
-        formData.append("CommentId", parentId); // This is the ParentId
-        formData.append("Title", "پاسخ به نظر"); // Generic title for reply
+      if (parentId) {
+        formData.append("CommentId", parentId); 
+        formData.append("Title", "پاسخ به نظر"); 
         endpointUrl = endpoints.createReplyComment;
-      } else { // New course comment
-        formData.append("Title", "نظر برای دوره"); // Generic title for new comment
+      } else {
+
+        formData.append("Title", "نظر برای دوره");
         endpointUrl = endpoints.createComment;
       }
-      // UserId is NOT appended for FormData as per Postman (likely from token for course comments)
+
       payload = formData;
-      headers = { // Override headers for FormData
+      headers = {
         Authorization: `Bearer ${token}`,
-        // "Content-Type": "multipart/form-data" is set automatically by axios for FormData
       };
     }
 
@@ -305,8 +305,8 @@ const CommentSection: React.FC<CommentSectionProps> = ({
       }
       toast({
         title:
-          (axios.isAxiosError(err) && err.response?.data as ApiErrorResponse)?.ErrorType ||
-          "خطا در ارسال",
+          (axios.isAxiosError(err) && (err.response?.data as ApiErrorResponse))
+            ?.ErrorType || "خطا در ارسال",
         description: errorDescription,
         variant: "destructive",
       });
@@ -330,7 +330,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({
 
     setLoadingReplies((prev) => ({ ...prev, [parentCommentId]: true }));
     try {
-      const response = await axios.get<Comment[]>( // Ensure Comment type here matches display needs
+      const response = await axios.get<Comment[]>( 
         endpoints.getReplies(parentCommentId),
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -418,10 +418,11 @@ const CommentSection: React.FC<CommentSectionProps> = ({
                   </p>
                   <div className="flex items-center mt-3 text-gray-500 text-xs">
                     <button
-                      className={`flex items-center ml-4 hover:text-luko-teal transition-colors ${likedComments[comment.id] || comment.currentUserIsLike
-                        ? "text-luko-teal"
-                        : ""
-                        }`}
+                      className={`flex items-center ml-4 hover:text-luko-teal transition-colors ${
+                        likedComments[comment.id] || comment.currentUserIsLike
+                          ? "text-luko-teal"
+                          : ""
+                      }`}
                       onClick={() => handleCommentLikeDislike(comment.id, true)}
                     >
                       <svg
@@ -435,8 +436,9 @@ const CommentSection: React.FC<CommentSectionProps> = ({
                       {comment.likeCount}
                     </button>
                     <button
-                      className={`flex items-center ml-4 hover:text-red-500 transition-colors ${comment.currentUserIsDissLike ? "text-red-500" : ""
-                        }`}
+                      className={`flex items-center ml-4 hover:text-red-500 transition-colors ${
+                        comment.currentUserIsDissLike ? "text-red-500" : ""
+                      }`}
                       onClick={() =>
                         handleCommentLikeDislike(comment.id, false)
                       }
@@ -461,8 +463,8 @@ const CommentSection: React.FC<CommentSectionProps> = ({
                         {loadingReplies[comment.id]
                           ? "در حال بارگذاری..."
                           : expandedReplies[comment.id]
-                            ? "مخفی کردن پاسخ‌ها"
-                            : `نمایش ${comment.replyCount} پاسخ`}
+                          ? "مخفی کردن پاسخ‌ها"
+                          : `نمایش ${comment.replyCount} پاسخ`}
                       </Button>
                     )}
                     <button
@@ -529,11 +531,12 @@ const CommentSection: React.FC<CommentSectionProps> = ({
                           </p>
                           <div className="flex items-center mt-2 text-gray-500 text-xs">
                             <button
-                              className={`flex items-center ml-3 hover:text-luko-teal transition-colors ${likedComments[reply.id] ||
+                              className={`flex items-center ml-3 hover:text-luko-teal transition-colors ${
+                                likedComments[reply.id] ||
                                 reply.currentUserIsLike
-                                ? "text-luko-teal"
-                                : ""
-                                }`}
+                                  ? "text-luko-teal"
+                                  : ""
+                              }`}
                               onClick={() =>
                                 handleCommentLikeDislike(reply.id, true)
                               }
@@ -549,10 +552,11 @@ const CommentSection: React.FC<CommentSectionProps> = ({
                               {reply.likeCount}
                             </button>
                             <button
-                              className={`flex items-center ml-3 hover:text-red-500 transition-colors ${reply.currentUserIsDissLike
-                                ? "text-red-500"
-                                : ""
-                                }`}
+                              className={`flex items-center ml-3 hover:text-red-500 transition-colors ${
+                                reply.currentUserIsDissLike
+                                  ? "text-red-500"
+                                  : ""
+                              }`}
                               onClick={() =>
                                 handleCommentLikeDislike(reply.id, false)
                               }

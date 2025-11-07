@@ -15,7 +15,7 @@ import { Badge } from '@/components/ui/badge';
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
 
-  // Mock notification and cart counts - in a real app, these would come from a state manager or API
+
   const notificationCount = 3;
   const cartCount = 2;
 
@@ -75,16 +75,6 @@ const Navbar: React.FC = () => {
             </Button>
           </NavLink>
 
-          {/* <Link to="/cart">
-            <Button variant="ghost" size="icon" aria-label="Shopping Cart" className="relative">
-              <ShoppingCart className="h-5 w-5" />
-              {cartCount > 0 && (
-                <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center bg-orange-500">
-                  {cartCount}
-                </Badge>
-              )}
-            </Button>
-          </Link> */}
 
           <NavLink to="/auth/login">
             <Button className="bg-luko-teal hover:bg-luko-teal/90 text-white">

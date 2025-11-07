@@ -22,6 +22,7 @@ import { IoTrash } from "react-icons/io5";
 const DashboardReserved: React.FC = () => {
   const [ReservedCourses, setReservedCourses] = useState([]);
 
+
   async function handleDeleteReserve(reserveId: string) {
     const data = {
       id: reserveId,
@@ -80,40 +81,42 @@ const DashboardReserved: React.FC = () => {
               <TableHead className="text-right">عملیات</TableHead>
             </TableRow>
           </TableHeader>
-           <TableBody>
-            {ReservedCourses.map((course) => (
-              <TableRow key={course?.courseId}>
-                <TableCell>{course?.title}</TableCell>
-                <TableCell>{course.teacherName}</TableCell>
-                <TableCell>{makeDatePersian(course?.insertDate)}</TableCell>
-                <TableCell>{course.cost}</TableCell>
-                <TableCell>
-                  <span className="px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800">
-                    {course?.isCourseUser == 1
-                      ? "تایید شده"
-                      : "در انتظار تایید"}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <button
-                    className="text-gray-600 hover:text-gray-900"
-                    onClick={() => navigate(`/courses/${course?.courseId}`)}
-                  >
-                    <Eye className="h-5 w-5 " />
-                  </button>
-                  <button
-                    onClick={() => handleDeleteReserve(course?.reserveId)}
-                  >
-                    <IoTrash className="h-5 w-5 " />
-                  </button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody> 
+          <TableBody>
+            {ReservedCourses.map((course) => {
+              console.log("Course:", course); 
+              return (
+                <TableRow key={course?.courseId}>
+                  <TableCell>{course?.title}</TableCell>
+                  <TableCell>{course.teacherName}</TableCell>
+                  <TableCell>{makeDatePersian(course?.insertDate)}</TableCell>
+                  <TableCell>{course.cost}</TableCell>
+                  <TableCell>
+                    <span className="px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800">
+                      {course?.isCourseUser == 1
+                        ? "تایید شده"
+                        : "در انتظار تایید"}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <button
+                      className="text-gray-600 hover:text-gray-900"
+                      onClick={() => navigate(`/courses/${course?.courseId}`)}
+                    >
+                      <Eye className="h-5 w-5 " />
+                    </button>
+                    <button onClick={() => handleDeleteReserve(course?.id)}>
+                      <IoTrash className="h-5 w-5 " />
+                    </button>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
         </Table>
       </div>
     </div>
   );
+
 };
 
 export default DashboardReserved;

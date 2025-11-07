@@ -49,21 +49,28 @@ const PanelLayout = ({ activeTab = "/panel/dashboard" }) => {
   }, []);
 
   const renderMenuLinks = (isMobile = false) =>
-    menuItems.map((item) => (
-      <Link
-        key={item.path}
-        to={`/panel/dashboard/${item.path}`}
-        className={`flex items-center py-3 px-4 rounded-md mb-2 ${
-          activeTab.endsWith(item.path)
-            ? "bg-white text-[#00D0B9]"
-            : "text-white hover:bg-white/10"
-        }`}
-        onClick={() => isMobile && setMobileMenuOpen(false)}
-      >
-        <item.icon className="ml-3 h-5 w-5" />
-        <span>{item.label}</span>
-      </Link>
-    ));
+    menuItems.map((item) => {
+      // مسیر درست بساز
+      const path =
+        item.path === "profile" ? "/panel/profile" : `/panel/${item.path}`;
+
+      return (
+        <Link
+          key={item.path}
+          to={path}
+          className={`flex items-center py-3 px-4 rounded-md mb-2 ${
+            activeTab.endsWith(item.path)
+              ? "bg-white text-[#00D0B9]"
+              : "text-white hover:bg-white/10"
+          }`}
+          onClick={() => isMobile && setMobileMenuOpen(false)}
+        >
+          <item.icon className="ml-3 h-5 w-5" />
+          <span>{item.label}</span>
+        </Link>
+      );
+    });
+
 
   return (
     <div className="min-h-screen bg-gray-50 flex rtl">

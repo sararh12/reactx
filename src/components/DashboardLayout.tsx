@@ -64,7 +64,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           </Link>
 
           <Link
-            to="/panel/dashboard/courses"
+            to="/panel/courses"
             className={`flex items-center py-3 px-4 rounded-md mb-2 ${
               activeTab === "courses"
                 ? "bg-white text-[#00D0B9]"
@@ -76,7 +76,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           </Link>
 
           <Link
-            to="/panel/dashboard/reserved"
+            to="/panel/reserved"
             className={`flex items-center py-3 px-4 rounded-md mb-2 ${
               activeTab === "reserved"
                 ? "bg-white text-[#00D0B9]"
@@ -88,7 +88,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           </Link>
 
           <Link
-            to="/panel/dashboard/favorites"
+            to="/panel/favorites"
             className={`flex items-center py-3 px-4 rounded-md mb-2 ${
               activeTab === "favorites"
                 ? "bg-white text-[#00D0B9]"
@@ -100,7 +100,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           </Link>
 
           <Link
-            to="/panel/dashboard/comments"
+            to="/panel/comments"
             className={`flex items-center py-3 px-4 rounded-md mb-2 ${
               activeTab === "comments"
                 ? "bg-white text-[#00D0B9]"
@@ -112,7 +112,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           </Link>
 
           <Link
-            to="/panel/dashboard/security"
+            to="/panel/security"
             className={`flex items-center py-3 px-4 rounded-md mb-2 ${
               activeTab === "security"
                 ? "bg-white text-[#00D0B9]"

@@ -1,10 +1,9 @@
 const setItem = (key: string, value: string) => {
-  localStorage.setItem(key, JSON.stringify(value));
+  localStorage.setItem(key, value);
 };
-
 const getItem = (key: string) => {
-  if (localStorage.getItem(key)) return JSON.parse(localStorage.getItem(key));
-  return false;
+  const item = localStorage.getItem(key);
+  return item ? item : false;
 };
 
 const getItemGeneric = (key: string) => {

@@ -15,7 +15,6 @@ import {
   GetMyFavoriteCourses,
 } from "@/services/api/course/courseService";
 import OnSetFormData from "@/utils/form-data";
-import { title } from "process";
 import { GetMyFavoriteNews } from "@/services/api/blog/blogServices";
 import { makeDatePersian } from "@/utils/persianDates";
 
@@ -41,16 +40,16 @@ const DashboardFavorites: React.FC = () => {
     try {
       const callApi = await DeleteCourseFavorite(formData);
       toast({ title: ` حذف دوره ${callApi?.data?.message}` });
-     if (callApi?.data?.success) {
-      const filteredData = favoriteCourses.filter(
-        (e) => e.favoriteId !== courseFavId
-      );
-      setFavoriteCourses(filteredData);
+      if (callApi?.data?.success) {
+        const filteredData = favoriteCourses.filter(
+          (e) => e.favoriteId !== courseFavId
+        );
+        setFavoriteCourses(filteredData);
+      }
+    } catch (error) {
+      console.log(error);
     }
-  } catch (error) {
-    console.log(error);
   }
-}
 
   useEffect(() => {
     FavCourse();
@@ -61,40 +60,38 @@ const DashboardFavorites: React.FC = () => {
   };
 
   const toggleFavorite = (courseId: number) => {
-    setFavoriteCourses(
-      (prevCourses) =>
-        prevCourses
-          .map((course) => {
-            if (course.id === courseId) {
-              const updatedCourse = {
-                ...course,
-                isFavorite: !course.isFavorite,
-              };
+    setFavoriteCourses((prevCourses) =>
+      prevCourses
+        .map((course) => {
+          if (course.id === courseId) {
+            const updatedCourse = {
+              ...course,
+              isFavorite: !course.isFavorite,
+            };
 
-              // Show toast notification
-              if (!updatedCourse.isFavorite) {
-                toast({
-                  title: "حذف از علاقه‌مندی‌ها",
-                  description: `${course.title} از لیست علاقه‌مندی‌های شما حذف شد.`,
-                });
-              } else {
-                toast({
-                  title: "افزودن به علاقه‌مندی‌ها",
-                  description: `${course.title} به لیست علاقه‌مندی‌های شما اضافه شد.`,
-                });
-              }
-
-              return updatedCourse;
+            if (!updatedCourse.isFavorite) {
+              toast({
+                title: "حذف از علاقه‌مندی‌ها",
+                description: `${course.title} از لیست علاقه‌مندی‌های شما حذف شد.`,
+              });
+            } else {
+              toast({
+                title: "افزودن به علاقه‌مندی‌ها",
+                description: `${course.title} به لیست علاقه‌مندی‌های شما اضافه شد.`,
+              });
             }
-            return course;
-          })
-          .filter((course) => course.isFavorite) // Filter out unfavorited courses
+
+            return updatedCourse;
+          }
+          return course;
+        })
+        .filter((course) => course.isFavorite)
     );
   };
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">  علاقه‌مندی‌ها</h1>
+      <h1 className="text-2xl font-bold mb-6"> علاقه‌مندی‌ها</h1>
       {favoriteCourses.length > 0 ? (
         <div className="overflow-x-auto">
           <Table>
@@ -103,41 +100,42 @@ const DashboardFavorites: React.FC = () => {
                 <TableHead className="text-right"> عنوان</TableHead>
                 <TableHead className="text-right">نویسنده </TableHead>
                 <TableHead className="text-right">دسته بندی</TableHead>
-                {/* <TableHead className="text-right">قیمت (تومان)</TableHead> */}
                 <TableHead className="text-right"> زمان انتشار</TableHead>
                 <TableHead className="text-right">عملیات</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {favoriteCourses.map((course) => (
-                <TableRow key={course.courseId}>
-                  <TableCell>{course.courseTitle}</TableCell>
-                  <TableCell>{course.teacheName}</TableCell>
-                  <TableCell>{course.levelName}</TableCell>
-                  {/* <TableCell>{course.cost}</TableCell> */}
-                  <TableCell>{makeDatePersian(course.lastUpdate)}</TableCell>
-                  <TableCell>
-                    <div className="flex space-x-2 space-x-reverse">
-                      <Link
-                        to={`/courses/${course.courseId}`}
-                        className="text-gray-600 hover:text-gray-900"
-                      >
-                        <Eye className="h-5 w-5" />
-                      </Link>
-                      <button
-                        className="text-red-500 hover:text-red-700"
-                        onClick={() => handleDeleteFav(course?.favoriteId	)}
-                      >
-                        {course.isFavorite ? (
-                          <Heart className="h-5 w-5 fill-current" />
-                        ) : (
-                          <HeartOff className="h-5 w-5" />
-                        )}
-                      </button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
+              {favoriteCourses.map((course) => {
+                console.log("Course:", course); // ← لاگ هر course هنگام رندر
+                return (
+                  <TableRow key={course.courseId}>
+                    <TableCell>{course.courseTitle}</TableCell>
+                    <TableCell>{course.teacheName}</TableCell>
+                    <TableCell>{course.levelName}</TableCell>
+                    <TableCell>{makeDatePersian(course.lastUpdate)}</TableCell>
+                    <TableCell>
+                      <div className="flex space-x-2 space-x-reverse">
+                        <Link
+                          to={`/courses/${course.courseId}`}
+                          className="text-gray-600 hover:text-gray-900"
+                        >
+                          <Eye className="h-5 w-5" />
+                        </Link>
+                        <button
+                          className="text-red-500 hover:text-red-700"
+                          onClick={() => handleDeleteFav(course?.favoriteId)}
+                        >
+                          {course.isFavorite ? (
+                            <Heart className="h-5 w-5 fill-current" />
+                          ) : (
+                            <HeartOff className="h-5 w-5" />
+                          )}
+                        </button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </div>

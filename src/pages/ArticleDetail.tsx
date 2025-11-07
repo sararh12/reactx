@@ -339,9 +339,6 @@ const ArticleDetail: React.FC = () => {
                         />
                       )}
                     </svg>
-                    {/* {articleData?.detailsNewsDto.isCurrentUserFavorite
-                      ? "ذخیره شده"
-                      : "ذخیره"} */}
                   </Button>
                 </div>
               </div>

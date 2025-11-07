@@ -3,18 +3,6 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import CourseCard from './CourseCard';
 
-// interface Course {
-//   id: string;
-//   title: string;
-//   instructor: string;
-//   rating: number;
-//   students: number;
-//   price: number;
-//   discountPrice?: number;
-//   image: string;
-
-
-// }
 
 const CourseSection: React.FC<{fetchedData:any}> = ({fetchedData})=> {
 
@@ -31,7 +19,7 @@ const CourseSection: React.FC<{fetchedData:any}> = ({fetchedData})=> {
       currentRegistrants: course.currentRegistrants,
       cost: course.cost,
       discountPrice: course.discountPrice,
-      image: course.image || '', // اگر ممکنه مقدار null باشه
+      image: course.image || '', 
     }} />
   ));
    

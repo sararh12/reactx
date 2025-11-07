@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -74,6 +73,9 @@ const CoursesPage: React.FC = () => {
     cost: [],
     priceRange: 3000000,
   });
+
+  // NEW: view mode state (grid | list)
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   const toggleFilterMenu = () => {
     setIsFilterOpen((prev) => !prev);
@@ -616,11 +618,20 @@ const CoursesPage: React.FC = () => {
                       </svg>
                     </button>
 
+                    {/* View toggle buttons wired to state */}
                     <div className="flex">
-                      <button className="p-1 bg-white border border-gray-300 rounded-r">
+                      <button
+                        onClick={() => setViewMode("list")}
+                        className={`p-2 border border-gray-300 rounded-r transition-colors flex items-center justify-center ${
+                          viewMode === "list"
+                            ? "bg-luko-teal text-white"
+                            : "bg-white text-gray-400 hover:bg-gray-50"
+                        }`}
+                        aria-label="نمایش لیست"
+                      >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5 text-gray-400"
+                          className="h-5 w-5"
                           fill="none"
                           viewBox="0 0 24 24"
                           stroke="currentColor"
@@ -633,10 +644,19 @@ const CoursesPage: React.FC = () => {
                           />
                         </svg>
                       </button>
-                      <button className="p-1 bg-gray-100 border border-gray-300 rounded-l">
+
+                      <button
+                        onClick={() => setViewMode("grid")}
+                        className={`p-2 border border-gray-300 rounded-l transition-colors flex items-center justify-center ${
+                          viewMode === "grid"
+                            ? "bg-luko-teal text-white"
+                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                        }`}
+                        aria-label="نمایش گرید"
+                      >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5 text-gray-600"
+                          className="h-5 w-5"
                           fill="none"
                           viewBox="0 0 24 24"
                           stroke="currentColor"
@@ -657,15 +677,66 @@ const CoursesPage: React.FC = () => {
                   </div>
                 </div>
 
+                {/* Conditional rendering based on viewMode */}
                 {courses.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {courses.map((courseData) => (
-                      <CourseCard
-                        key={courseData.courseId}
-                        course={courseData}
-                      />
-                    ))}
-                  </div>
+                  viewMode === "grid" ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {courses.map((courseData) => (
+                        <CourseCard
+                          key={courseData.courseId}
+                          course={courseData}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="flex flex-col space-y-4">
+                      {courses.map((courseData) => (
+                        <div
+                          key={courseData.courseId}
+                          className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm"
+                        >
+                          {/* Simple list layout: thumbnail + details */}
+                          <div className="flex items-center gap-4">
+                            <img
+                              src={
+                                courseData.tumbImageAddress ||
+                                "/lovable-uploads/course.png"
+                              }
+                              alt={courseData.title}
+                              className="w-28 h-20 rounded-md object-cover flex-shrink-0"
+                            />
+
+                            <div className="flex-1">
+                              <h3 className="text-lg font-semibold text-gray-800">
+                                {courseData.title}
+                              </h3>
+                              <p className="text-sm text-gray-500 mt-1 line-clamp-2">
+                                {courseData.miniDescribe || courseData.describe}
+                              </p>
+
+                              <div className="mt-3 flex items-center justify-between">
+                                <div className="text-xs text-gray-600">
+                                  {courseData.teacherName}
+                                </div>
+                                <div className="text-sm text-gray-700 font-medium">
+                                  {formatPrice(courseData.cost || 0)} تومان
+                                </div>
+                              </div>
+                            </div>
+
+                            <div>
+                              <a
+                                href={`/courses/${courseData.courseId}`}
+                                className="inline-block px-3 py-2 bg-luko-teal text-white rounded-md hover:opacity-90"
+                              >
+                                مشاهده
+                              </a>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )
                 ) : (
                   <div className="text-center py-12">
                     <h3 className="text-xl font-bold text-gray-700 mb-2">
@@ -685,7 +756,7 @@ const CoursesPage: React.FC = () => {
                 )}
 
                 {totalCount > coursesPerPage && (
-                  <div className="flex justify-center mt-8">
+                  <div className="flex justify-center mt-8 items-center gap-4">
                     <button
                       onClick={() => paginate(currentPage - 1)}
                       disabled={currentPage === 1}

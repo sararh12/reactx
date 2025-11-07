@@ -79,14 +79,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                 <br />
                 تخفیف
               </div>
-              {/* <div className="absolute -z-10 top-6 right-6 w-full h-full rounded-lg bg-luko-teal opacity-20"></div> */}
-
-              {/* Floating elements */}
-              {/* <div className="absolute -top-10 -left-10 w-16 h-16 bg-luko-yellow rounded-full opacity-60"></div>
-              <div className="absolute bottom-20 -left-8 w-12 h-12 bg-luko-teal rounded-full opacity-60"></div>
-              <div className="absolute -bottom-6 right-20 w-10 h-10 bg-luko-orange rounded-full opacity-60"></div> */}
-
-              {/* Curved line */}
+              
               <svg
                 className="absolute top-0 left-0 w-full h-full -z-20"
                 viewBox="0 0 200 200"

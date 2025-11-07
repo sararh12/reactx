@@ -34,32 +34,38 @@ const CourseCard: React.FC<CourseCardProps> = ({course}) => {
     image,
   } = course;
 
-  const renderStars = () => {
-    const stars = [];
-    const fullStars = Math.floor(courseRate);
-    const hasHalfStar = courseRate % 1 >= 0.5;
+const renderStars = () => {
+  const stars = [];
+  const fullStars = Math.floor(courseRate.avg);
+  const hasHalfStar = courseRate.avg % 1 >= 0.5;
 
-    for (let i = 0; i < fullStars; i++) {
-      stars.push(
-        <span key={`star-${i}`} className="text-luko-yellow">★</span>
-      );
-    }
+  for (let i = 0; i < fullStars; i++) {
+    stars.push(
+      <span key={`star-${i}`} className="text-luko-yellow">
+        ★
+      </span>
+    );
+  }
 
-    if (hasHalfStar) {
-      stars.push(
-        <span key="half-star" className="text-luko-yellow">★</span>
-      );
-    }
+  if (hasHalfStar) {
+    stars.push(
+      <span key="half-star" className="text-luko-yellow">
+        ★
+      </span>
+    );
+  }
 
-    const emptyStars = 5 - stars.length;
-    for (let i = 0; i < emptyStars; i++) {
-      stars.push(
-        <span key={`empty-star-${i}`} className="text-gray-300">★</span>
-      );
-    }
+  const emptyStars = 5 - stars.length;
+  for (let i = 0; i < emptyStars; i++) {
+    stars.push(
+      <span key={`empty-star-${i}`} className="text-gray-300">
+        ★
+      </span>
+    );
+  }
 
-    return stars;
-  };
+  return stars;
+};
 
   return (
     <div className="course-card bg-white rounded-lg overflow-hidden shadow-md rtl">
@@ -71,11 +77,7 @@ const CourseCard: React.FC<CourseCardProps> = ({course}) => {
               alt={title}
               className="w-full h-48 object-cover"
             />
-            {/* <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full w-16 h-16 m-auto">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
-              </svg>
-            </div> */}
+
           </div>
         </Link>
       </div>
@@ -102,7 +104,9 @@ const CourseCard: React.FC<CourseCardProps> = ({course}) => {
         </div>
         <div className="flex items-center mb-2">
           <div className="flex text-lg">{renderStars()}</div>
-          <span className="text-sm text-gray-500 mr-1">({courseRate})</span>
+          <span className="text-sm text-gray-500 mr-1">
+            ({courseRate.avg} از {courseRate.count} رأی)
+          </span>
         </div>
         <div className="flex items-center text-sm text-gray-600 mb-4">
           <svg

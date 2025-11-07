@@ -1,5 +1,4 @@
 import axios, { AxiosError, AxiosInstance, AxiosResponse } from "axios";
-
 import { toast } from "sonner";
 import { getItem, removeItem } from "../common/storage.service";
 
@@ -14,12 +13,16 @@ const instance: AxiosInstance = axios.create({
   baseURL,
 });
 
-const onSuccess = (response: AxiosResponse) => {
-  return response;
-};
+const onSuccess = (response: AxiosResponse) => response;
 
 const onError = (err: AxiosError<AxiosErrorMessage>) => {
-  if (err.response?.data.ErrorMessage) {
+  const status = err.response?.status; // اصلاح: وضعیت HTTP واقعی
+
+  if (status === 401) {
+    removeItem("token");
+    window.location.pathname = "/auth/login";
+    toast.error("برای ادامه باید وارد شوید.");
+  } else if (err.response?.data?.ErrorMessage) {
     err.response.data.ErrorMessage.forEach((errorMessage) => {
       toast.error(errorMessage);
     });
@@ -27,21 +30,24 @@ const onError = (err: AxiosError<AxiosErrorMessage>) => {
     toast.error("مشکل غیر منتظره ای رخ داد !");
   }
 
-  if (err.response?.data.status === 401) {
-    removeItem("token");
-
-    window.location.pathname = "/auth/login";
-  }
-
-  Promise.reject(err);
+  return Promise.reject(err); // حتما return
 };
 
+// اصلاح request interceptor
 instance.interceptors.request.use((opt) => {
   const token = getItem("token");
-
-  if (token && token !== null) opt.headers.Authorization = "Bearer " + token;
+  if (token) {
+    if (!opt.headers) opt.headers = {};
+    opt.headers.Authorization = "Bearer " + token;
+  } else {
+    // اگر token نیست، Authorization ارسال نشود
+    if (opt.headers && "Authorization" in opt.headers) {
+      delete opt.headers.Authorization;
+    }
+  }
   return opt;
 });
+
 instance.interceptors.response.use(onSuccess, onError);
 
 export default instance;
