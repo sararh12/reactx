@@ -19,9 +19,10 @@ const Navbar: React.FC = () => {
   const notificationCount = 3;
   const cartCount = 2;
 
+   const isLoggedIn = true;
+
   const menuItems = [
     { to: "/courses", label: "دوره ها" },
-    { to: "/panel/dashboard", label: "صفحه داشبورد" },
     { to: "/blog", label: "اخبار و مقالات" },
     { to: "/instructors", label: "اساتید" },
     { to: "/contact", label: "تماس با ما" },
@@ -75,11 +76,10 @@ const Navbar: React.FC = () => {
             </Button>
           </NavLink>
 
-
-          <NavLink to="/auth/login">
+          <NavLink to={isLoggedIn ? "/panel/dashboard" : "/auth/login"}>
             <Button className="bg-luko-teal hover:bg-luko-teal/90 text-white">
               <User className="h-4 w-4 mr-2 ml-2" />
-              حساب کاربری
+              {isLoggedIn ? "داشبورد" : "حساب کاربری"}
             </Button>
           </NavLink>
         </div>
