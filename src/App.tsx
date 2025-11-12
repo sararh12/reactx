@@ -20,6 +20,7 @@ import DashboardSecurity from "./pages/dashboard/DashboardSecurity";
 import DashboardFavorites from "./pages/dashboard/DashboardFavorites";
 import DashboardFavoriteNews from "./pages/dashboard/DashboardFavoriteNews";
 import PanelLayout from "./components/layout/dashboard";
+import DashboardLogout from "./pages/dashboard/DashboardLogout";
 
 const queryClient = new QueryClient();
 
@@ -41,14 +42,9 @@ const App = () => (
             <Route path="reserved" element={<DashboardReserved />} />
             <Route path="comments" element={<DashboardComments />} />
             <Route path="security" element={<DashboardSecurity />} />
-            <Route
-              path="favorites"
-              element={<DashboardFavorites />}
-            />
-             <Route
-              path="favoriteNews"
-              element={<DashboardFavoriteNews />}
-            />
+            <Route path="/panel/logout" element={<DashboardLogout />} />
+            <Route path="favorites" element={<DashboardFavorites />} />
+            <Route path="favoriteNews" element={<DashboardFavoriteNews />} />
             <Route path="profile" element={<UserProfile />} />
           </Route>
 
